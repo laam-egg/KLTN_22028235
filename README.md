@@ -88,7 +88,7 @@ then check that OpenMP is installed, with:
 
 ```sh
 # Expected output: 0
-echo 'int main(){}' > test.cpp && clang++ -fopenmp test.cpp -o test -lomp && rm test.cpp && echo $?
+echo 'int main(){}' > test.cpp && clang++ -fopenmp test.cpp -o test -lomp && rm -f test.cpp && rm -f test && echo $?
 ```
 
 Meanwhile, build the (static) LightGBM C library:
