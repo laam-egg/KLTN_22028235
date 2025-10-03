@@ -19,4 +19,6 @@ list(
 
 add_library(efe_core ${SRC_FILES})
 
+target_include_directories(efe_core PUBLIC include)
+
 target_link_libraries(efe_core PUBLIC efe_common efe_pefile)

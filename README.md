@@ -49,8 +49,10 @@ Then, build the (static) LightGBM C library:
 
 ```powershell
 cd <project_root>\..
-git clone --recursive https://github.com/microsoft/LightGBM
+git clone https://github.com/microsoft/LightGBM
 cd LightGBM
+git checkout 047e7d5a2a227273608efa142bd3a7ddbd71ff5c
+git submodule update --init --recursive
 
 mkdir build
 cd build
@@ -95,11 +97,13 @@ Meanwhile, build the (static) LightGBM C library:
 
 ```sh
 cd <project_root>/..
-git clone --recursive https://github.com/microsoft/LightGBM
+git clone https://github.com/microsoft/LightGBM
 cd LightGBM
+git checkout 047e7d5a2a227273608efa142bd3a7ddbd71ff5c
+git submodule update --init --recursive
 
 mkdir build && cd build
-cmake -DBUILD_STATIC_LIB=ON ..
+cmake .. -DBUILD_STATIC_LIB=ON -DCMAKE_BUILD_TYPE=Release
 make -j$(nproc)
 ```
 
