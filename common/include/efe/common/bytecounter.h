@@ -23,6 +23,15 @@ public:
     inline constexpr size_t getTotalNumBytes() const { return totalNumBytes; }
 
     inline constexpr size_t const* getByteCountsArray() const { return byteCounts; }
+
+    /**
+     * Only use this after finalize(). Use at your own risk.
+     * If you update the resulting array, subsequent calls
+     * to getTotalNumBytes() or this method could be
+     * surprising - since the underlying buffer has been
+     * modified by you.
+     */
+    inline constexpr size_t* unsafe_getModifiableCountsArray() { return byteCounts; }
 };
 
 #endif // BYTECOUNTER_INCLUDED

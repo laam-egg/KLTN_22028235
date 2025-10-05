@@ -17,6 +17,8 @@ list(
                 src/f_general_file_info.cpp
     include/efe/core/f_byte_entropy_histogram.h
                 src/f_byte_entropy_histogram.cpp
+    include/efe/core/f_string_extractor.h
+                src/f_string_extractor.cpp
 )
 
 add_library(efe_core ${SRC_FILES})
