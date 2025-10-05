@@ -9,6 +9,7 @@ list(
     APPEND SRC_FILES
     include/efe/common.h
             src/common.cpp
+    include/efe/common/nop.h
     include/efe/common/logging.h
             src/logging.cpp
     include/efe/common/meth.h

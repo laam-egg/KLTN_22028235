@@ -17,7 +17,7 @@ add_library(efe_pefile ${SRC_FILES})
 
 target_include_directories(efe_pefile PUBLIC include)
 
-target_link_libraries(efe_pefile PUBLIC caching)
+target_link_libraries(efe_pefile PUBLIC efe_common caching)
 
 include(FetchContent)
 

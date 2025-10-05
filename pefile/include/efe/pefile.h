@@ -12,8 +12,9 @@ private:
     bool m_isPEFile;
 
 public:
-    PEFile(std::string filePath);
-    inline constexpr bool isPEFile() const { return m_isPEFile; }
+    PEFile(uint8_t const* const buf, size_t bufSize);
+    bool isPEFile() const;
+    uint64_t entrypointRVA() const;
 };
 
 #endif // EFE_PEFILE_INCLUDED

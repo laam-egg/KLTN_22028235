@@ -1,13 +1,11 @@
 #ifndef LOGGING_INCLUDED
 #define LOGGING_INCLUDED
 
+#include "efe/common/nop.h"
 #include <cstdio>
 #include <cstdlib>
-
 #include <cstring>
 #define __FILENAME__ (__FILE__ + SOURCE_PATH_SIZE)
-
-inline constexpr void nop() {}
 
 #define LOG_PREFIX(type) fprintf(stderr, "--- At file %s | line %d | " type ":\n", __FILENAME__, __LINE__)
 
