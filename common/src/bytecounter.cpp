@@ -10,7 +10,7 @@ void ByteCounter::reset() {
 
 void ByteCounter::start() {}
 
-void ByteCounter::reduce(char const* buf, size_t bufSize) {
+void ByteCounter::reduce(uint8_t const* buf, size_t bufSize) {
     for (size_t i = 0; i < bufSize; ++i) {
         ++byteCounts[buf[i]];
     }

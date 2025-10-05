@@ -2,6 +2,7 @@
 #define BlockStream_INCLUDED
 
 #include <cstddef>
+#include <cstdint>
 
 class BlockStream {
 public:
@@ -13,14 +14,14 @@ public:
 
     void stopReading();
 
-    size_t readNext(char* buf);
+    size_t readNext(uint8_t* outputBuf);
 
     size_t getOffset() const;
 
 protected:
     virtual bool doStartReading() = 0;
     virtual void doStopReading() = 0;
-    virtual size_t doReadNext(char* buf) = 0;
+    virtual size_t doReadNext(uint8_t* outputBuf) = 0;
 
 private:
     size_t m_blockSize = 0;

@@ -18,7 +18,7 @@ public:
 
     virtual void start(feature_t* output, PEFile const& peFile) = 0;
 
-    virtual bool reduce(feature_t* output, PEFile const& peFile, size_t bufOffset, char const* buf, size_t bufSize) = 0;
+    virtual void reduce(feature_t* output, PEFile const& peFile, size_t bufOffset, uint8_t const* buf, size_t bufSize) = 0;
 
     virtual void finalize(feature_t* output, PEFile const& peFile) = 0;
 };

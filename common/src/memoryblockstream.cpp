@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <cstring>
 
-void MemoryBlockStream::setup(char const* buf, size_t bufSize) {
+void MemoryBlockStream::setup(uint8_t const* buf, size_t bufSize) {
     m_buf = buf;
     m_bufSize = bufSize;
 }
@@ -19,7 +19,7 @@ void MemoryBlockStream::doStopReading() {
     m_bufSize = 0;
 }
 
-size_t MemoryBlockStream::doReadNext(char* buf) {
+size_t MemoryBlockStream::doReadNext(uint8_t* buf) {
     size_t blockSize = getBlockSize();
     size_t offset = getOffset();
     size_t numBytesLeft = m_bufSize - offset;

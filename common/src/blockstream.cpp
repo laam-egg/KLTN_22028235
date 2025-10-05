@@ -26,12 +26,12 @@ void BlockStream::stopReading() {
     doStopReading();
 }
 
-size_t BlockStream::readNext(char* buf) {
+size_t BlockStream::readNext(uint8_t* outputBuf) {
     if (!m_started || m_finished) {
         return 0;
     }
 
-    size_t numBytesRead = doReadNext(buf);
+    size_t numBytesRead = doReadNext(outputBuf);
 
     if (numBytesRead == 0) {
         m_finished = true;

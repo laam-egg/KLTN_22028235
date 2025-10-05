@@ -9,6 +9,10 @@ list(
     APPEND SRC_FILES
     include/efe/common.h
             src/common.cpp
+    include/efe/common/logging.h
+            src/logging.cpp
+    include/efe/common/meth.h
+            src/meth.cpp
     include/efe/common/blockstream.h
                     src/blockstream.cpp
     include/efe/common/memoryblockstream.h
@@ -17,6 +21,10 @@ list(
                     src/bytecounter.cpp
     include/efe/common/bytecatcher.h
                     src/bytecatcher.cpp
+    include/efe/common/slidingbytewindow.h
+                    src/slidingbytewindow.cpp
+    include/efe/common/shannonentropycalculator.h
+                    src/shannonentropycalculator.cpp
     include/efe/common/pefile.h
                     src/pefile.cpp
 )

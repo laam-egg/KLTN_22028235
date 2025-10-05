@@ -2,6 +2,7 @@
 #define BYTECOUNTER_INCLUDED
 
 #include <cstddef>
+#include <cstdint>
 
 class ByteCounter {
 private:
@@ -15,7 +16,7 @@ public:
 
     void start();
 
-    void reduce(char const* buf, size_t bufSize);
+    void reduce(uint8_t const* buf, size_t bufSize);
 
     void finalize();
 

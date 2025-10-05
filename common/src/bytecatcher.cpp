@@ -24,7 +24,7 @@ void ByteCatcher::start() {
     // minOffsetToLookFor = minKey;
 }
 
-void ByteCatcher::reduce(size_t bufOffset, char const* buf, size_t bufSize) {
+void ByteCatcher::reduce(size_t bufOffset, uint8_t const* buf, size_t bufSize) {
     if (bufOffset > maxOffsetToLookFor) {
         return;
     }

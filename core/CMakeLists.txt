@@ -15,6 +15,8 @@ list(
                 src/f_base.cpp
     include/efe/core/f_general_file_info.h
                 src/f_general_file_info.cpp
+    include/efe/core/f_byte_entropy_histogram.h
+                src/f_byte_entropy_histogram.cpp
 )
 
 add_library(efe_core ${SRC_FILES})
