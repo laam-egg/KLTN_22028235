@@ -13,7 +13,7 @@ bool BlockStream::startReading() {
         return false;
     }
 
-    m_offset = 0;
+    m_offset = m_nextOffset = 0;
     m_finished = false;
     m_started = true;
     return doStartReading();
@@ -24,6 +24,7 @@ void BlockStream::stopReading() {
         return;
     }
     doStopReading();
+    m_finished = true;
 }
 
 size_t BlockStream::readNext(uint8_t* outputBuf) {
@@ -31,6 +32,7 @@ size_t BlockStream::readNext(uint8_t* outputBuf) {
         return 0;
     }
 
+    m_offset = m_nextOffset;
     size_t numBytesRead = doReadNext(outputBuf);
 
     if (numBytesRead == 0) {
@@ -38,7 +40,7 @@ size_t BlockStream::readNext(uint8_t* outputBuf) {
         return 0;
     }
 
-    m_offset += numBytesRead;
+    m_nextOffset = m_offset + numBytesRead;
     return numBytesRead;
 }
 

@@ -10,4 +10,6 @@ std::vector<char const*> SectionCharacteristic::getNamesByValue(characteristic_t
 
     #include "efe/pefile/section_characteristics_declarations.h"
     #undef ADD
+
+    return names;
 }

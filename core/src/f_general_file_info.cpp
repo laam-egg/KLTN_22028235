@@ -1,6 +1,6 @@
 #include "efe/core/f_general_file_info.h"
 
-#define NUM_FIRST_BYTES_TO_TAKE 3
+#define NUM_FIRST_BYTES_TO_TAKE 4
 
 char const* GeneralFileInfo::getName() const {
     return "general,histogram";
@@ -10,10 +10,9 @@ void GeneralFileInfo::reset(feature_t* output, PEFile const& peFile) {
     byteCounter.reset();
 
     byteAtOffsetCatcher.reset();
-    byteAtOffsetCatcher.wantByteAtOffset(0);
-    byteAtOffsetCatcher.wantByteAtOffset(1);
-    byteAtOffsetCatcher.wantByteAtOffset(2);
-    byteAtOffsetCatcher.wantByteAtOffset(3);
+    for (size_t i = 0; i < NUM_FIRST_BYTES_TO_TAKE; ++i) {
+        byteAtOffsetCatcher.wantByteAtOffset(i);
+    }
 }
 
 void GeneralFileInfo::start(feature_t* output, PEFile const& peFile) {

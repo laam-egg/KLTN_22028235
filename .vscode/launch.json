@@ -1,0 +1,38 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "GDB my_program withArgs",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceRoot}/build/main/my_program",
+            "args": [
+                "/home/lam/Desktop/Viettel/EMBER2024/models/EMBER2024_all.model",
+                // "/home/lam/Desktop/Viettel/MORE_DATA/BENIGN-WIN/Collected/5e37bc3ef0d311acb3140f343ca79b321fdd0bf80dd3ef391f3410f7aaddbd66.exe"
+                // "/home/lam/Desktop/Viettel/MORE_DATA/BENIGN-WIN/Collected/_installers/827f0700a152386e8b4bc8db0882609276fbcfb51f5cf7eff06d20144c835bb4.exe"
+                // "/home/lam/Desktop/Viettel/LESS_DATA/VirusShare_53cfd02336c3a3176a5cc684fbac9b50.exe"
+                "home/lam/Desktop/Viettel/MORE_DATA/VirusSign/unzipped/samples/Trojan.Autorun.ATA_virussign.com_984d76fa534016d9e8a23f575d56e7c2.vir"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceRoot}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+    ]
+}

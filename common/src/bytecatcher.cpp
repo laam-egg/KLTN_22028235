@@ -1,5 +1,4 @@
 #include "efe/common/bytecatcher.h"
-#include <limits>
 
 ByteCatcher::ByteCatcher() {}
 
@@ -12,20 +11,17 @@ void ByteCatcher::wantByteAtOffset(size_t offset) {
 }
 
 void ByteCatcher::start() {
-    // size_t minKey = std::numeric_limits<size_t>::max();
-    size_t maxKey = std::numeric_limits<size_t>::min();
+    size_t maxKey = 0;
 
     for (auto const& [key, value] : offsetToByteMap) {
-        // if (key < minKey) minKey = key;
         if (key > maxKey) maxKey = key;
     }
 
     maxOffsetToLookFor = maxKey;
-    // minOffsetToLookFor = minKey;
 }
 
 void ByteCatcher::reduce(size_t bufOffset, uint8_t const* buf, size_t bufSize) {
-    if (bufOffset > maxOffsetToLookFor) {
+    if (offsetToByteMap.empty() || bufOffset > maxOffsetToLookFor) {
         return;
     }
 

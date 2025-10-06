@@ -46,6 +46,9 @@ list(
                 src/f_authenticode_signature.cpp
     include/efe/core/f_pe_format_warnings.h
                 src/f_pe_format_warnings.cpp
+
+    include/efe/core/all_feature_types.h
+                src/all_feature_types.cpp
 )
 
 add_library(efe_core ${SRC_FILES})

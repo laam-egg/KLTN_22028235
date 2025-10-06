@@ -13,7 +13,7 @@ entropy_t calculateShannonEntropy(size_t sumTotalCounts, size_t const* const cou
         auto const x = counts[i];
         if (x == 0) continue; // skip zero counts
         entropy_t p_x = x * invTotal;
-        entropy -= x * std::log2(p_x);
+        entropy -= p_x * std::log2(p_x);
     }
 
     return entropy;

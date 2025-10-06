@@ -39,3 +39,21 @@ if(OpenMP_CXX_FOUND)
 endif()
 
 target_link_libraries(my_program PUBLIC ${LINKED_LIBRARIES})
+
+target_link_libraries(my_program PUBLIC efe_core)
+
+
+# mio - cross-platform memory-mapping library
+# https://github.com/vimpunk/mio
+
+set(MIO_GIT_URL "https://github.com/vimpunk/mio.git")
+set(MIO_VERSION "8b6b7d878c89e81614d05edca7936de41ccdd2da")
+
+FetchContent_Declare(mio
+    GIT_REPOSITORY  "${MIO_GIT_URL}"
+    GIT_TAG         "${MIO_VERSION}"
+)
+
+FetchContent_MakeAvailable(mio)
+
+target_link_libraries(my_program PUBLIC mio::mio)

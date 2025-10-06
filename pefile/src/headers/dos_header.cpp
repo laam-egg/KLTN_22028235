@@ -12,7 +12,7 @@ DOSHeader DOSHeader::fromPEFile(uint8_t const* fileContent, size_t const fileSiz
         NOT_A_PE_FILE("Unable to read the DOS Header, possibly a truncated file.")
     }
 
-    std::memcpy(&dh.fields, fileContent, fileSize);
+    std::memcpy(&dh.fields, fileContent, DOS_HEADER_SIZE);
 
     if (dh.fields.e_magic == IMAGE_DOSZM_SIGNATURE) {
         NOT_A_PE_FILE("Probably a ZM Executable (not a PE file).")

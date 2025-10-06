@@ -26,6 +26,7 @@ protected:
 private:
     size_t m_blockSize = 0;
     size_t m_offset = 0;
+    size_t m_nextOffset = 0;
     bool m_started = false;
     bool m_finished = false;
 };
