@@ -22,8 +22,8 @@ struct PESection {
 
     bool hasCharacteristic(LIEF::PE::Section::CHARACTERISTICS chr) const;
     bool hasCharacteristic(characteristic_t chr) const;
-};
 
-std::vector<PESection> getSectionsFromPEFile(LIEF::PE::Binary const& pe, size_t const fileSize);
+    static std::vector<PESection> listFromPEFile(LIEF::PE::Binary const& pe, size_t const fileSize);
+};
 
 #endif // PEFILE_SECTION_INCLUDED

@@ -16,7 +16,7 @@ bool PESection::hasCharacteristic(characteristic_t chr) const {
     return (characteristics & chr) != 0;
 }
 
-std::vector<PESection> getSectionsFromPEFile(LIEF::PE::Binary const& pe, size_t const fileSize) {
+std::vector<PESection> PESection::listFromPEFile(LIEF::PE::Binary const& pe, size_t const fileSize) {
     std::vector<PESection> out;
     for (auto const& s : pe.sections()) {
         PESection ss;

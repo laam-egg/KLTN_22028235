@@ -11,7 +11,8 @@ PEFile::PEFile(uint8_t const* const buf, size_t bufSize) {
     }
 
     if (pe != nullptr) {
-        sections = getSectionsFromPEFile(*pe, fileSize);
+        sections = PESection::listFromPEFile(*pe, fileSize);
+        imports = ImportLibrary::listFromPEFile(*pe, fileSize);
     }
 }
 
@@ -46,4 +47,14 @@ void PEFile::getOverlayBytes(uint8_t const** pBuf, size_t* pBufSize) const {
 size_t PEFile::getOverlayOffset() const {
     PE_DEFAULT(0);
     return pe->overlay_offset();
+}
+
+bool PEFile::hasImportDirectory() const {
+    PE_DEFAULT(false);
+    return !imports.empty();
+}
+
+std::vector<ImportLibrary> const& PEFile::getImportLibraries() const {
+    PE_DEFAULT(imports);
+    return imports;
 }

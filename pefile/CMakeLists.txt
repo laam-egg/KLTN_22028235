@@ -16,6 +16,8 @@ list(
                     src/section_characteristics.cpp
     include/efe/pefile/section.h
                     src/section.cpp
+    include/efe/pefile/import_library.h
+                    src/import_library.cpp
 )
 
 add_library(efe_pefile ${SRC_FILES})

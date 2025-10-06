@@ -21,6 +21,8 @@ list(
                 src/f_string_extractor.cpp
     include/efe/core/f_section_info.h
                 src/f_section_info.cpp
+    include/efe/core/f_imports_info.h
+                src/f_imports_info.cpp
 )
 
 add_library(efe_core ${SRC_FILES})
