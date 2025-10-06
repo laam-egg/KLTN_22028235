@@ -18,6 +18,8 @@ PEFile::PEFile(uint8_t const* const fileContent, size_t bufSize) {
         dosHeader = DOSHeader::fromPEFile(fileContent, fileSize);
         coffHeader = CoffHeader::fromPEFile(*pe, fileSize);
         optionalHeader = OptionalHeader::fromPEFile(*pe, fileSize);
+
+        dataDirectories = DataDirectory::listFromPEFile(*pe, fileSize);
     }
 }
 
@@ -72,4 +74,22 @@ bool PEFile::hasExportDirectory() const {
 std::vector<ExportFunction> const& PEFile::getExportedFunctions() const {
     PE_DEFAULT(exportedFunctions);
     return exportedFunctions;
+}
+
+bool PEFile::hasRelocs() const {
+    PE_DEFAULT(false);
+    return pe->has_relocations();
+}
+
+bool PEFile::hasDynamicRelocs() const {
+    PE_DEFAULT(false);
+    if (!pe->has_configuration()) {
+        return false;
+    }
+    LIEF::PE::LoadConfiguration const* lc = pe->load_configuration();
+    if (lc == NULL) {
+        return false;
+    }
+
+    return !lc->dynamic_relocations().empty();
 }

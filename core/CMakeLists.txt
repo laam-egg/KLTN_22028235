@@ -38,6 +38,8 @@ list(
                 src/f_header_file_info/dos_header_encoding.cpp
     include/efe/core/f_header_file_info.h
                 src/f_header_file_info.cpp
+    include/efe/core/f_data_directories.h
+                src/f_data_directories.cpp
 )
 
 add_library(efe_core ${SRC_FILES})

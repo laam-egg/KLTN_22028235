@@ -46,6 +46,9 @@ list(
                     src/headers/optional_header.cpp
     include/efe/pefile/headers/dos_header.h
                     src/headers/dos_header.cpp
+
+    include/efe/pefile/data_directory.h
+                    src/data_directory.cpp
 )
 
 add_library(efe_pefile ${SRC_FILES})

@@ -11,6 +11,7 @@
 #include "efe/pefile/headers/dos_header.h"
 #include "efe/pefile/headers/coff_header.h"
 #include "efe/pefile/headers/optional_header.h"
+#include "efe/pefile/data_directory.h"
 
 class PEFile {
 private:
@@ -24,6 +25,8 @@ private:
     DOSHeader dosHeader;
     CoffHeader coffHeader;
     OptionalHeader optionalHeader;
+
+    std::vector<DataDirectory> dataDirectories;
 
 public:
     PEFile(uint8_t const* const buf, size_t bufSize);
@@ -43,6 +46,10 @@ public:
     inline constexpr DOSHeader const& getDOSHeader() const { return dosHeader; }
     inline constexpr CoffHeader const& getCOFFHeader() const { return coffHeader; }
     inline constexpr OptionalHeader const& getOptionalHeader() const { return optionalHeader; }
+
+    bool hasRelocs() const;
+    bool hasDynamicRelocs() const;
+    inline constexpr std::vector<DataDirectory> const& getDataDirectories() const { return dataDirectories; }
 };
 
 #endif // EFE_PEFILE_INCLUDED
