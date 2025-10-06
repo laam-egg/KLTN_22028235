@@ -1,6 +1,6 @@
 #include "efe/core/f_general_file_info.h"
 
-size_t const GeneralFileInfo::NUM_FIRST_BYTES_TO_TAKE = 3;
+#define NUM_FIRST_BYTES_TO_TAKE 3
 
 char const* GeneralFileInfo::getName() const {
     return "general,histogram";

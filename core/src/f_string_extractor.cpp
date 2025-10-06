@@ -151,7 +151,7 @@ void StringExtractor::finalize(feature_t* output, PEFile const& peFile) {
     readableByteCounter.finalize();
     interestingStringCounter.finalize();
 
-    register size_t outputOffset = 0;
+    size_t outputOffset = 0;
 
     // :: numstrings
     output[outputOffset] = numReadableStrings;

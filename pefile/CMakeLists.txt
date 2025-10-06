@@ -11,6 +11,11 @@ list(
             src/pefile.cpp
     include/efe/pefile/common.h
                     src/common.cpp
+    include/efe/pefile/section_characteristics_declarations.h
+    include/efe/pefile/section_characteristics.h
+                    src/section_characteristics.cpp
+    include/efe/pefile/section.h
+                    src/section.cpp
 )
 
 add_library(efe_pefile ${SRC_FILES})
@@ -37,7 +42,7 @@ FetchContent_Declare(LIEF
 )
 
 # https://lief.re//doc/latest/compilation.html#cmake-options
-set(LIEF_DOC                        OFF        CACHE BOOL "" FORCE)
+set(LIEF_DOC                        OFF CACHE BOOL "" FORCE)
 set(LIEF_TESTS                      OFF CACHE BOOL "Enable tests" FORCE)
 set(LIEF_PYTHON_API                 OFF CACHE BOOL "Enable Python Bindings" FORCE)
 set(LIEF_C_API                      ON  CACHE BOOL "C API" FORCE)

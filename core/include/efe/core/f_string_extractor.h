@@ -8,7 +8,7 @@
 
 class StringExtractor final : public FeatureType {
 private:
-    static std::regex const INTERESTING_STRING_REGEXES[];
+    static std::regex const INTERESTING_STRING_REGEXES[]; // TODO: convert to pattern "static function has static const variable and returns it" so that threads don't race to initialize these regexes
     static std::regex const READABLE_STRING_REGEX;
 
     size_t NUM_INTERESTING_STRING_REGEXES;

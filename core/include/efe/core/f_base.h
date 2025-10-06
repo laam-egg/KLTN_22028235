@@ -1,9 +1,9 @@
 #ifndef FEATURE_BASE_INCLUDED
 #define FEATURE_BASE_INCLUDED
 
+#include "efe/core/common.h"
 #include "efe/pefile.h"
-
-using feature_t = float;
+#include "efe/featurehasher.h"
 
 /**
  * Base class from which each feature type may inherit

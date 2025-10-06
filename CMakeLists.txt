@@ -6,6 +6,8 @@ string(LENGTH "${CMAKE_SOURCE_DIR}/" SOURCE_PATH_SIZE)
 add_definitions("-DSOURCE_PATH_SIZE=${SOURCE_PATH_SIZE}")
 
 add_subdirectory("lklist")
+add_subdirectory("murmur3")
+add_subdirectory("featurehasher")
 add_subdirectory("caching")
 add_subdirectory("common")
 add_subdirectory("pefile")

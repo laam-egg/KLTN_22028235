@@ -17,7 +17,6 @@ class GeneralFileInfo final : public FeatureType {
 private:
     ByteCounter byteCounter;
     ByteCatcher byteAtOffsetCatcher;
-    static size_t const NUM_FIRST_BYTES_TO_TAKE;
 
 public:
     virtual char const* getName() const override;
