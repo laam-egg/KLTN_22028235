@@ -20,6 +20,11 @@ PEFile::PEFile(uint8_t const* const fileContent, size_t bufSize) {
         optionalHeader = OptionalHeader::fromPEFile(*pe, fileSize);
 
         dataDirectories = DataDirectory::listFromPEFile(*pe, fileSize);
+
+        if (pe->has_rich_header()) {
+            LIEF::PE::RichHeader const* rh = pe->rich_header();
+            richHeaderRaw = rh->raw();
+        }
     }
 }
 
@@ -29,6 +34,7 @@ bool PEFile::isPEFile() const {
 
 #define PE_DEFAULT(returnValue) if (!pe) { return (returnValue); }; nop()
 #define IF_NO_PE if (!pe)
+#define IF_NO_PE_OR(cond) if (!pe || (cond))
 
 uint64_t PEFile::getEntrypointRVA() const {
     PE_DEFAULT(0);
@@ -41,6 +47,10 @@ std::vector<PESection> const& PEFile::getSections() const {
 }
 
 void PEFile::getOverlayBytes(uint8_t const** pBuf, size_t* pBufSize) const {
+    if (!pBuf || !pBufSize) {
+        return;
+    }
+    
     IF_NO_PE {
         pBuf[0] = NULL;
         pBufSize[0] = 0;
@@ -92,4 +102,24 @@ bool PEFile::hasDynamicRelocs() const {
     }
 
     return !lc->dynamic_relocations().empty();
+}
+
+bool PEFile::hasRichHeader() const {
+    PE_DEFAULT(false);
+    return pe->has_rich_header() && richHeaderRaw.size() > 0;
+}
+
+void PEFile::getRichHeaderBytes(uint8_t const** pBuf, size_t* pBufSize) const {
+    if (!pBuf || !pBufSize) {
+        return;
+    }
+    
+    IF_NO_PE_OR(!hasRichHeader()) {
+        pBuf[0] = NULL;
+        pBufSize[0] = 0;
+        return;
+    }
+
+    pBuf[0] = richHeaderRaw.data();
+    pBufSize[0] = richHeaderRaw.size();
 }

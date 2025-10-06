@@ -40,6 +40,8 @@ list(
                 src/f_header_file_info.cpp
     include/efe/core/f_data_directories.h
                 src/f_data_directories.cpp
+    include/efe/core/f_rich_header.h
+                src/f_rich_header.cpp
 )
 
 add_library(efe_core ${SRC_FILES})

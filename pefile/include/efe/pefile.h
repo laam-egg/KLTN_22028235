@@ -28,6 +28,8 @@ private:
 
     std::vector<DataDirectory> dataDirectories;
 
+    std::vector<uint8_t> richHeaderRaw;
+
 public:
     PEFile(uint8_t const* const buf, size_t bufSize);
     bool isPEFile() const;
@@ -50,6 +52,9 @@ public:
     bool hasRelocs() const;
     bool hasDynamicRelocs() const;
     inline constexpr std::vector<DataDirectory> const& getDataDirectories() const { return dataDirectories; }
+
+    bool hasRichHeader() const;
+    void getRichHeaderBytes(uint8_t const** pBuf, size_t* pBufSize) const;
 };
 
 #endif // EFE_PEFILE_INCLUDED
