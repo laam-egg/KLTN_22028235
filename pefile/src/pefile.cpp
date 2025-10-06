@@ -13,6 +13,7 @@ PEFile::PEFile(uint8_t const* const buf, size_t bufSize) {
     if (pe != nullptr) {
         sections = PESection::listFromPEFile(*pe, fileSize);
         imports = ImportLibrary::listFromPEFile(*pe, fileSize);
+        exportedFunctions = ExportFunction::listFromPEFile(*pe, fileSize);
     }
 }
 
@@ -57,4 +58,14 @@ bool PEFile::hasImportDirectory() const {
 std::vector<ImportLibrary> const& PEFile::getImportLibraries() const {
     PE_DEFAULT(imports);
     return imports;
+}
+
+bool PEFile::hasExportDirectory() const {
+    PE_DEFAULT(false);
+    return !exportedFunctions.empty();
+}
+
+std::vector<ExportFunction> const& PEFile::getExportedFunctions() const {
+    PE_DEFAULT(exportedFunctions);
+    return exportedFunctions;
 }

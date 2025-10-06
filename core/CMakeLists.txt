@@ -23,6 +23,8 @@ list(
                 src/f_section_info.cpp
     include/efe/core/f_imports_info.h
                 src/f_imports_info.cpp
+    include/efe/core/f_exports_info.h
+                src/f_exports_info.cpp
 )
 
 add_library(efe_core ${SRC_FILES})

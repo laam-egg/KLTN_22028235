@@ -48,24 +48,23 @@ void ImportsInfo::start(feature_t* output, PEFile const& peFile) {
 
     std::vector<ImportLibrary> const& libraries = peFile.getImportLibraries();
     size_t const numLibraries = libraries.size();
-    size_t numFunctions = 0;
     std::string funcNameBuf;
     funcNameBuf.reserve(128);
-    for (ImportLibrary const& lib : peFile.getImportLibraries()) {
+    size_t numFunctions = 0;
+    for (ImportLibrary const& lib : libraries) {
         std::string const& libName = lib.dllName;
         librariesFH.reduce(libName.c_str(), 1.0);
 
         for (ImportFunction const& func : lib.functions) {
-            funcNameBuf.assign(libName);
-            funcNameBuf.append(":");
+            funcNameBuf = libName + ":";
             if (!func.name.empty()) {
-                funcNameBuf.append(func.name);
+                functionsFH.reduce(func.name.substr(0, 10000).c_str(), 1.0);
             } else {
                 funcNameBuf.append("ordinal");
                 funcNameBuf.append(std::to_string(func.ordinal));
+                functionsFH.reduce(funcNameBuf.c_str(), 1.0);
             }
 
-            functionsFH.reduce(funcNameBuf.c_str(), 1.0);
             ++numFunctions;
         }
     }

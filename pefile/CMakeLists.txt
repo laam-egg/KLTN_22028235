@@ -18,6 +18,8 @@ list(
                     src/section.cpp
     include/efe/pefile/import_library.h
                     src/import_library.cpp
+    include/efe/pefile/export_library.h
+                    src/export_library.cpp
 )
 
 add_library(efe_pefile ${SRC_FILES})

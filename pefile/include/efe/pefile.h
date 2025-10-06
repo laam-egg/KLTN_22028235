@@ -7,12 +7,16 @@
 #include <memory>
 #include "efe/pefile/section.h"
 #include "efe/pefile/import_library.h"
+#include "efe/pefile/export_library.h"
+
+
 class PEFile {
 private:
     std::unique_ptr<LIEF::PE::Binary> pe;
     size_t fileSize;
     std::vector<PESection> sections;
     std::vector<ImportLibrary> imports;
+    std::vector<ExportFunction> exportedFunctions;
     bool m_isPEFile;
 
 public:
@@ -26,6 +30,9 @@ public:
 
     bool hasImportDirectory() const;
     std::vector<ImportLibrary> const& getImportLibraries() const;
+
+    bool hasExportDirectory() const;
+    std::vector<ExportFunction> const& getExportedFunctions() const;
 };
 
 #endif // EFE_PEFILE_INCLUDED
