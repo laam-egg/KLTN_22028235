@@ -9,17 +9,43 @@ list(
     APPEND SRC_FILES
     include/efe/pefile.h
             src/pefile.cpp
+
     include/efe/pefile/common.h
                     src/common.cpp
     include/efe/pefile/section_characteristics_declarations.h
+
     include/efe/pefile/section_characteristics.h
                     src/section_characteristics.cpp
+    
+    include/efe/pefile/dll_characteristics_declarations.h
+    include/efe/pefile/dll_characteristics.h
+                    src/dll_characteristics.cpp
+    
+    include/efe/pefile/machine_types_declarations.h
+    include/efe/pefile/machine_types.h
+                    src/machine_types.cpp
+
+    include/efe/pefile/subsystem_types_declarations.h
+    include/efe/pefile/subsystem_types.h
+                    src/subsystem_types.cpp
+    
+    include/efe/pefile/coff_characteristics_declarations.h
+    include/efe/pefile/coff_characteristics.h
+                    src/coff_characteristics.cpp
+    
     include/efe/pefile/section.h
                     src/section.cpp
     include/efe/pefile/import_library.h
                     src/import_library.cpp
     include/efe/pefile/export_library.h
                     src/export_library.cpp
+
+    include/efe/pefile/headers/coff_header.h
+                    src/headers/coff_header.cpp
+    include/efe/pefile/headers/optional_header.h
+                    src/headers/optional_header.cpp
+    include/efe/pefile/headers/dos_header.h
+                    src/headers/dos_header.cpp
 )
 
 add_library(efe_pefile ${SRC_FILES})

@@ -1,0 +1,5 @@
+#include "coff_characteristics_encoding.h"
+#include "dll_characteristics_encoding.h"
+#include "dos_header_encoding.h"
+#include "machine_type_encoding.h"
+#include "subsystem_type_encoding.h"

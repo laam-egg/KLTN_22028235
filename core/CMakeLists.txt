@@ -25,6 +25,19 @@ list(
                 src/f_imports_info.cpp
     include/efe/core/f_exports_info.h
                 src/f_exports_info.cpp
+
+    include/efe/core/f_header_file_info/machine_type_encoding.h
+                src/f_header_file_info/machine_type_encoding.cpp
+    include/efe/core/f_header_file_info/subsystem_type_encoding.h
+                src/f_header_file_info/subsystem_type_encoding.cpp
+    include/efe/core/f_header_file_info/dll_characteristics_encoding.h
+                src/f_header_file_info/dll_characteristics_encoding.cpp
+    include/efe/core/f_header_file_info/coff_characteristics_encoding.h
+                src/f_header_file_info/coff_characteristics_encoding.cpp
+    include/efe/core/f_header_file_info/dos_header_encoding.h
+                src/f_header_file_info/dos_header_encoding.cpp
+    include/efe/core/f_header_file_info.h
+                src/f_header_file_info.cpp
 )
 
 add_library(efe_core ${SRC_FILES})

@@ -59,3 +59,15 @@ void ExportsInfo::start(feature_t* output, PEFile const& peFile) {
 
     output[Offset::NUM_EXPORTED_FUNCTIONS] = numExportedFunctions;
 }
+
+void ExportsInfo::reduce(feature_t* output, PEFile const& peFile, size_t bufOffset, uint8_t const* buf, size_t bufSize) {
+    // pass
+}
+
+void ExportsInfo::finalize(feature_t* output, PEFile const& peFile) {
+    // pass
+}
+
+size_t ExportsInfo::getMaxDim() const {
+    return DIM;
+}

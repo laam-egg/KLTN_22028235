@@ -8,16 +8,22 @@
 #include "efe/pefile/section.h"
 #include "efe/pefile/import_library.h"
 #include "efe/pefile/export_library.h"
-
+#include "efe/pefile/headers/dos_header.h"
+#include "efe/pefile/headers/coff_header.h"
+#include "efe/pefile/headers/optional_header.h"
 
 class PEFile {
 private:
     std::unique_ptr<LIEF::PE::Binary> pe;
     size_t fileSize;
+
     std::vector<PESection> sections;
     std::vector<ImportLibrary> imports;
     std::vector<ExportFunction> exportedFunctions;
-    bool m_isPEFile;
+
+    DOSHeader dosHeader;
+    CoffHeader coffHeader;
+    OptionalHeader optionalHeader;
 
 public:
     PEFile(uint8_t const* const buf, size_t bufSize);
@@ -33,6 +39,10 @@ public:
 
     bool hasExportDirectory() const;
     std::vector<ExportFunction> const& getExportedFunctions() const;
+
+    inline constexpr DOSHeader const& getDOSHeader() const { return dosHeader; }
+    inline constexpr CoffHeader const& getCOFFHeader() const { return coffHeader; }
+    inline constexpr OptionalHeader const& getOptionalHeader() const { return optionalHeader; }
 };
 
 #endif // EFE_PEFILE_INCLUDED

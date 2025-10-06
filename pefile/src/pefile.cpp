@@ -1,11 +1,11 @@
 #include "efe/pefile.h"
 #include "efe/common/nop.h"
 
-PEFile::PEFile(uint8_t const* const buf, size_t bufSize) {
+PEFile::PEFile(uint8_t const* const fileContent, size_t bufSize) {
     fileSize = bufSize;
     pe = nullptr;
     try {
-        pe = LIEF::PE::Parser::parse(buf, bufSize);
+        pe = LIEF::PE::Parser::parse(fileContent, bufSize);
     } catch (std::exception const& e) {
         pe = nullptr;
     }
@@ -14,6 +14,10 @@ PEFile::PEFile(uint8_t const* const buf, size_t bufSize) {
         sections = PESection::listFromPEFile(*pe, fileSize);
         imports = ImportLibrary::listFromPEFile(*pe, fileSize);
         exportedFunctions = ExportFunction::listFromPEFile(*pe, fileSize);
+
+        dosHeader = DOSHeader::fromPEFile(fileContent, fileSize);
+        coffHeader = CoffHeader::fromPEFile(*pe, fileSize);
+        optionalHeader = OptionalHeader::fromPEFile(*pe, fileSize);
     }
 }
 
