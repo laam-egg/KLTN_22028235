@@ -42,6 +42,10 @@ list(
                 src/f_data_directories.cpp
     include/efe/core/f_rich_header.h
                 src/f_rich_header.cpp
+    include/efe/core/f_authenticode_signature.h
+                src/f_authenticode_signature.cpp
+    include/efe/core/f_pe_format_warnings.h
+                src/f_pe_format_warnings.cpp
 )
 
 add_library(efe_core ${SRC_FILES})
