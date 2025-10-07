@@ -34,7 +34,7 @@ OpenMP is installed and enabled (it
 should be, by default):
 
 ```powershell
-echo "int main(){}" > test.cpp ; cl /openmp test.cpp ; .\test.exe ; echo $LastExitCode ; rm test.exe ; rm test.cpp
+echo "int main(){}" > test.cpp ; cl /openmp test.cpp ; .\test.exe ; echo $LastExitCode ; rm test.*
 ```
 
 Expected output:
@@ -60,17 +60,13 @@ cmake .. -DBUILD_STATIC_LIB=ON -A x64
 cmake --build . --config Release --target ALL_BUILD
 ```
 
-and the RE2 library:
-
-???
-
 ### Windows: Compile
 
 ```powershell
 cd <project_root>
 mkdir build
 cd build
-cmake .. -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=Release
+cmake .. -A x64 -DCMAKE_BUILD_TYPE=Release
 cmake --build . --config Release --target ALL_BUILD
 ```
 
