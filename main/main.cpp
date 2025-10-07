@@ -17,7 +17,7 @@ constexpr int getLGBMInputDataType() {
 }
 
 double scan(BoosterHandle booster, char const* peFilePath) {
-    auto absPath =std::filesystem::absolute(peFilePath);
+    auto absPath = std::filesystem::absolute(peFilePath);
     std::cerr << "Scanning: " << absPath << '\n';
 
     if (!std::filesystem::exists(peFilePath)) {

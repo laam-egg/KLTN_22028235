@@ -1,104 +1,113 @@
 #include "efe/core/f_string_extractor.h"
 #include "efe/common/logging.h"
 #include "efe/common/meth.h"
+#include <array>
 
-std::regex const StringExtractor::READABLE_STRING_REGEX = std::regex("[\\x20-\\x7f]{5,}");
+RE2 const& StringExtractor::getReadableStringRegex() {
+    static RE2 readableStringRegex{ "[\\x20-\\x7f]{5,}" };
+    return readableStringRegex;
+}
 
-// TODO: Regex matching could be faster
-// with RE2 or Hyperscan.
-std::regex const StringExtractor::INTERESTING_STRING_REGEXES[] = {
-#define IGNORECASE std::regex::icase
-#define ADD_FINAL(...) std::regex(__VA_ARGS__)
-#define ADD(...) std::regex(__VA_ARGS__),
+RE2 const* StringExtractor::getInterestingStringRegexes(size_t& count) {
+    static const RE2::Options IGNORECASE = []{
+        RE2::Options opt;
+        opt.set_case_sensitive(false);
+        return opt;
+    }();
 
-    ADD(".click", IGNORECASE)
-    ADD("/EmbeddedFile")
-    ADD("/FlateDecode")
-    ADD("/URI")
-    ADD("/bin/")
-    ADD("/dev/")
-    ADD("/proc/")
-    ADD("/tmp/")
-    ADD("/usr/")
-    ADD("<script", IGNORECASE)
-    ADD("Invoke-Command")
-    ADD("Invoke-Expression")
-    ADD("Start-process")
-    ADD("base64", IGNORECASE)
-    ADD("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/")
-    ADD("[13][a-km-zA-HJ-NP-Z1-9]{25,34}")
-    ADD("cache", IGNORECASE)
-    ADD("certificate", IGNORECASE)
-    ADD("clipboard", IGNORECASE)
-    ADD("command", IGNORECASE)
-    ADD("connect", IGNORECASE)
-    ADD("cookie", IGNORECASE)
-    ADD("create", IGNORECASE)
-    ADD("crypt")
-    ADD("debug", IGNORECASE)
-    ADD("decode", IGNORECASE)
-    ADD("delete", IGNORECASE)
-    ADD("desktop", IGNORECASE)
-    ADD("directory", IGNORECASE)
-    ADD("disk", IGNORECASE)
-    ADD("!This program ")
-    ADD("download", IGNORECASE)
-    // https://github.com/FutureComputing4AI/EMBER2024/issues/7
-    ADD("\\b(?:[0-9A-Fa-f]{2}[:-]){5}(?:[0-9A-Fa-f]{2})\\b")
-    ADD("encode", IGNORECASE)
-    ADD("enum", IGNORECASE)
-    ADD("environment", IGNORECASE)
-    ADD("exit", IGNORECASE)
-    ADD("file", IGNORECASE)
-    ADD("\\bC:/")
-    ADD("ftp:", IGNORECASE)
-    ADD("GET /", IGNORECASE)
-    ADD("hidden", IGNORECASE)
-    ADD("hostname", IGNORECASE)
-    ADD("html", IGNORECASE)
-    ADD("HTTP/", IGNORECASE)
-    ADD("http://", IGNORECASE)
-    ADD("https://", IGNORECASE)
-    ADD("install", IGNORECASE)
-    ADD("internet", IGNORECASE)
-    ADD("\\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\b")
-    ADD("\\b(?:[A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}\\b|\\b(?:[A-Fa-f0-9]{1,4}:){1,7}:\\b|\\b:[A-Fa-f0-9]{1,4}(?::[A-Fa-f0-9]{1,4}){1,6}\\b")
-    ADD("javascript", IGNORECASE)
-    ADD("keyboard", IGNORECASE)
-    ADD("\\b(?:[0-9A-Fa-f]{2}[:-]){5}(?:[0-9A-Fa-f]{2})\\b")
-    ADD("memory", IGNORECASE)
-    ADD("module", IGNORECASE)
-    ADD("mutex", IGNORECASE)
-    ADD("onclick", IGNORECASE)
-    ADD("password", IGNORECASE)
-    ADD("POST /", IGNORECASE)
-    ADD("powershell", IGNORECASE)
-    ADD("privilege", IGNORECASE)
-    ADD("process", IGNORECASE)
-    ADD("\\b(?:KHEY_|KHLM|HKCU)")
-    ADD("remote", IGNORECASE)
-    ADD("resource", IGNORECASE)
-    ADD("security", IGNORECASE)
-    ADD("service", IGNORECASE)
-    ADD("shell", IGNORECASE)
-    ADD("snapshot", IGNORECASE)
-    ADD("system", IGNORECASE)
-    ADD("thread", IGNORECASE)
-    ADD("token", IGNORECASE)
-    ADD("\\b(?:http|https|ftp):\\/\\/[a-zA-Z0-9-._~:?#[\\]@!$&'()*+,;=]+")
-    ADD("User-Agent", IGNORECASE)
-    ADD("wallet", IGNORECASE)
-    ADD_FINAL("window", IGNORECASE)
+    static std::array regexes{
+        #define ADD(...) RE2(__VA_ARGS__),
 
-#undef ADD
-#undef ADD_FINAL
-#undef IGNORECASE
-};
+        ADD(".click", IGNORECASE)
+        ADD("/EmbeddedFile")
+        ADD("/FlateDecode")
+        ADD("/URI")
+        ADD("/bin/")
+        ADD("/dev/")
+        ADD("/proc/")
+        ADD("/tmp/")
+        ADD("/usr/")
+        ADD("<script", IGNORECASE)
+        ADD("Invoke-Command")
+        ADD("Invoke-Expression")
+        ADD("Start-process")
+        ADD("base64", IGNORECASE)
+        ADD("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/")
+        ADD("[13][a-km-zA-HJ-NP-Z1-9]{25,34}")
+        ADD("cache", IGNORECASE)
+        ADD("certificate", IGNORECASE)
+        ADD("clipboard", IGNORECASE)
+        ADD("command", IGNORECASE)
+        ADD("connect", IGNORECASE)
+        ADD("cookie", IGNORECASE)
+        ADD("create", IGNORECASE)
+        ADD("crypt")
+        ADD("debug", IGNORECASE)
+        ADD("decode", IGNORECASE)
+        ADD("delete", IGNORECASE)
+        ADD("desktop", IGNORECASE)
+        ADD("directory", IGNORECASE)
+        ADD("disk", IGNORECASE)
+        ADD("!This program ")
+        ADD("download", IGNORECASE)
+        // https://github.com/FutureComputing4AI/EMBER2024/issues/7
+        ADD("\\b(?:[0-9A-Fa-f]{2}[:-]){5}(?:[0-9A-Fa-f]{2})\\b")
+        ADD("encode", IGNORECASE)
+        ADD("enum", IGNORECASE)
+        ADD("environment", IGNORECASE)
+        ADD("exit", IGNORECASE)
+        ADD("file", IGNORECASE)
+        ADD("\\bC:/")
+        ADD("ftp:", IGNORECASE)
+        ADD("GET /", IGNORECASE)
+        ADD("hidden", IGNORECASE)
+        ADD("hostname", IGNORECASE)
+        ADD("html", IGNORECASE)
+        ADD("HTTP/", IGNORECASE)
+        ADD("http://", IGNORECASE)
+        ADD("https://", IGNORECASE)
+        ADD("install", IGNORECASE)
+        ADD("internet", IGNORECASE)
+        ADD("\\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\b")
+        ADD("\\b(?:[A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}\\b|\\b(?:[A-Fa-f0-9]{1,4}:){1,7}:\\b|\\b:[A-Fa-f0-9]{1,4}(?::[A-Fa-f0-9]{1,4}){1,6}\\b")
+        ADD("javascript", IGNORECASE)
+        ADD("keyboard", IGNORECASE)
+        ADD("\\b(?:[0-9A-Fa-f]{2}[:-]){5}(?:[0-9A-Fa-f]{2})\\b")
+        ADD("memory", IGNORECASE)
+        ADD("module", IGNORECASE)
+        ADD("mutex", IGNORECASE)
+        ADD("onclick", IGNORECASE)
+        ADD("password", IGNORECASE)
+        ADD("POST /", IGNORECASE)
+        ADD("powershell", IGNORECASE)
+        ADD("privilege", IGNORECASE)
+        ADD("process", IGNORECASE)
+        ADD("\\b(?:KHEY_|KHLM|HKCU)")
+        ADD("remote", IGNORECASE)
+        ADD("resource", IGNORECASE)
+        ADD("security", IGNORECASE)
+        ADD("service", IGNORECASE)
+        ADD("shell", IGNORECASE)
+        ADD("snapshot", IGNORECASE)
+        ADD("system", IGNORECASE)
+        ADD("thread", IGNORECASE)
+        ADD("token", IGNORECASE)
+        ADD("\\b(?:http|https|ftp):\\/\\/[a-zA-Z0-9-._~:?#[\\]@!$&'()*+,;=]+")
+        ADD("User-Agent", IGNORECASE)
+        ADD("wallet", IGNORECASE)
+        ADD("window", IGNORECASE)
 
-StringExtractor::StringExtractor() {
-    NUM_INTERESTING_STRING_REGEXES =
-        sizeof(StringExtractor::INTERESTING_STRING_REGEXES)
-        / sizeof(StringExtractor::INTERESTING_STRING_REGEXES[0]);
+        #undef ADD
+    };
+
+    count = regexes.size();
+    return regexes.data();
+}
+
+StringExtractor::StringExtractor()
+    : readableStringRegex{ getReadableStringRegex() }
+{
+    interestingStringRegexes = getInterestingStringRegexes(NUM_INTERESTING_STRING_REGEXES);
     
     if (NUM_INTERESTING_STRING_REGEXES >= 256) {
         LOG_ERROR("The algorithm needs to be rewritten!");
@@ -124,21 +133,17 @@ void StringExtractor::start(feature_t* output, PEFile const& peFile) {
 
 void StringExtractor::reduce(feature_t* output, PEFile const& peFile, size_t bufOffset, uint8_t const* buf, size_t bufSize) {
     char const* charBuf = reinterpret_cast<char const*>(buf);
-    auto begin = std::cregex_iterator(charBuf, charBuf + bufSize, READABLE_STRING_REGEX);
-    auto end = std::cregex_iterator();
-    for (auto it = begin; it != end; ++it) {
-        char const* matchBuf = charBuf + it->position();
-        size_t matchLength = it->length();
 
-        sumReadableStringLengths += matchLength;
+    re2::StringPiece input{ charBuf, bufSize };
+    re2::StringPiece match;
+
+    while (RE2::FindAndConsume(&input, readableStringRegex, &match)) {
+        sumReadableStringLengths += match.size();
         numReadableStrings += 1;
-
-        readableByteCounter.reduce(reinterpret_cast<uint8_t const*>(matchBuf), matchLength);
-
+        readableByteCounter.reduce(reinterpret_cast<uint8_t const*>(match.data()), match.size());
+        
         for (size_t i = 0; i < NUM_INTERESTING_STRING_REGEXES; ++i) {
-            // Check if the matched string (i.e. the readable string just found)
-            // matches any of the interesting regexes
-            if (std::regex_search(matchBuf, matchBuf + matchLength, INTERESTING_STRING_REGEXES[i])) {
+            if (RE2::PartialMatch(match, interestingStringRegexes[i])) {
                 // An abuse of ByteCounter - thanks to the fact that NUM_INTERESTING_STRING_REGEXES < 256
                 uint8_t interestingStringRegexIndex = i;
                 interestingStringCounter.reduce(&interestingStringRegexIndex, 1);

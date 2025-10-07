@@ -13,6 +13,9 @@
 #include "efe/core/f_authenticode_signature.h"
 #include "efe/core/f_pe_format_warnings.h"
 
+// #define LOG_FE_PROGRESS(...) LOG_INFO(__VA_ARGS__)
+#define LOG_FE_PROGRESS(...)
+
 static inline constexpr size_t const NUM_FEATURES = 2568;
 
 #define DEBUG
@@ -55,6 +58,7 @@ char const* AllFeatureTypes::getName() const {
 void AllFeatureTypes::reset(feature_t* output, PEFile const& peFile) {
     feature_t* vec = output;
     for (auto const& ft : featureTypes) {
+        LOG_FE_PROGRESS("RESET: %s", ft->getName());
         ft->reset(vec, peFile);
         vec += ft->getMaxDim();
     }
@@ -64,6 +68,7 @@ void AllFeatureTypes::start(feature_t* output, PEFile const& peFile) {
     // std::memset(output, 0, dim * sizeof(output[0]));
     feature_t* vec = output;
     for (auto const& ft : featureTypes) {
+        LOG_FE_PROGRESS("START: %s", ft->getName());
         ft->start(vec, peFile);
         vec += ft->getMaxDim();
     }
@@ -72,6 +77,7 @@ void AllFeatureTypes::start(feature_t* output, PEFile const& peFile) {
 void AllFeatureTypes::reduce(feature_t* output, PEFile const& peFile, size_t bufOffset, uint8_t const* buf, size_t bufSize) {
     feature_t* vec = output;
     for (auto const& ft : featureTypes) {
+        LOG_FE_PROGRESS("REDUCE: %s", ft->getName());
         ft->reduce(vec, peFile, bufOffset, buf, bufSize);
         vec += ft->getMaxDim();
     }
@@ -80,6 +86,7 @@ void AllFeatureTypes::reduce(feature_t* output, PEFile const& peFile, size_t buf
 void AllFeatureTypes::finalize(feature_t* output, PEFile const& peFile) {
     feature_t* vec = output;
     for (auto const& ft : featureTypes) {
+        LOG_FE_PROGRESS("FINALIZE: %s", ft->getName());
         ft->finalize(vec, peFile);
         vec += ft->getMaxDim();
     }

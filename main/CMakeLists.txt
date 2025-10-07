@@ -57,3 +57,7 @@ FetchContent_Declare(mio
 FetchContent_MakeAvailable(mio)
 
 target_link_libraries(my_program PUBLIC mio::mio)
+
+## RE2
+
+target_link_libraries(my_program PUBLIC re2::re2)

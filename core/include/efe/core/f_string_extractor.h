@@ -4,13 +4,15 @@
 #include "efe/core/f_base.h"
 #include "efe/common/bytecounter.h"
 #include "efe/common/shannonentropycalculator.h"
-#include <regex>
+#include <re2/re2.h>
 
 class StringExtractor final : public FeatureType {
 private:
-    static std::regex const INTERESTING_STRING_REGEXES[]; // TODO: convert to pattern "static function has static const variable and returns it" so that threads don't race to initialize these regexes
-    static std::regex const READABLE_STRING_REGEX;
+    static RE2 const* getInterestingStringRegexes(size_t& count);
+    static RE2 const& getReadableStringRegex();
 
+    RE2 const* interestingStringRegexes;
+    RE2 const& readableStringRegex;
     size_t NUM_INTERESTING_STRING_REGEXES;
     double sumReadableStringLengths;
     size_t numReadableStrings;

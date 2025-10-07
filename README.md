@@ -60,6 +60,10 @@ cmake .. -DBUILD_STATIC_LIB=ON -A x64
 cmake --build . --config Release --target ALL_BUILD
 ```
 
+and the RE2 library:
+
+???
+
 ### Windows: Compile
 
 ```powershell
@@ -83,10 +87,13 @@ cd <project_root>/build/Release
 
 ```sh
 sudo apt update
-sudo apt install -y libomp-dev
+sudo apt install -y libomp-dev libabsl-dev
 ```
 
-then check that OpenMP is installed, with:
+where `libabsl-dev` is a prerequisite for RE2
+(see below).
+
+Then, check that OpenMP is installed, with:
 
 ```sh
 # Expected output: 0
@@ -105,6 +112,21 @@ git submodule update --init --recursive
 mkdir build && cd build
 cmake .. -DBUILD_STATIC_LIB=ON -DCMAKE_BUILD_TYPE=Release
 make -j$(nproc)
+```
+
+and build the RE2 library:
+
+```sh
+cd <project_root>/..
+git clone https://github.com/google/re2.git
+cd re2
+git checkout 61c4644171ee6b480540bf9e569cba06d9090b4b
+git submodule update --init --recursive
+
+rm -rf build
+cmake -DRE2_TEST=OFF -DRE2_BENCHMARK=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -S . -B build
+cd build
+make
 ```
 
 ### Ubuntu: Compile
