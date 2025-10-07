@@ -74,7 +74,7 @@ cmake --build . --config Release --target ALL_BUILD
 
 ```powershell
 cd <project_root>/build/Release
-.\my_program.exe <path/to/lgbm/model/file>
+.\my_program.exe <path/to/lgbm/model/file> <path/to/PE/file/to/inspect>
 ```
 
 ## Ubuntu and derivatives
@@ -139,5 +139,5 @@ cmake --build build --target all -j
 
 ```sh
 cd <project_root>/build
-./my_program <path/to/lgbm/model/file>
+./my_program <path/to/lgbm/model/file> <path/to/PE/file/to/inspect>
 ```
