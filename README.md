@@ -1,143 +1,74 @@
-# EMBER2024 LMDB
+# ember2024-cpp
 
-- [EMBER2024 LMDB](#ember2024-lmdb)
-  - [Windows](#windows)
-    - [Windows: Setup](#windows-setup)
-    - [Windows: Compile](#windows-compile)
-    - [Windows: Run](#windows-run)
-  - [Ubuntu and derivatives](#ubuntu-and-derivatives)
-    - [Ubuntu: Setup](#ubuntu-setup)
-    - [Ubuntu: Compile](#ubuntu-compile)
-    - [Ubuntu: Run](#ubuntu-run)
+- [ember2024-cpp](#ember2024-cpp)
+  - [Introduction](#introduction)
+  - [Getting It Up and Running](#getting-it-up-and-running)
+  - [Implementation Key Points](#implementation-key-points)
+  - [Known Issues](#known-issues)
+  - [Author and Licensing](#author-and-licensing)
 
-## Windows
+## Introduction
 
-### Windows: Setup
+This project consists of:
 
-This guide uses VS2022. I do not know
-how to do it with a different compiler
-toolchain e.g. MinGW. Maybe ChatGPT?
+1. A **C++ implementation** of the **EMBER2024 feature extractor** for PE files, and
+2. Integration with LightGBM to allow **loading an EMBER2024 pretrained LGBM model**
+    and **running inference** directly on a PE file.
 
-So first, install VS2022 and CMake.
-CMake `>= 3.31` and `< 4` is preferred.
+EMBER2024 feature extractor is [originally written in Python](https://github.com/futurecomputing4ai/ember2024).
 
-Open Developer Command Prompt for
-VS2022. Type `powershell` to open
-a PowerShell inside it. (Or you
-could open the Developer Command
-Prompt, start VSCode from there,
-and use the PowerShell inside
-VSCode.)
+## Getting It Up and Running
 
-Then, run this to check whether
-OpenMP is installed and enabled (it
-should be, by default):
+[See this guide](./UP_AND_RUNNING.md).
 
-```powershell
-echo "int main(){}" > test.cpp ; cl /openmp test.cpp ; .\test.exe ; echo $LastExitCode ; rm test.*
-```
+The code is known to compile and run fine
+on Windows 10 and Ubuntu 22.04/Linux Mint 21.3.
+Other operating systems e.g. MacOS might
+need specific CMake/compiler tweaks to
+get it right.
 
-Expected output:
+## Implementation Key Points
 
-    Microsoft (R)...
-    ...
-    0
+- Uses memory mapping instead of loading the whole PE file onto memory.
+- Implements a reduction approach to iterate over blocks of a PE file
+    to extract features, instead of random access on the mapped memory.
+    This way, blocks should be read into memory sequentially and on-demand
+    by the OS, saving memory consumption and avoid hangs (at least on
+    Windows - see [Known issues](#known-issues)).
+- Uses [RE2 for fast regex matching](https://github.com/google/re2)
+    in `StringExtractor` feature type,
+    which improved speed substantially.
+- For other implementation details, see the `README.md` file
+    in each subdirectory, if any.
 
-Just make sure the last line contains the number `0`.
+## Known Issues
 
-Then, build the (static) LightGBM C library:
+1. While most feature types are known to produce
+    results that are consistent with those generated
+    by the original Python code,
+    some do not. I will fix this as time
+    goes on, and probably write unit tests
+    for robust checks.
 
-```powershell
-cd <project_root>\..
-git clone https://github.com/microsoft/LightGBM
-cd LightGBM
-git checkout 047e7d5a2a227273608efa142bd3a7ddbd71ff5c
-git submodule update --init --recursive
+2. On Linux, implementation of `mio` - a memory mapping
+    library - showed poor performance even when the
+    code in this project deliberately iterates over
+    a PE file sequentially, block-by-block - resulting
+    in the program eating up RAM and eventually terminated
+    by the OS in case the PE file is too big.
 
-mkdir build
-cd build
-cmake .. -DBUILD_STATIC_LIB=ON -A x64
-cmake --build . --config Release --target ALL_BUILD
-```
+    This issue is not present on Windows though - scanning
+    a 1 GB file is done in a blink of an eye.
 
-### Windows: Compile
+    I might have to rewrite custom memory mapping solutions,
+    for each platform, to address this in the future.
 
-```powershell
-cd <project_root>
-mkdir build
-cd build
-cmake .. -A x64 -DCMAKE_BUILD_TYPE=Release
-cmake --build . --config Release --target ALL_BUILD
-```
+## Author and Licensing
 
-### Windows: Run
+Copyright (c) 2025 Vu Tung Lam.
 
-```powershell
-cd <project_root>/build/Release
-.\my_program.exe <path/to/lgbm/model/file> <path/to/PE/file/to/inspect>
-```
+Licensed under the MIT license (which is
+compatible with the Apache 2.0 imposed by
+the original project).
 
-## Ubuntu and derivatives
-
-### Ubuntu: Setup
-
-```sh
-sudo apt update
-sudo apt install -y libomp-dev libabsl-dev
-```
-
-where `libabsl-dev` is a prerequisite for RE2
-(see below).
-
-Then, check that OpenMP is installed, with:
-
-```sh
-# Expected output: 0
-echo 'int main(){}' > test.cpp && clang++ -fopenmp test.cpp -o test -lomp && rm -f test.cpp && rm -f test && echo $?
-```
-
-Meanwhile, build the (static) LightGBM C library:
-
-```sh
-cd <project_root>/..
-git clone https://github.com/microsoft/LightGBM
-cd LightGBM
-git checkout 047e7d5a2a227273608efa142bd3a7ddbd71ff5c
-git submodule update --init --recursive
-
-mkdir build && cd build
-cmake .. -DBUILD_STATIC_LIB=ON -DCMAKE_BUILD_TYPE=Release
-make -j$(nproc)
-```
-
-and build the RE2 library:
-
-```sh
-cd <project_root>/..
-git clone https://github.com/google/re2.git
-cd re2
-git checkout 61c4644171ee6b480540bf9e569cba06d9090b4b
-git submodule update --init --recursive
-
-rm -rf build
-cmake -DRE2_TEST=OFF -DRE2_BENCHMARK=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -S . -B build
-cd build
-make
-```
-
-### Ubuntu: Compile
-
-```sh
-cd <project_root>
-mkdir build
-cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release
-cmake --build build --target all -j
-```
-
-### Ubuntu: Run
-
-```sh
-cd <project_root>/build
-./my_program <path/to/lgbm/model/file> <path/to/PE/file/to/inspect>
-```
+See [LICENSE.txt](./LICENSE.txt) for details.
