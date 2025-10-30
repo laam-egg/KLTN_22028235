@@ -1,6 +1,6 @@
-# ember2024-cpp
+# ember2024-fe-cpp
 
-- [ember2024-cpp](#ember2024-cpp)
+- [ember2024-fe-cpp](#ember2024-fe-cpp)
   - [Introduction](#introduction)
   - [Getting It Up and Running](#getting-it-up-and-running)
   - [Implementation Key Points](#implementation-key-points)
@@ -9,11 +9,10 @@
 
 ## Introduction
 
-This project consists of:
-
-1. A **C++ implementation** of the **EMBER2024 feature extractor** for PE files, and
-2. Integration with LightGBM to allow **loading an EMBER2024 pretrained LGBM model**
-    and **running inference** directly on a PE file.
+This project consists of a **C++ implementation** of the
+**EMBER2024 feature extractor** for PE files. It does not
+contain the code to directly run an AI model - it is now
+in another project. (**TODO: WHERE ???**)
 
 EMBER2024 feature extractor is [originally written in Python](https://github.com/futurecomputing4ai/ember2024).
 

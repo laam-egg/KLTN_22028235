@@ -1,25 +1,32 @@
 # Getting It Up and Running
 
 - [Getting It Up and Running](#getting-it-up-and-running)
+  - [Build Options](#build-options)
   - [Windows](#windows)
     - [Windows: Setup](#windows-setup)
-    - [Windows: Compile](#windows-compile)
-    - [Windows: Run](#windows-run)
+    - [Windows: Build the Libraries only](#windows-build-the-libraries-only)
+    - [Windows: Build for Testing](#windows-build-for-testing)
   - [Ubuntu and derivatives](#ubuntu-and-derivatives)
     - [Ubuntu: Setup](#ubuntu-setup)
-    - [Ubuntu: Compile](#ubuntu-compile)
-    - [Ubuntu: Run](#ubuntu-run)
+    - [Ubuntu: Build the Libraries only](#ubuntu-build-the-libraries-only)
+    - [Ubuntu: Build for Testing](#ubuntu-build-for-testing)
+
+## Build Options
+
+1. **Build the Libraries only:** so that you just get
+    the library files, static or dynamic, to be used
+    in your program. No tests would be built.
+
+2. **Build for Testing:** so that you could run the
+    tests.
 
 ## Windows
 
 ### Windows: Setup
 
-This guide uses VS2022. I do not know
-how to do it with a different compiler
-toolchain e.g. MinGW. Maybe ChatGPT
-would help?
+This guide assumes the compiler toolchain
+is VS2022 + CMake.
 
-So first, install VS2022 and CMake.
 CMake `>= 3.31` and `< 4` is preferred.
 
 Open Developer Command Prompt for
@@ -50,36 +57,46 @@ Expected output:
 
 Just make sure the last line contains the number `0`.
 
-Then, build the (static) LightGBM C library:
+### Windows: Build the Libraries only
 
-```powershell
-cd <project_root>\..
-git clone https://github.com/microsoft/LightGBM
-cd LightGBM
-git checkout 047e7d5a2a227273608efa142bd3a7ddbd71ff5c
-git submodule update --init --recursive
-
-mkdir build
-cd build
-cmake .. -DBUILD_STATIC_LIB=ON -A x64
-cmake --build . --config Release --target ALL_BUILD
-```
-
-### Windows: Compile
+Compile:
 
 ```powershell
 cd <project_root>
+
 mkdir build
 cd build
 cmake .. -A x64 -DCMAKE_BUILD_TYPE=Release
 cmake --build . --config Release --target ALL_BUILD
 ```
 
-### Windows: Run
+The library you would need to link against
+is `build\core\Release\efe_core.lib`.
+
+### Windows: Build for Testing
+
+Compile:
 
 ```powershell
-cd <project_root>/build/Release
-.\my_program.exe <path/to/lgbm/model/file> <path/to/PE/file/to/inspect>
+cd <project_root>
+
+$BUILD_TYPE = "Release"
+# or
+# $BUILD_TYPE = "Debug"
+
+mkdir build
+cd build
+cmake .. -A x64 -DCMAKE_BUILD_TYPE="$BUILD_TYPE" -DBUILD_TESTING=ON
+cmake --build . --config "$BUILD_TYPE" --target ALL_BUILD
+```
+
+Run tests:
+
+```powershell
+cd <project_root>
+
+cd build
+ctest --test-dir . --output-on-failure
 ```
 
 ## Ubuntu and derivatives
@@ -96,40 +113,51 @@ where `libabsl-dev` is a prerequisite for RE2
 **might not be needed ; you may try omitting**
 **it and see what happens in the next steps.**
 
-Then, check that OpenMP is installed, with:
+Then, ensure that OpenMP is installed, with:
 
 ```sh
 # Expected output: 0
 echo 'int main(){}' > test.cpp && clang++ -fopenmp test.cpp -o test -lomp && rm -f test.cpp && rm -f test && echo $?
 ```
 
-Meanwhile, build the (static) LightGBM C library:
+### Ubuntu: Build the Libraries only
 
-```sh
-cd <project_root>/..
-git clone https://github.com/microsoft/LightGBM
-cd LightGBM
-git checkout 047e7d5a2a227273608efa142bd3a7ddbd71ff5c
-git submodule update --init --recursive
-
-mkdir build && cd build
-cmake .. -DBUILD_STATIC_LIB=ON -DCMAKE_BUILD_TYPE=Release
-make -j$(nproc)
-```
-
-### Ubuntu: Compile
+Compile:
 
 ```sh
 cd <project_root>
+
 mkdir build
 cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release
-cmake --build build --target all -j
+cmake --build . --target all -j
 ```
 
-### Ubuntu: Run
+The library you would need to link against
+is `build/core/libefe_core.a`.
+
+### Ubuntu: Build for Testing
+
+Compile:
 
 ```sh
-cd <project_root>/build
-./my_program <path/to/lgbm/model/file> <path/to/PE/file/to/inspect>
+cd <project_root>
+
+export BUILD_TYPE=Release
+# or
+# export BUILD_TYPE=Debug
+
+mkdir build
+cd build
+cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBUILD_TESTING=ON
+cmake --build . --target all -j
+```
+
+Run tests:
+
+```sh
+cd <project_root>
+
+cd build
+ctest --test-dir . --output-on-failure
 ```
