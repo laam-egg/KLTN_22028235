@@ -51,10 +51,25 @@ list(
                 src/all_feature_types.cpp
 )
 
+# mio - cross-platform memory-mapping library
+# https://github.com/vimpunk/mio
+
+set(MIO_GIT_URL "https://github.com/vimpunk/mio.git")
+set(MIO_VERSION "8b6b7d878c89e81614d05edca7936de41ccdd2da")
+
+FetchContent_Declare(mio
+    GIT_REPOSITORY  "${MIO_GIT_URL}"
+    GIT_TAG         "${MIO_VERSION}"
+)
+
+FetchContent_MakeAvailable(mio)
+
+#######################################
+
 add_library(efe_core ${SRC_FILES})
 
 target_include_directories(efe_core PUBLIC include)
 
 target_link_libraries(efe_core PUBLIC efe_common efe_pefile efe_featurehasher)
 
-target_link_libraries(efe_core PUBLIC re2::re2)
+target_link_libraries(efe_core PUBLIC re2::re2 mio::mio)

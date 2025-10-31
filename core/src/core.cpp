@@ -2,6 +2,7 @@
 #include "efe/pefile.h"
 #include "efe/common/logging.h"
 #include "efe/common/memoryblockstream.h"
+#include <mio/mmap.hpp>
 
 static inline constexpr size_t const BUF_SIZE = 1048576 * 4; // 4 MB
 
@@ -18,7 +19,15 @@ EMBER2024FeatureExtractor::EMBER2024FeatureExtractor() :
     output{std::make_unique<feature_t[]>(dim)}
 {}
 
-feature_t const* EMBER2024FeatureExtractor::run(uint8_t const* fileContent, size_t fileSize) {
+feature_t const* EMBER2024FeatureExtractor::run(
+    uint8_t const* fileContent,
+    size_t fileSize,
+    std::error_code& errorCode
+) {
+    errorCode.clear();
+    // Currently this function never fails.
+    // But it might in the future.
+
     LOG_FE_PROGRESS("Parsing PE file...");
     PEFile peFile(fileContent, fileSize);
 
@@ -51,4 +60,53 @@ feature_t const* EMBER2024FeatureExtractor::run(uint8_t const* fileContent, size
     blockStream.stopReading();
 
     return output.get();
+}
+
+feature_t const* EMBER2024FeatureExtractor::run(
+    std::filesystem::path filePath,
+    std::error_code& errorCode
+) {
+    errorCode.clear();
+
+    #define FAIL_ERRC(err) { errorCode = err; return nullptr; } (void)0
+    #define FAIL(err) FAIL_ERRC(std::make_error_code(err))
+    #define FORWARD_SYSTEM_ERROR(exc) FAIL_ERRC(exc.code())
+    #define CHECK_FAILURE() if (errorCode) { return nullptr; } (void)0
+
+    LOG_FE_PROGRESS("Checking path...");
+    filePath = std::filesystem::absolute(filePath);
+    if (!std::filesystem::exists(filePath)) {
+        FAIL(std::errc::no_such_file_or_directory);
+    }
+
+    LOG_FE_PROGRESS("Checking file size...");
+    auto const fileSizeFromSystem = std::filesystem::file_size(filePath);
+    if (fileSizeFromSystem == 0) {
+        FAIL(std::errc::no_message);
+    }
+
+    LOG_FE_PROGRESS("Mapping the file onto memory...");
+    mio::mmap_source mmap;
+    try {
+        mmap = mio::make_mmap_source(filePath.native(), 0, mio::map_entire_file, errorCode);
+    } catch (std::system_error const& e) {
+        FORWARD_SYSTEM_ERROR(e);
+    }
+    CHECK_FAILURE();
+
+    LOG_FE_PROGRESS("Calling actual feature extractor...");
+    uint8_t const* const fileContent = reinterpret_cast<uint8_t const*>(mmap.data());
+    size_t const fileSize = mmap.size();
+    if (fileSizeFromSystem != fileSize) {
+        FAIL(std::errc::message_size);
+    }
+    feature_t const* featureVector = this->run(fileContent, fileSize, errorCode);
+    CHECK_FAILURE();
+
+    #undef CHECK_FAILURE
+    #undef FORWARD_SYSTEM_ERROR
+    #undef FAIL
+    #undef FAIL_ERRC
+
+    return featureVector;
 }

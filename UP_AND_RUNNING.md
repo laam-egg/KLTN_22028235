@@ -73,6 +73,14 @@ cmake --build . --config Release --target ALL_BUILD
 The library you would need to link against
 is `build\core\Release\efe_core.lib`.
 
+Run the demo program:
+
+```powershell
+cd <project_root>
+
+.\build\demo\Release\efe_demo.exe /path/to/a/PE/file
+```
+
 ### Windows: Build for Testing
 
 Compile:
@@ -137,6 +145,14 @@ cmake --build . --target all -j
 
 The library you would need to link against
 is `build/core/libefe_core.a`.
+
+Run the demo program:
+
+```sh
+cd <project_root>
+
+./build/demo/efe_demo /path/to/a/PE/file
+```
 
 ### Ubuntu: Build for Testing
 

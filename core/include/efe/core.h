@@ -6,6 +6,8 @@
 #include <cstdint>
 #include <vector>
 #include <memory>
+#include <filesystem>
+#include <system_error>
 
 class EMBER2024FeatureExtractor {
 private:
@@ -17,7 +19,9 @@ private:
 public:
     EMBER2024FeatureExtractor();
 
-    feature_t const* run(uint8_t const* fileContent, size_t fileSize);
+    feature_t const* run(uint8_t const* fileContent, size_t fileSize, std::error_code& err);
+
+    feature_t const* run(std::filesystem::path filePath, std::error_code& err);
 
     inline constexpr size_t getDim() const { return dim; }
 };
