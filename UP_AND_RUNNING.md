@@ -127,9 +127,11 @@ Compile:
 ```sh
 cd <project_root>
 
+export GENERATOR=Ninja
+
 mkdir build
 cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release
+cmake -G $GENERATOR .. -DCMAKE_BUILD_TYPE=Release
 cmake --build . --target all -j
 ```
 
@@ -144,12 +146,13 @@ Compile:
 cd <project_root>
 
 export BUILD_TYPE=Release
+export GENERATOR=Ninja
 # or
 # export BUILD_TYPE=Debug
 
 mkdir build
 cd build
-cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBUILD_TESTING=ON
+cmake .. -G $GENERATOR -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBUILD_TESTING=ON
 cmake --build . --target all -j
 ```
 
