@@ -17,6 +17,8 @@ public:
     static_assert(HAS_DYNAMIC_RELOCS + 1 == DIM);
 };
 
+DataDirectories::~DataDirectories() = default;
+
 char const* DataDirectories::getName() const {
     return "datadirectories";
 }

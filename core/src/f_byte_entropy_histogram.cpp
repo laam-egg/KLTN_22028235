@@ -3,6 +3,8 @@
 
 // #define MODULO_WINDOW_SIZE(x) ((x) & (WINDOW_SIZE - 1))
 
+ByteEntropyHistogram::~ByteEntropyHistogram() = default;
+
 char const* ByteEntropyHistogram::getName() const {
     return "byteentropy";
 }

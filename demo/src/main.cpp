@@ -1,6 +1,7 @@
 #include <efe/core.h>
 #include <iostream>
 #include <filesystem>
+#include <chrono>
 
 void printFeatureVector(feature_t const* const featureVector, size_t const N) {
     constexpr size_t const LINE_BREAK_AT = 10;
@@ -21,7 +22,16 @@ void printFeatureVector(feature_t const* const featureVector, size_t const N) {
 
 bool scanSingleFile(EMBER2024FeatureExtractor& fe, std::filesystem::path const& filePath) {
     std::error_code errorCode;
+
+    auto start = std::chrono::high_resolution_clock::now();
     feature_t const* featureVector = fe.run(filePath, errorCode);
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> duration = end - start;
+    double elapsed_seconds = duration.count();
+    double elapsed_ms = elapsed_seconds * 1000;
+
+    std::cerr << "FEATURE EXTRACTION TIME: " << elapsed_ms << " milliseconds\n";
+
     if (errorCode) {
         std::cerr << "Error code value: " << errorCode.value() << "\n";
         std::cerr << "Error category: " << errorCode.category().name() << "\n";
@@ -35,6 +45,9 @@ bool scanSingleFile(EMBER2024FeatureExtractor& fe, std::filesystem::path const& 
 }
 
 int main(int argc, char** argv) {
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(NULL);
+
     if (argc != 2) {
         std::cerr << "Usage: " << argv[0] << " <path/to/pe/file>" << std::endl;
         return 1;

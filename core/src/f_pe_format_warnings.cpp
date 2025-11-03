@@ -2,6 +2,8 @@
 
 #define DIM 88
 
+PEFormatWarnings::~PEFormatWarnings() = default;
+
 char const* PEFormatWarnings::getName() const {
     return "pefilewarnings";
 }

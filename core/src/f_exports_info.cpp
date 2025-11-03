@@ -18,6 +18,8 @@ public:
     );
 };
 
+ExportsInfo::~ExportsInfo() = default;
+
 char const* ExportsInfo::getName() const {
     return "exports";
 }

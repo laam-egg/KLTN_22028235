@@ -22,6 +22,8 @@ public:
     #undef ADD
 };
 
+ImportsInfo::~ImportsInfo() = default;
+
 char const* ImportsInfo::getName() const {
     return "imports";
 }

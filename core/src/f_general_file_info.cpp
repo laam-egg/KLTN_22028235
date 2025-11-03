@@ -2,6 +2,8 @@
 
 #define NUM_FIRST_BYTES_TO_TAKE 4
 
+GeneralFileInfo::~GeneralFileInfo() = default;
+
 char const* GeneralFileInfo::getName() const {
     return "general,histogram";
 }

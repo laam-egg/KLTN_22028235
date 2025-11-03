@@ -25,9 +25,11 @@
 ### Windows: Setup
 
 This guide assumes the compiler toolchain
-is VS2022 + CMake.
+is VS2022 + CMake + Ninja.
 
 CMake `>= 3.31` and `< 4` is preferred.
+
+Tested with Ninja `1.13.1`.
 
 Open Developer Command Prompt for
 VS2022. Type `powershell` to open
@@ -63,22 +65,23 @@ Compile:
 
 ```powershell
 cd <project_root>
+$Generator = "Ninja"
 
 mkdir build
 cd build
-cmake .. -A x64 -DCMAKE_BUILD_TYPE=Release
-cmake --build . --config Release --target ALL_BUILD
+cmake .. -G "$Generator" -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF
+cmake --build . --config Release --target all -j
 ```
 
 The library you would need to link against
-is `build\core\Release\efe_core.lib`.
+is `<project_root>\build\core\efe_core.lib`.
 
 Run the demo program:
 
 ```powershell
 cd <project_root>
 
-.\build\demo\Release\efe_demo.exe /path/to/a/PE/file
+.\build\demo\efe_demo.exe /path/to/a/PE/file
 ```
 
 ### Windows: Build for Testing
@@ -87,15 +90,15 @@ Compile:
 
 ```powershell
 cd <project_root>
-
+$Generator = "Ninja"
 $BUILD_TYPE = "Release"
 # or
 # $BUILD_TYPE = "Debug"
 
 mkdir build
 cd build
-cmake .. -A x64 -DCMAKE_BUILD_TYPE="$BUILD_TYPE" -DBUILD_TESTING=ON
-cmake --build . --config "$BUILD_TYPE" --target ALL_BUILD
+cmake .. -G "$Generator" -DCMAKE_BUILD_TYPE="$BUILD_TYPE" -DBUILD_TESTING=ON
+cmake --build . --config "$BUILD_TYPE" --target all -j
 ```
 
 Run tests:
@@ -111,15 +114,15 @@ ctest --test-dir . --output-on-failure
 
 ### Ubuntu: Setup
 
+This guide assumes the compiler toolchain
+is GCC (gcc, g++) + Clang + Ninja.
+
+Tested with Ninja `1.10.1`.
+
 ```sh
 sudo apt update
-sudo apt install -y libomp-dev libabsl-dev
+sudo apt install -y libomp-dev
 ```
-
-where `libabsl-dev` is a prerequisite for RE2
-(which this library uses). **UPDATE: `libabsl-dev`**
-**might not be needed ; you may try omitting**
-**it and see what happens in the next steps.**
 
 Then, ensure that OpenMP is installed, with:
 
@@ -144,7 +147,7 @@ cmake --build . --target all -j
 ```
 
 The library you would need to link against
-is `build/core/libefe_core.a`.
+is `<project_root>/build/core/libefe_core.a`.
 
 Run the demo program:
 

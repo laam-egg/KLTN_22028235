@@ -10,6 +10,8 @@
  */
 class FeatureType {
 public:
+    virtual ~FeatureType() = 0;
+    
     virtual char const* getName() const = 0;
 
     virtual size_t getMaxDim() const = 0;

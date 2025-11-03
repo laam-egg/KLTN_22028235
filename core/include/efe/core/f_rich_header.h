@@ -5,6 +5,8 @@
 
 class RichHeaderFeatureType final : public FeatureType {
 public:
+    virtual ~RichHeaderFeatureType() override;
+
     virtual char const* getName() const override;
 
     virtual void reset(feature_t* output, PEFile const& peFile) override;

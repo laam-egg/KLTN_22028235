@@ -55,7 +55,8 @@ add_library(efe_pefile ${SRC_FILES})
 
 target_include_directories(efe_pefile PUBLIC include)
 
-target_link_libraries(efe_pefile PUBLIC efe_common caching)
+target_link_libraries(efe_pefile PUBLIC efe_common)
+# target_link_libraries(efe_pefile PUBLIC caching)
 
 include(FetchContent)
 
@@ -68,11 +69,7 @@ include(FetchContent)
 # https://lief.re//doc/latest/installation.html
 
 set(LIEF_GIT_URL "https://github.com/lief-project/LIEF.git")
-set(LIEF_VERSION 0.17.0)
-FetchContent_Declare(LIEF
-    GIT_REPOSITORY  "${LIEF_GIT_URL}"
-    GIT_TAG         "${LIEF_VERSION}"
-)
+set(LIEF_VERSION 0.17.1)
 
 # https://lief.re//doc/latest/compilation.html#cmake-options
 set(LIEF_DOC                        OFF CACHE BOOL "" FORCE)
@@ -99,10 +96,14 @@ set(LIEF_COFF                       ON  CACHE BOOL "Build LIEF with COFF module"
 
 
 if(MSVC)
-  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded" CACHE STRING "CRT option")
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded" CACHE STRING "CRT option")
 endif()
 
 
+FetchContent_Declare(LIEF
+    GIT_REPOSITORY  "${LIEF_GIT_URL}"
+    GIT_TAG         "${LIEF_VERSION}"
+)
 FetchContent_MakeAvailable(LIEF)
 
 target_link_libraries(efe_pefile PUBLIC LIEF::LIEF)

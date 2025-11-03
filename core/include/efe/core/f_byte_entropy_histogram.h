@@ -24,6 +24,8 @@ private:
     feature_t* outputBuffer;
 
 public:
+    virtual ~ByteEntropyHistogram() override;
+    
     virtual char const* getName() const override;
 
     virtual size_t getMaxDim() const override;

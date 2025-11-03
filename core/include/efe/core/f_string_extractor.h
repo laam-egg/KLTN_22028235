@@ -20,6 +20,8 @@ private:
     ByteCounter interestingStringCounter;
 
 public:
+    virtual ~StringExtractor() override;
+
     StringExtractor();
 
     virtual char const* getName() const override;

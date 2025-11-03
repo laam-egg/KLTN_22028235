@@ -37,4 +37,4 @@ list(APPEND LINKED_LIBRARIES
 target_link_libraries(efe_e2e_test PRIVATE ${LINKED_LIBRARIES})
 
 include(GoogleTest)
-gtest_discover_tests(efe_e2e_test)
+gtest_discover_tests(efe_e2e_test PROPERTIES DISCOVERY_TIMEOUT 15)

@@ -2,6 +2,8 @@
 
 #define DIM 8
 
+AuthenticodeSignature::~AuthenticodeSignature() = default;
+
 char const* AuthenticodeSignature::getName() const {
     return "authenticode";
 }

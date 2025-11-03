@@ -21,7 +21,8 @@ EMBER2024 feature extractor is [originally written in Python](https://github.com
 [See this guide](./UP_AND_RUNNING.md).
 
 The code is known to compile and run fine
-on Windows 10 and Ubuntu 22.04/Linux Mint 21.3.
+on Windows 10, Windows 11, and
+Ubuntu 22.04/Linux Mint 21.3.
 Other operating systems e.g. MacOS might
 need specific CMake/compiler tweaks to
 get it right.

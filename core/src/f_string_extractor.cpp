@@ -3,6 +3,8 @@
 #include "efe/common/meth.h"
 #include <array>
 
+StringExtractor::~StringExtractor() = default;
+
 RE2 const& StringExtractor::getReadableStringRegex() {
     static RE2 readableStringRegex{ "[\\x20-\\x7f]{5,}" };
     return readableStringRegex;

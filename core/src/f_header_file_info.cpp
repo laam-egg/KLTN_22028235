@@ -50,6 +50,8 @@ public:
     static_assert(DOS_VECTOR + DOS_HEADERS_ENCODING_DIM == DIM);
 };
 
+HeaderFileInfo::~HeaderFileInfo() = default;
+
 char const* HeaderFileInfo::getName() const {
     return "header";
 }

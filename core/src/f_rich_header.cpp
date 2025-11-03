@@ -16,6 +16,8 @@ public:
     static_assert(PAIRS_HASHED + PAIRS_FH_BUCKET_SIZE == DIM);
 };
 
+RichHeaderFeatureType::~RichHeaderFeatureType() = default;
+
 char const* RichHeaderFeatureType::getName() const {
     return "richheader";
 }

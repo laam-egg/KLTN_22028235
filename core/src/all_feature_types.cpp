@@ -18,7 +18,11 @@
 
 static inline constexpr size_t const NUM_FEATURES = 2568;
 
+#ifndef NDEBUG
 #define DEBUG
+#endif
+
+AllFeatureTypes::~AllFeatureTypes() = default;
 
 AllFeatureTypes::AllFeatureTypes() :
     

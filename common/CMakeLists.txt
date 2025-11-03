@@ -38,4 +38,4 @@ set_property(
 
 target_include_directories(efe_common PUBLIC include)
 
-target_link_libraries(efe_common PUBLIC lklist)
+# target_link_libraries(efe_common PUBLIC lklist)

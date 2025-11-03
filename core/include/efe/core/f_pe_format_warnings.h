@@ -5,6 +5,8 @@
 
 class PEFormatWarnings final : public FeatureType {
 public:
+    virtual ~PEFormatWarnings() override;
+
     virtual char const* getName() const override;
 
     virtual void reset(feature_t* output, PEFile const& peFile) override;
