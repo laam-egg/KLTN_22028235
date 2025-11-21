@@ -7,6 +7,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(SRC_FILES "")
 list(
     APPEND SRC_FILES
+    
+    include/efe/featurehasher/hashing_fast.h
+    
     include/efe/featurehasher.h
             src/featurehasher.cpp
 )

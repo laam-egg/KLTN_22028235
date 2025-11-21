@@ -19,6 +19,8 @@ list(APPEND SRC_FILES
                 "src/core/fixtures/efe_test_data_fixture.cpp"
     
     "src/core/all_features.test.cpp"
+
+    "src/featurehasher/featurehasher.test.cpp"
 )
 
 add_executable(efe_e2e_test ${SRC_FILES})

@@ -32,8 +32,9 @@ void hash(size_t N, int argc, char* argv[]) {
 
 int main(int argc, char* argv[]) {
     if (argc < 4 || argc % 2 == 0) {
-        std::cerr << "Usage: fh hash <BUCKET_SIZE> <STRING1> <FLOAT1> <STRING2> <FLOAT2> ..." << '\n';
-        std::cerr << "e.g. : fh hash       50      abc 0 def 12 ghi -4 jkl 15.02" << '\n';
+        std::cerr << "Usage: fh hash <BUCKET_SIZE> <STRING1> <FLOAT1> <STRING2> <FLOAT2> ...\n";
+        std::cerr << "e.g. : fh hash       50      abc 0 def 12 ghi -4 jkl 15.02\n";
+        std::cerr << "NOTE: Currently only compute for 1 sample.\n";
         return 1;
     }
 
