@@ -25,6 +25,8 @@ private:
 
 public:
     virtual ~ByteEntropyHistogram() override;
+
+    static char const* getFeatureName();
     
     virtual char const* getName() const override;
 

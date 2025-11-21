@@ -12,11 +12,12 @@
 #include "efe/core/f_rich_header.h"
 #include "efe/core/f_authenticode_signature.h"
 #include "efe/core/f_pe_format_warnings.h"
+#include "efe/core/common.h"
+
+#include <cstring> // strcmp
 
 // #define LOG_FE_PROGRESS(...) LOG_INFO(__VA_ARGS__)
 #define LOG_FE_PROGRESS(...)
-
-static inline constexpr size_t const NUM_FEATURES = 2568;
 
 #ifndef NDEBUG
 #define DEBUG
@@ -98,4 +99,21 @@ void AllFeatureTypes::finalize(feature_t* output, PEFile const& peFile) {
 
 size_t AllFeatureTypes::getMaxDim() const {
     return dim;
+}
+
+std::tuple<FeatureType const*, size_t>
+AllFeatureTypes::getFeatureTypeAndOffsetByName(
+    char const* featureName
+) const {
+    size_t offset = 0;
+    for (std::unique_ptr<FeatureType> const& featureType : this->featureTypes) {
+        if (0 == strcmp(featureType->getName(), featureName)) {
+            return { featureType.get(), offset };
+        }
+        offset += featureType->getMaxDim();
+    }
+
+    throw std::runtime_error(
+        std::string("no FeatureType named '") + featureName + '\''
+    );
 }

@@ -4,8 +4,12 @@
 
 PEFormatWarnings::~PEFormatWarnings() = default;
 
-char const* PEFormatWarnings::getName() const {
+char const* PEFormatWarnings::getFeatureName() {
     return "pefilewarnings";
+}
+
+char const* PEFormatWarnings::getName() const {
+    return getFeatureName();
 }
 
 void PEFormatWarnings::reset(feature_t* output, PEFile const& peFile) {

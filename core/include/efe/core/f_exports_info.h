@@ -10,6 +10,8 @@ private:
 public:
     virtual ~ExportsInfo() override;
 
+    static char const* getFeatureName();
+
     virtual char const* getName() const override;
 
     virtual void reset(feature_t* output, PEFile const& peFile) override;

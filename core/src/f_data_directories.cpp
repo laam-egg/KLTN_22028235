@@ -19,8 +19,12 @@ public:
 
 DataDirectories::~DataDirectories() = default;
 
-char const* DataDirectories::getName() const {
+char const* DataDirectories::getFeatureName() {
     return "datadirectories";
+}
+
+char const* DataDirectories::getName() const {
+    return getFeatureName();
 }
 
 void DataDirectories::reset(feature_t* output, PEFile const& peFile) {

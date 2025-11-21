@@ -110,3 +110,12 @@ feature_t const* EMBER2024FeatureExtractor::run(
 
     return featureVector;
 }
+
+std::tuple<size_t, size_t> EMBER2024FeatureExtractor::getFeatureTypeOffsetAndLength(
+    char const* featureName
+) const {
+    auto const [featureType, offset] = allFeatures
+        ->getFeatureTypeAndOffsetByName(featureName);
+
+    return { offset, featureType->getMaxDim() };
+}

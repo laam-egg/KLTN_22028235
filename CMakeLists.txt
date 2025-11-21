@@ -32,6 +32,7 @@ if (BUILD_TESTING)
     include(CTest)
     enable_testing()
 
+    add_subdirectory(sqlite3)
     add_subdirectory(googletest)
     add_subdirectory(tests)
 endif()

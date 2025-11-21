@@ -142,7 +142,7 @@ export GENERATOR=Ninja
 
 mkdir build
 cd build
-cmake -G $GENERATOR .. -DCMAKE_BUILD_TYPE=Release
+cmake -G $GENERATOR .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF
 cmake --build . --target all -j
 ```
 

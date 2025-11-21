@@ -18,8 +18,12 @@ public:
 
 RichHeaderFeatureType::~RichHeaderFeatureType() = default;
 
-char const* RichHeaderFeatureType::getName() const {
+char const* RichHeaderFeatureType::getFeatureName() {
     return "richheader";
+}
+
+char const* RichHeaderFeatureType::getName() const {
+    return getFeatureName();
 }
 
 void RichHeaderFeatureType::reset(feature_t* output, PEFile const& peFile) {

@@ -8,6 +8,7 @@
 #include <memory>
 #include <filesystem>
 #include <system_error>
+#include <tuple>
 
 class EMBER2024FeatureExtractor {
 private:
@@ -24,6 +25,10 @@ public:
     feature_t const* run(std::filesystem::path filePath, std::error_code& err);
 
     inline constexpr size_t getDim() const { return dim; }
+
+    std::tuple<size_t, size_t> getFeatureTypeOffsetAndLength(
+        char const* featureName
+    ) const;
 };
 
 #endif // EFE_CORE_INCLUDED

@@ -155,8 +155,12 @@ void SectionInfoFeatureHashers::finalize() {
 
 SectionInfo::~SectionInfo() = default;
 
-char const* SectionInfo::getName() const {
+char const* SectionInfo::getFeatureName() {
     return "section";
+}
+
+char const* SectionInfo::getName() const {
+    return getFeatureName();
 }
 
 void SectionInfo::reset(feature_t* output, PEFile const& peFile) {

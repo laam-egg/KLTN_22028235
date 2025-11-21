@@ -20,8 +20,12 @@ public:
 
 ExportsInfo::~ExportsInfo() = default;
 
-char const* ExportsInfo::getName() const {
+char const* ExportsInfo::getFeatureName() {
     return "exports";
+}
+
+char const* ExportsInfo::getName() const {
+    return getFeatureName();
 }
 
 void ExportsInfo::reset(feature_t* output, PEFile const& peFile) {

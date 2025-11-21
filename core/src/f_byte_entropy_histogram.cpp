@@ -5,8 +5,12 @@
 
 ByteEntropyHistogram::~ByteEntropyHistogram() = default;
 
-char const* ByteEntropyHistogram::getName() const {
+char const* ByteEntropyHistogram::getFeatureName() {
     return "byteentropy";
+}
+
+char const* ByteEntropyHistogram::getName() const {
+    return getFeatureName();
 }
 
 size_t ByteEntropyHistogram::getMaxDim() const {

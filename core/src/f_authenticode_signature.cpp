@@ -4,8 +4,12 @@
 
 AuthenticodeSignature::~AuthenticodeSignature() = default;
 
-char const* AuthenticodeSignature::getName() const {
+char const* AuthenticodeSignature::getFeatureName() {
     return "authenticode";
+}
+
+char const* AuthenticodeSignature::getName() const {
+    return getFeatureName();
 }
 
 void AuthenticodeSignature::reset(feature_t* output, PEFile const& peFile) {

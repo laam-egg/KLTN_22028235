@@ -117,8 +117,12 @@ StringExtractor::StringExtractor()
     }
 }
 
-char const* StringExtractor::getName() const {
+char const* StringExtractor::getFeatureName() {
     return "strings";
+}
+
+char const* StringExtractor::getName() const {
+    return getFeatureName();
 }
 
 void StringExtractor::reset(feature_t* output, PEFile const& peFile) {

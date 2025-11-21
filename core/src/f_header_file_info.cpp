@@ -1,4 +1,4 @@
-#define uint642uint32(x) static_cast<uint32_t>((x) & 0xffffffffu)
+// #define uint642uint32(x) static_cast<uint32_t>((x) & 0xffffffffu)
 
 #include "efe/core/f_header_file_info.h"
 #include "efe/core/f_header_file_info/all.h"
@@ -52,8 +52,12 @@ public:
 
 HeaderFileInfo::~HeaderFileInfo() = default;
 
-char const* HeaderFileInfo::getName() const {
+char const* HeaderFileInfo::getFeatureName() {
     return "header";
+}
+
+char const* HeaderFileInfo::getName() const {
+    return getFeatureName();
 }
 
 void HeaderFileInfo::reset(feature_t* output, PEFile const& peFile) {
@@ -96,7 +100,7 @@ void HeaderFileInfo::start(feature_t* output, PEFile const& peFile) {
     output[Offset::OPT_SIZEOF_HEAP_COMMIT] = opt.SizeOfHeapCommit;
     output[Offset::OPT_ADDRESS_OF_ENTRYPOINT] = opt.AddressOfEntryPoint;
     output[Offset::OPT_BASE_OF_CODE] = opt.BaseOfCode;
-    output[Offset::OPT_IMAGE_BASE] = uint642uint32(opt.ImageBase);
+    output[Offset::OPT_IMAGE_BASE] = /*uint642uint32*/(opt.ImageBase);
     output[Offset::OPT_SECTION_ALIGNMENT] = opt.SectionAlignment;
     output[Offset::OPT_CHECKSUM] = opt.CheckSum;
     output[Offset::OPT_NUM_RVAS_AND_SIZES] = opt.NumberOfRvaAndSizes;

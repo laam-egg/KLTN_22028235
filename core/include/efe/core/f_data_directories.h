@@ -6,6 +6,8 @@
 class DataDirectories final : public FeatureType {
 public:
     virtual ~DataDirectories() override;
+
+    static char const* getFeatureName();
     
     virtual char const* getName() const override;
 

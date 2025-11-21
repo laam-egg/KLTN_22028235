@@ -9,6 +9,8 @@
 class HeaderFileInfo final : public FeatureType {
 public:
     virtual ~HeaderFileInfo() override;
+    
+    static char const* getFeatureName();
 
     virtual char const* getName() const override;
 

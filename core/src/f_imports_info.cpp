@@ -24,8 +24,12 @@ public:
 
 ImportsInfo::~ImportsInfo() = default;
 
-char const* ImportsInfo::getName() const {
+char const* ImportsInfo::getFeatureName() {
     return "imports";
+}
+
+char const* ImportsInfo::getName() const {
+    return getFeatureName();
 }
 
 void ImportsInfo::reset(feature_t* output, PEFile const& peFile) {

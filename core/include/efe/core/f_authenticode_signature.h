@@ -6,6 +6,8 @@
 class AuthenticodeSignature final : public FeatureType {
 public:
     virtual ~AuthenticodeSignature() override;
+
+    static char const* getFeatureName();
     
     virtual char const* getName() const override;
 

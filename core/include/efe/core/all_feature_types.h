@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <vector>
 #include <memory>
+#include <tuple>
 
 class AllFeatureTypes final : public FeatureType {
 private:
@@ -28,6 +29,10 @@ public:
     virtual void finalize(feature_t* output, PEFile const& peFile) override;
 
     virtual size_t getMaxDim() const override;
+
+    std::tuple<FeatureType const*, size_t> getFeatureTypeAndOffsetByName(
+        char const* featureName
+    ) const;
 };
 
 #endif // EFE_ALL_FEATURE_TYPES_INCLUDED

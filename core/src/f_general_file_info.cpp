@@ -4,8 +4,12 @@
 
 GeneralFileInfo::~GeneralFileInfo() = default;
 
-char const* GeneralFileInfo::getName() const {
+char const* GeneralFileInfo::getFeatureName() {
     return "general,histogram";
+}
+
+char const* GeneralFileInfo::getName() const {
+    return getFeatureName();
 }
 
 void GeneralFileInfo::reset(feature_t* output, PEFile const& peFile) {
