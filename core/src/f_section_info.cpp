@@ -4,6 +4,10 @@
 #include "efe/common/nop.h"
 #include <algorithm>
 
+// #include "efe/common/logging.h"
+// #define LLL LOG_INFO
+#define LLL(...)
+
 #define DIM 224
 
 // Bucket size for FeatureHasher
@@ -113,21 +117,25 @@ void SectionInfoFeatureHashers::start() {
 }
 
 void SectionInfoFeatureHashers::reduceFromSection(PESection const& section) {
+    LLL("???? Reducing section: %s - entropy = %lf, sizeRaw = %u", section.name.c_str(), section.entropy, section.sizeRaw);
     char const* const sectionName = section.name.c_str();
 
     sectionSizeFH.reduce(sectionName, section.sizeRaw);
     sectionVSizeFH.reduce(sectionName, section.vsize);
     sectionEntropyFH.reduce(sectionName, section.entropy);
+    std::string chrstFHStringValue;
     for (
         char const* characteristicsString
         : SectionCharacteristic::getNamesByValue(section.characteristics)
     ) {
-        characteristicsFH.reduce(characteristicsString, 1.0);
+        chrstFHStringValue = section.name + ':' + characteristicsString;
+        characteristicsFH.reduce(chrstFHStringValue.c_str());
     }
 }
 
 void SectionInfoFeatureHashers::reduceFromEntrySectionName(char const* entryName) {
-    entrySectionNameFH.reduce(entryName, 1.0);
+    LLL("???? ENTRY: %s", entryName);
+    entrySectionNameFH.reduce(entryName);
 }
 
 void SectionInfoFeatureHashers::finalize() {
@@ -193,16 +201,17 @@ void SectionInfo::start(feature_t* output, PEFile const& peFile) {
     size_t fileSize = peFile.getFileSize();
     feature_t overlaySizeRatio = fileSize == 0 ? 0.0 : static_cast<feature_t>(overlaySize) / fileSize;
 
-    entropy_t maxEntropy = overlayEntropy;
-    entropy_t minEntropy = overlayEntropy;
-    feature_t maxSizeRatio = overlaySizeRatio;
-    feature_t minSizeRatio = overlaySizeRatio;
+    entropy_t maxEntropy = std::max(static_cast<entropy_t>(0), overlayEntropy);
+    entropy_t minEntropy = std::min(static_cast<entropy_t>(0), overlayEntropy);
+    feature_t maxSizeRatio = std::max(static_cast<feature_t>(0), overlaySizeRatio);
+    feature_t minSizeRatio = std::min(static_cast<feature_t>(0), overlaySizeRatio);
     feature_t maxVSizeRatio = 0;
     feature_t minVSizeRatio = 0;
 
     PESection const* pEntrySection = nullptr;
     PESection const* pPotentialEntrySection = nullptr;
     size_t entrypointRVA = peFile.getEntrypointRVA();
+    LLL("Entry point RVA: %zu - 0x%llx", entrypointRVA, static_cast<unsigned long long>(entrypointRVA));
     std::vector<PESection> const& sections = peFile.getSections();
     size_t numSectionsZeroSize = 0;
     size_t numSectionsEmptyName = 0;
@@ -231,19 +240,21 @@ void SectionInfo::start(feature_t* output, PEFile const& peFile) {
         if (section.hasCharacteristic(SectionCharacteristic::MEM_WRITE)) {
             ++numSectionsWritable;
         }
+
+        if (section.containsRVA(entrypointRVA)) {
+            pEntrySection = &section; // find entry section the usual way
+        }
+
         if (section.hasCharacteristic(SectionCharacteristic::MEM_EXECUTE)) {
+            {
+                // find entry section the UNUSUAL way:
+                if (!pPotentialEntrySection) pPotentialEntrySection = &section;
+            }
             if (section.hasCharacteristic(SectionCharacteristic::MEM_READ)) {
                 ++numSectionsReadableAndExecutable;
-                if (!pPotentialEntrySection) pPotentialEntrySection = &section;
-            } else {
-                // An executable but not readable section? Very suspicious! Memorize it right away!
-                pPotentialEntrySection = &section;
             }
         }
 
-        if (section.containsRVA(entrypointRVA)) {
-            pEntrySection = &section; // find pEntry section the usual way
-        }
     }
 
     // If the entrypointRVA is NOT in any section,

@@ -30,6 +30,8 @@ private:
 
     std::vector<uint8_t> richHeaderRaw;
 
+    size_t entrypointRVA;
+
 public:
     PEFile(uint8_t const* const buf, size_t bufSize);
     bool isPEFile() const;

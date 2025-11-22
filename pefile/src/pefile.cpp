@@ -4,6 +4,8 @@
 PEFile::PEFile(uint8_t const* const fileContent, size_t bufSize) {
     fileSize = bufSize;
     pe = nullptr;
+    entrypointRVA = 0;
+
     try {
         pe = LIEF::PE::Parser::parse(fileContent, bufSize);
     } catch (std::exception const& e) {
@@ -11,6 +13,14 @@ PEFile::PEFile(uint8_t const* const fileContent, size_t bufSize) {
     }
 
     if (pe != nullptr) {
+        if (fileSize > 0x68) {
+            // PE Optional Header AddressOfEntryPoint offset
+            // LIEF fails to parse entrypoint correctly sometimes,
+            // so we read it manually here.
+            entrypointRVA = static_cast<size_t>(
+                *reinterpret_cast<uint32_t const*>(fileContent + 0x68)
+            );
+        }
         sections = PESection::listFromPEFile(*pe, fileSize);
         imports = ImportLibrary::listFromPEFile(*pe, fileSize);
         exportedFunctions = ExportFunction::listFromPEFile(*pe, fileSize);
@@ -38,7 +48,8 @@ bool PEFile::isPEFile() const {
 
 uint64_t PEFile::getEntrypointRVA() const {
     PE_DEFAULT(0);
-    return pe->entrypoint();
+    // return pe->entrypoint();
+    return this->entrypointRVA;
 }
 
 std::vector<PESection> const& PEFile::getSections() const {

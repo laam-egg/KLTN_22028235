@@ -1,4 +1,6 @@
 #include "efe/pefile/section.h"
+#include "efe/common/bytecounter.h"
+#include "efe/common/shannonentropycalculator.h"
 #include <cctype>
 #include <string>
 #include <algorithm>
@@ -29,8 +31,31 @@ std::vector<PESection> PESection::listFromPEFile(LIEF::PE::Binary const& pe, siz
         ss.sizeRaw = s.sizeof_raw_data();
         ss.vsize    = s.virtual_size();
         ss.vaddr    = s.virtual_address();
-        ss.entropy  = s.entropy(); // or compute with calculateShannonEntropy, args (s.content().data(), s.content().size());
-                                   // it seems both approaches are equivalent
+        ss.entropy  = s.entropy(); // or compute with calculateShannonEntropy like below;
+                                   // it seems both approaches are equivalent!
+        
+        // {
+        //     ByteCounter byteCounter;
+        //     byteCounter.reset();
+        //     byteCounter.start();
+        //     byteCounter.reduce(
+        //         reinterpret_cast<uint8_t const*>(s.content().data()),
+        //         s.content().size()
+        //     );
+        //     byteCounter.finalize();
+
+        //     std::vector<size_t> counts(256);
+        //     for (size_t i = 0; i < 256; ++i) {
+        //         counts[i] = byteCounter.getByteCountsArray()[i];
+        //     }
+
+        //     ss.entropy = calculateShannonEntropy(
+        //         s.content().size(),
+        //         counts.data(),
+        //         counts.size()
+        //     );
+        // }
+        
         ss.sizeRatio  = fileSize ? double(ss.sizeRaw) / double(fileSize) : 0.0;
         ss.vsizeRatio = ss.vsize ? double(ss.sizeRaw) / double(std::max<uint32_t>(ss.vsize, 1)) : 0.0;
 

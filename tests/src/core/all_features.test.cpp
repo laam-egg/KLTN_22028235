@@ -14,20 +14,22 @@
 #include "efe/core/f_authenticode_signature.h"
 #include "efe/core/f_pe_format_warnings.h"
 
-constexpr int const FEATURE_DECIMAL_PLACES_FOR_COMPROMISE = 3;
-static feature_t const FEATURE_TOLERANCE = std::pow(10.0, -FEATURE_DECIMAL_PLACES_FOR_COMPROMISE);
+inline constexpr feature_t const tolerateDecimalPlaces(int const decimalPlaces) {
+    return std::pow(10.0, -decimalPlaces);
+}
 
 void testFeatureType(
     std::vector<feature_t> const& expectedFeatureVector,
     std::vector<feature_t> const& actualFeatureVector,
-    char const* featureTypeName, size_t offset, size_t length
+    char const* featureTypeName, size_t offset, size_t length,
+    feature_t const tolerance
 ) {
-    SCOPED_TRACE(testing::Message() << "while testing feature type " << featureTypeName);
+    SCOPED_TRACE(testing::Message() << "while testing feature type: " << featureTypeName);
     feature_t const* expected = expectedFeatureVector.data() + offset;
     feature_t const* actual = actualFeatureVector.data() + offset;
     for (size_t i = 0; i < length; ++i) {
         SCOPED_TRACE(testing::Message() << "at index " << i);
-        EXPECT_NEAR(expected[i], actual[i], FEATURE_TOLERANCE);
+        EXPECT_NEAR(expected[i], actual[i], tolerance);
     }
 }
 
@@ -50,7 +52,7 @@ TEST_F(EFEFixtureTest, AllFeatures) {
         std::vector<feature_t> const& expectedFeatureVector =
             sample.featureVector;
         
-        #define TEST_FT(FeatureTypeClass) \
+        #define TEST_FT_WITH_TOLERANCE(FeatureTypeClass, tolerance) \
             { \
                 char const* featureTypeName = FeatureTypeClass::getFeatureName(); \
                 auto const offsetAndLength = ef.getFeatureTypeOffsetAndLength(featureTypeName); \
@@ -61,9 +63,12 @@ TEST_F(EFEFixtureTest, AllFeatures) {
                     actualFeatureVector, \
                     featureTypeName, \
                     offset, \
-                    length \
+                    length, \
+                    tolerance \
                 ); \
             } (void)0 \
+        
+        #define TEST_FT(FeatureTypeClass) TEST_FT_WITH_TOLERANCE(FeatureTypeClass, tolerateDecimalPlaces(3))
 
         TEST_FT(GeneralFileInfo);
         TEST_FT(ByteEntropyHistogram);
