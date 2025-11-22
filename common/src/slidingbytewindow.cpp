@@ -9,22 +9,13 @@ SlidingByteWindow::SlidingByteWindow() {
     reset();
 }
 
-SlidingByteWindow::~SlidingByteWindow() {
-    deallocateEverything();
-}
+SlidingByteWindow::~SlidingByteWindow() = default;
 
 void SlidingByteWindow::reset() {
-    window = NULL;
+    block.clear();
     windowSize = 0;
-    filledPartBeginPos = filledPartSize = 0;
-    callback = NULL;
-}
-
-void SlidingByteWindow::deallocateEverything() {
-    if (window != NULL) {
-        delete[] window;
-        window = NULL;
-    }
+    step = 0;
+    callback = nullptr;
 }
 
 void SlidingByteWindow::setWindowSize(size_t newWindowSize) {
@@ -46,69 +37,47 @@ void SlidingByteWindow::start() {
     if (step == 0) {
         LOG_FATAL_ERROR("step is zero or not set");
     }
-    if (step > windowSize) {
-        LOG_FATAL_ERROR("step > windowSize is not supported (step = %zu, windowSize = %zu)", step, windowSize);
-    }
-    if (!isPowerOf2(windowSize)) {
-        LOG_FATAL_ERROR("windowSize is not a power of 2 - this breaks modulo computation when an overflow occurs, hence not allowed.");
-    }
     if (callback == NULL) {
         LOG_FATAL_ERROR("callback not set");
     }
+    if (step > windowSize) {
+        LOG_FATAL_ERROR("step is greater than window size - this is not supported");
+    }
 
-    window = new uint8_t[windowSize];
+    this->block.reserve(this->windowSize);
+    this->block.clear();
 }
 
 
 void SlidingByteWindow::reduce(size_t bufOffset, uint8_t const* buf, size_t bufSize) {
-    // #define MODULO_WINDOW_SIZE(x) ((x) % windowSize)
-    // WARNING: Only legit if windowSize is a power of 2 (which it is, in this case):
-    #define MODULO_WINDOW_SIZE(x) ((x) & (windowSize - 1))
+    uint8_t const* endBuf = buf + bufSize;
 
-    size_t readPos = 0;
-
-    while (readPos < bufSize) {
-        size_t bytesToTake = std::min(bufSize - readPos, windowSize - filledPartSize);
-
-        size_t writePos = MODULO_WINDOW_SIZE(filledPartBeginPos + filledPartSize);
-        size_t bytesToWrite = std::min(windowSize - writePos, bytesToTake);
-        if (bytesToWrite > 0) {
-            std::memcpy(window + writePos, buf + readPos, bytesToWrite);
-            readPos += bytesToWrite;
-        }
-        if (bytesToWrite < bytesToTake) {
-            bytesToWrite = bytesToTake - bytesToWrite;
-            writePos = 0;
-            std::memcpy(window + writePos, buf + readPos, bytesToWrite);
-            readPos += bytesToWrite;
-        }
-
-        filledPartSize += bytesToTake;
-        if (filledPartSize == windowSize) {
-            // callback(window, windowSize, filledPartSize, &filledPartBeginPos);
+    while (buf < endBuf) {
+        size_t spaceInBlock = windowSize - this->block.size();
+        if (spaceInBlock > 0) {
+            size_t bytesToCopy = std::min(spaceInBlock, static_cast<size_t>(endBuf - buf));
+            this->block.insert(this->block.end(), buf, buf + bytesToCopy);
+            buf += bytesToCopy;
+        } else {
+            // Block is full, call the callback
             callTheCallback();
-            filledPartBeginPos = MODULO_WINDOW_SIZE(filledPartBeginPos + step);
-            filledPartSize -= step;
+            // Slide the window by 'step' bytes
+            this->block.erase(this->block.begin(), this->block.begin() + step);
         }
     }
-
-    #undef MODULO_WINDOW_SIZE
 }
 
 void SlidingByteWindow::finalize() {
-    if (filledPartSize > 0) {
+    // If there's any remaining data in the block that forms a complete window, process it
+    if (this->block.size() == this->windowSize) {
         callTheCallback();
     }
-
-    deallocateEverything();
 }
 
 void SlidingByteWindow::callTheCallback() noexcept {
-    const size_t firstSegmentSize = std::min(windowSize - filledPartBeginPos, filledPartSize);
-    const size_t secondSegmentSize = filledPartSize - firstSegmentSize;
+    callback(this->block.data(), this->block.size());
+}
 
-    uint8_t* firstSegment = window + filledPartBeginPos;
-    uint8_t* secondSegment = window;
-
-    callback(firstSegment, firstSegmentSize, secondSegment, secondSegmentSize);
+std::vector<uint8_t> const& SlidingByteWindow::getLastBlockAnyway() const {
+    return this->block;
 }

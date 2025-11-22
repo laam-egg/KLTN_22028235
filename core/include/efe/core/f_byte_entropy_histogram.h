@@ -17,11 +17,14 @@ private:
 
     ByteCounter byteCounter;
 
-    bool isFirstWindow;
+    std::vector<uint8_t> temp;
 
-    void withCompleteWindow(uint8_t* firstSegment, size_t firstSegmentSize, uint8_t* secondSegment, size_t secondSegmentSize);
+    void withCompleteWindow(uint8_t const* block, size_t blockSize);
+    bool withCompleteWindowCalled;
 
     feature_t* outputBuffer;
+
+    void writeEntropyBinCounts(feature_t* outputBuffer, uint8_t const* block, size_t blockSize);
 
 public:
     virtual ~ByteEntropyHistogram() override;

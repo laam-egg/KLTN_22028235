@@ -66,7 +66,7 @@ TEST_F(EFEFixtureTest, AllFeatures) {
             } (void)0 \
 
         TEST_FT(GeneralFileInfo);
-        // TEST_FT(ByteEntropyHistogram);
+        TEST_FT(ByteEntropyHistogram);
         // TEST_FT(StringExtractor);
         TEST_FT(HeaderFileInfo);
         // TEST_FT(SectionInfo);

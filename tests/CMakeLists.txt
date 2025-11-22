@@ -23,6 +23,7 @@ list(APPEND SRC_FILES
     "src/featurehasher/featurehasher.test.cpp"
 
     "src/common/bytecounter.test.cpp"
+    "src/common/slidingbytewindow.test.cpp"
 )
 
 add_executable(efe_e2e_test ${SRC_FILES})

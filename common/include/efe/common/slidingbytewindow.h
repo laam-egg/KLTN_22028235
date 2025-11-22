@@ -4,19 +4,16 @@
 #include <cstddef>
 #include <cstdint>
 #include <functional>
+#include <vector>
 
-using WithCompleteWindowCallback = std::function<void(uint8_t* firstSegment, size_t firstSegmentSize, uint8_t* secondSegment, size_t secondSegmentSize)>;
+using WithCompleteWindowCallback = std::function<void(uint8_t const* block, size_t blockSize)>;
 
 class SlidingByteWindow {
 private:
-    uint8_t* window;
+    std::vector<uint8_t> block;
     size_t windowSize;
     size_t step;
-    size_t filledPartBeginPos;
-    size_t filledPartSize;
     WithCompleteWindowCallback callback;
-
-    void deallocateEverything();
 
     void callTheCallback() noexcept;
 
@@ -37,6 +34,11 @@ public:
     void reduce(size_t bufOffset, uint8_t const* buf, size_t bufSize);
 
     void finalize();
+
+    /**
+     * Get the last block anyway, even if it is smaller than window size.
+     */
+    std::vector<uint8_t> const& getLastBlockAnyway() const;
 };
 
 #endif // BYTE_ACCUMULATOR_INCLUDED
