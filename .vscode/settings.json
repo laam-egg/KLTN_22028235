@@ -1,0 +1,12 @@
+{
+    "cmake.generator": "Ninja",
+    "files.associations": {
+        ".git-ftp-ignore": "ignore",
+        "memory": "cpp",
+        "filesystem": "cpp",
+        "system_error": "cpp"
+    },
+    "cmake.automaticReconfigure": false,
+    "cmake.configureOnEdit": false,
+    "cmake.configureOnOpen": false
+}
