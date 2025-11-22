@@ -14,21 +14,6 @@
 #include "efe/core/f_authenticode_signature.h"
 #include "efe/core/f_pe_format_warnings.h"
 
-#include <type_traits>
-
-template<class> inline constexpr bool always_false_v = false;
-
-template<typename T>
-inline void EXPECT_REAL_EQ(T a, T b) {
-    if constexpr (std::is_same_v<T, float>) {
-        EXPECT_FLOAT_EQ(a, b);
-    } else if constexpr (std::is_same_v<T, double>) {
-        EXPECT_DOUBLE_EQ(a, b);
-    } else {
-        static_assert(always_false_v<T>, "T is not float or double? Then what the hell is it?");
-    }
-}
-
 constexpr int const FEATURE_DECIMAL_PLACES_FOR_COMPROMISE = 3;
 static feature_t const FEATURE_TOLERANCE = std::pow(10.0, -FEATURE_DECIMAL_PLACES_FOR_COMPROMISE);
 
