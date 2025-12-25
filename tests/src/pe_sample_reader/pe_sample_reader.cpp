@@ -71,6 +71,15 @@ bool PESampleReader::next(PESample& sample) {
     uint8_t const* key = reinterpret_cast<uint8_t const*>(rawKey);
     openAndDecodeFileContent(sample.fileContent, key, hash);
 
+    #ifdef DUMP_TEST_SAMPLES
+    {
+        std::ofstream f(TEST_BINARIES_DIR / (std::string(hash) + "_original"), std::ios::binary);
+        // write sample.fileContent to f
+
+        f.write(reinterpret_cast<char const*>(sample.fileContent.data()), sample.fileContent.size());
+    }
+    #endif // DUMP_TEST_SAMPLES
+
     void const* rawFeatureVector = sqlite3_column_blob(stmt, COL_FEATURE_VECTOR);
     int rawFeatureVectorByteCount = sqlite3_column_bytes(stmt, COL_FEATURE_VECTOR);
     // SELECT DISTINCT LENGTH(feature_vector) FROM files;

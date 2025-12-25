@@ -4,9 +4,12 @@
 #include "efe/common/nop.h"
 #include <algorithm>
 
-// #include "efe/common/logging.h"
-// #define LLL LOG_INFO
+#ifdef DEBUG
+#include "efe/common/logging.h"
+#define LLL LOG_INFO
+#else
 #define LLL(...)
+#endif // DEBUG
 
 #define DIM 224
 
@@ -117,7 +120,7 @@ void SectionInfoFeatureHashers::start() {
 }
 
 void SectionInfoFeatureHashers::reduceFromSection(PESection const& section) {
-    LLL("???? Reducing section: %s - entropy = %lf, sizeRaw = %u", section.name.c_str(), section.entropy, section.sizeRaw);
+    LLL("???? Reducing section: %s - entropy = %lf, sizeRaw = %u, vsize = %u", section.name.c_str(), section.entropy, section.sizeRaw, section.vsize);
     char const* const sectionName = section.name.c_str();
 
     sectionSizeFH.reduce(sectionName, section.sizeRaw);

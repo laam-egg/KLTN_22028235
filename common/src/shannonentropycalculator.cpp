@@ -7,12 +7,21 @@ entropy_t calculateShannonEntropy(size_t sumTotalCounts, size_t const* const cou
     }
 
     entropy_t entropy = 0.0;
+    
+    #ifdef OPTIMIZATION_MISMATCHING_ORIGINAL
     const entropy_t invTotal = 1.0 / sumTotalCounts;
+    #endif
 
     for (size_t i = 0; i < numCounts; ++i) {
         auto const x = counts[i];
         if (x == 0) continue; // skip zero counts
-        entropy_t p_x = x * invTotal;
+        entropy_t p_x = (
+            #ifdef OPTIMIZATION_MISMATCHING_ORIGINAL
+            x * invTotal
+            #else
+            float(x) / sumTotalCounts
+            #endif
+        );
         entropy -= p_x * std::log2(p_x);
     }
 

@@ -35,12 +35,14 @@ std::vector<PESection> PESection::listFromPEFile(LIEF::PE::Binary const& pe, siz
                                    // it seems both approaches are equivalent!
         
         // {
+        //     size_t SIZE_TO_COMPUTE = s.content().size();
+        //     // size_t SIZE_TO_COMPUTE = std::min(static_cast<size_t>(ss.vsize), s.content().size());
         //     ByteCounter byteCounter;
         //     byteCounter.reset();
         //     byteCounter.start();
         //     byteCounter.reduce(
         //         reinterpret_cast<uint8_t const*>(s.content().data()),
-        //         s.content().size()
+        //         SIZE_TO_COMPUTE
         //     );
         //     byteCounter.finalize();
 
@@ -50,7 +52,7 @@ std::vector<PESection> PESection::listFromPEFile(LIEF::PE::Binary const& pe, siz
         //     }
 
         //     ss.entropy = calculateShannonEntropy(
-        //         s.content().size(),
+        //         SIZE_TO_COMPUTE,
         //         counts.data(),
         //         counts.size()
         //     );
@@ -62,6 +64,17 @@ std::vector<PESection> PESection::listFromPEFile(LIEF::PE::Binary const& pe, siz
         ss.characteristics = s.characteristics();
         
         out.push_back(std::move(ss));
+
+        #ifdef DEBUG
+        for (size_t i = 0; i < std::min<size_t>(s.content().size(), 20); ++i) {
+            printf("    char[%zu] = 0x%02x ('%c')\n", i, static_cast<unsigned int>(static_cast<uint8_t>(s.content()[i])), std::isprint(s.content()[i]) ? s.content()[i] : '.');
+        }
+        printf("    ...\n");
+        for (int i = static_cast<int>(s.content().size()) - 20; i < static_cast<int>(s.content().size()); ++i) {
+            if (i < 0) continue;
+            printf("    char[%d] = 0x%02x ('%c')\n", i, static_cast<unsigned int>(static_cast<uint8_t>(s.content()[i])), std::isprint(s.content()[i]) ? s.content()[i] : '.');
+        }
+        #endif
     }
     return out;
 }
