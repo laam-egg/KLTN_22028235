@@ -80,7 +80,7 @@ TEST_F(EFEFixtureTest, AllFeatures) {
         // TEST_FT(StringExtractor);
         TEST_FT(HeaderFileInfo);
         TEST_FT_WITH_TOLERANCE(SectionInfo, 3.9);
-        // TEST_FT(ImportsInfo);
+        TEST_FT_WITH_TOLERANCE(ImportsInfo, 1.05);
         TEST_FT(ExportsInfo);
         TEST_FT(DataDirectories);
         // TEST_FT(RichHeaderFeatureType);

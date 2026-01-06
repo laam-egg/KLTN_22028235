@@ -1,6 +1,13 @@
 #include "efe/core/f_imports_info.h"
 #include <string>
 
+#ifdef DEBUG
+#include "efe/common/logging.h"
+#define LLL LOG_INFO
+#else
+#define LLL(...)
+#endif // DEBUG
+
 #define DIM 1282
 
 #define LIBRARIES_FH_BUCKET_SIZE 256
@@ -45,11 +52,13 @@ void ImportsInfo::start(feature_t* output, PEFile const& peFile) {
     librariesFH.reset();
     librariesFH.setOutput(output + Offset::LIBRARIES_HASHED);
     librariesFH.setSize(LIBRARIES_FH_BUCKET_SIZE);
+    librariesFH.setAlternateSign(false);
     librariesFH.start();
 
     functionsFH.reset();
     functionsFH.setOutput(output + Offset::FUNCTIONS_HASHED);
     functionsFH.setSize(FUNCTIONS_FH_BUCKET_SIZE);
+    functionsFH.setAlternateSign(false);
     functionsFH.start();
 
     std::vector<ImportLibrary> const& libraries = peFile.getImportLibraries();
@@ -60,16 +69,18 @@ void ImportsInfo::start(feature_t* output, PEFile const& peFile) {
     for (ImportLibrary const& lib : libraries) {
         std::string const& libName = lib.dllName;
         librariesFH.reduce(libName.c_str(), 1.0);
+        LLL("ImportsInfo: --- LIBRARY: %s", libName.c_str());
 
         for (ImportFunction const& func : lib.functions) {
             funcNameBuf = libName + ":";
             if (!func.name.empty()) {
-                functionsFH.reduce(func.name.substr(0, 10000).c_str(), 1.0);
+                funcNameBuf.append(func.name.substr(0, 10000).c_str());
             } else {
                 funcNameBuf.append("ordinal");
                 funcNameBuf.append(std::to_string(func.ordinal));
-                functionsFH.reduce(funcNameBuf.c_str(), 1.0);
             }
+            LLL("ImportsInfo: --- IMPORT: %s", funcNameBuf.c_str());
+            functionsFH.reduce(funcNameBuf.c_str());
 
             ++numFunctions;
         }
@@ -80,6 +91,8 @@ void ImportsInfo::start(feature_t* output, PEFile const& peFile) {
 
     output[Offset::NUM_FUNCTIONS] = numFunctions;
     output[Offset::NUM_LIBRARIES] = numLibraries;
+
+    LLL("ImportsInfo: num libraries = %zu, num functions = %zu", numLibraries, numFunctions);
 }
 
 void ImportsInfo::reduce(feature_t* output, PEFile const& peFile, size_t bufOffset, uint8_t const* buf, size_t bufSize) {
