@@ -83,7 +83,7 @@ TEST_F(EFEFixtureTest, AllFeatures) {
         TEST_FT_WITH_TOLERANCE(ImportsInfo, 1.05);
         TEST_FT(ExportsInfo);
         TEST_FT(DataDirectories);
-        // TEST_FT(RichHeaderFeatureType);
+        TEST_FT(RichHeaderFeatureType);
         // TEST_FT(AuthenticodeSignature);
         // TEST_FT(PEFormatWarnings);
     }

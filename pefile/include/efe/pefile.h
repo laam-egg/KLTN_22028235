@@ -57,6 +57,7 @@ public:
 
     bool hasRichHeader() const;
     void getRichHeaderBytes(uint8_t const** pBuf, size_t* pBufSize) const;
+    uint32_t getRichHeaderKey() const;
 };
 
 #endif // EFE_PEFILE_INCLUDED

@@ -60,7 +60,10 @@ void RichHeaderFeatureType::start(feature_t* output, PEFile const& peFile) {
 
     size_t numDwordPairs = rhNumDwords / 2;
     uint32_t const* const rhDwordBuf = reinterpret_cast<uint32_t const*>(rhBuf);
-    output[Offset::NUM_DWORD_PAIRS] = static_cast<feature_t>(numDwordPairs);
+    output[Offset::NUM_DWORD_PAIRS] = std::max(
+        static_cast<feature_t>(0),
+        static_cast<feature_t>(numDwordPairs) - 3
+    );
     std::string buf;
     buf.reserve(8);
     for (size_t pairIdx = 0; pairIdx < numDwordPairs; ++pairIdx) {

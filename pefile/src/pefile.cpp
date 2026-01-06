@@ -134,3 +134,12 @@ void PEFile::getRichHeaderBytes(uint8_t const** pBuf, size_t* pBufSize) const {
     pBuf[0] = richHeaderRaw.data();
     pBufSize[0] = richHeaderRaw.size();
 }
+
+uint32_t PEFile::getRichHeaderKey() const {
+    PE_DEFAULT(0);
+    if (!pe->has_rich_header()) {
+        return 0;
+    }
+
+    return pe->rich_header()->key();
+}
