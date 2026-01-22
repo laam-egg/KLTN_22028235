@@ -77,7 +77,7 @@ TEST_F(EFEFixtureTest, AllFeatures) {
 
         TEST_FT(GeneralFileInfo);
         TEST_FT(ByteEntropyHistogram);
-        // TEST_FT(StringExtractor);
+        TEST_FT(StringExtractor);
         TEST_FT(HeaderFileInfo);
         TEST_FT_WITH_TOLERANCE(SectionInfo, 3.9);
         TEST_FT_WITH_TOLERANCE(ImportsInfo, 1.05);

@@ -3,10 +3,28 @@
 #include "efe/common/meth.h"
 #include <array>
 
+#ifdef DEBUG
+#define LLL LOG_INFO
+#else
+#define LLL(...)
+#endif // DEBUG
+
+
 StringExtractor::~StringExtractor() = default;
 
 RE2 const& StringExtractor::getReadableStringRegex() {
-    static RE2 readableStringRegex{ "[\\x20-\\x7f]{5,}" };
+    static RE2 readableStringRegex([]{
+        RE2::Options opt;
+        opt.set_longest_match(true);
+        opt.set_encoding(RE2::Options::Encoding::EncodingLatin1);
+        // Common pitfall:
+        // This regex is used with RE2::FindAndConsume.
+        //
+        // EVERY TIME you use RE2::FindAndConsume,
+        // your regex must contain a capturing group around the part you want.
+        // So wrap the whole regex in parentheses `()`.
+        return RE2("([\x20-\x7f]{5,})", opt);
+    }());
     return readableStringRegex;
 }
 
@@ -19,6 +37,8 @@ RE2 const* StringExtractor::getInterestingStringRegexes(size_t& count) {
 
     static std::array regexes{
         #define ADD(...) RE2(__VA_ARGS__),
+        // These regexes are used with RE2::PartialMatch instead.
+        // So they do NOT need capturing groups.
 
         ADD(".click", IGNORECASE)
         ADD("/EmbeddedFile")
@@ -139,11 +159,13 @@ void StringExtractor::start(feature_t* output, PEFile const& peFile) {
 
 void StringExtractor::reduce(feature_t* output, PEFile const& peFile, size_t bufOffset, uint8_t const* buf, size_t bufSize) {
     char const* charBuf = reinterpret_cast<char const*>(buf);
+    LLL("PEEK CHAR: %.20s", charBuf);
 
     re2::StringPiece input{ charBuf, bufSize };
     re2::StringPiece match;
 
     while (RE2::FindAndConsume(&input, readableStringRegex, &match)) {
+        LLL("  MATCHED STRING: %.20s", match.data());
         sumReadableStringLengths += match.size();
         numReadableStrings += 1;
         readableByteCounter.reduce(reinterpret_cast<uint8_t const*>(match.data()), match.size());
