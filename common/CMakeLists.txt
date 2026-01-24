@@ -26,6 +26,8 @@ list(
                     src/slidingbytewindow.cpp
     include/efe/common/shannonentropycalculator.h
                     src/shannonentropycalculator.cpp
+    include/efe/common/timestamps.h
+                    src/timestamps.cpp
 )
 
 add_library(efe_common ${SRC_FILES})

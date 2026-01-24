@@ -143,3 +143,8 @@ uint32_t PEFile::getRichHeaderKey() const {
 
     return pe->rich_header()->key();
 }
+
+PEAuthenticodeSignatureInfo PEFile::getAuthenticodeSignatureInfo() const {
+    PE_DEFAULT(PEAuthenticodeSignatureInfo{});
+    return PEAuthenticodeSignatureInfo::extractFromPEFile(*pe);
+}

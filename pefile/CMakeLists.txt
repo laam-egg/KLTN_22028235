@@ -49,6 +49,9 @@ list(
 
     include/efe/pefile/data_directory.h
                     src/data_directory.cpp
+
+    include/efe/pefile/authenticode_signature.h
+                    src/authenticode_signature.cpp
 )
 
 add_library(efe_pefile ${SRC_FILES})

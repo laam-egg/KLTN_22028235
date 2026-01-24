@@ -12,6 +12,7 @@
 #include "efe/pefile/headers/coff_header.h"
 #include "efe/pefile/headers/optional_header.h"
 #include "efe/pefile/data_directory.h"
+#include "efe/pefile/authenticode_signature.h"
 
 class PEFile {
 private:
@@ -58,6 +59,8 @@ public:
     bool hasRichHeader() const;
     void getRichHeaderBytes(uint8_t const** pBuf, size_t* pBufSize) const;
     uint32_t getRichHeaderKey() const;
+
+    PEAuthenticodeSignatureInfo getAuthenticodeSignatureInfo() const;
 };
 
 #endif // EFE_PEFILE_INCLUDED
