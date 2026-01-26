@@ -110,3 +110,17 @@ FetchContent_Declare(LIEF
 FetchContent_MakeAvailable(LIEF)
 
 target_link_libraries(efe_pefile PUBLIC LIEF::LIEF)
+
+# Avast's authenticode-parser
+
+set(AUTHENTICODE_PARSER_GIT_URL "https://github.com/avast/authenticode-parser.git")
+set(AUTHENTICODE_PARSER_VERSION "b5d5018e25525d649bb26ff0155223ab3996628f")
+
+FetchContent_Declare(authenticode_parser
+    GIT_REPOSITORY  "${AUTHENTICODE_PARSER_GIT_URL}"
+    GIT_TAG         "${AUTHENTICODE_PARSER_VERSION}"
+)
+FetchContent_MakeAvailable(authenticode_parser)
+
+target_include_directories(efe_pefile PUBLIC authenticode)
+target_link_libraries(efe_pefile PUBLIC authenticode)

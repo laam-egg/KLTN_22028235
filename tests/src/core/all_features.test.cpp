@@ -40,11 +40,11 @@ TEST_F(EFEFixtureTest, AllFeatures) {
     PESample sample;
     std::vector<feature_t> actualFeatureVector;
     while (sampleReader.next(sample)) {
-        #ifdef DEBUG
-        if (sample.sha256 != "57d0068b412269f08af1496f316d809d6bf8313f789630676b736b1cfeef609c" && sample.sha256 != "6b33fa9a439a86f553f9f60e538ccabc857d2f308bc77c477c04a46552ade81f") {
-            continue;
-        }
-        #endif // DEBUG
+        // #ifdef DEBUG
+        // if (sample.sha256 != "57d0068b412269f08af1496f316d809d6bf8313f789630676b736b1cfeef609c" && sample.sha256 != "6b33fa9a439a86f553f9f60e538ccabc857d2f308bc77c477c04a46552ade81f") {
+        //     continue;
+        // }
+        // #endif // DEBUG
         SCOPED_TRACE(testing::Message() << "with sample: " << sample.sha256);
         std::error_code err;
         feature_t const* actualRawFeatureVector =
@@ -84,7 +84,7 @@ TEST_F(EFEFixtureTest, AllFeatures) {
         TEST_FT(ExportsInfo);
         TEST_FT(DataDirectories);
         TEST_FT(RichHeaderFeatureType);
-        TEST_FT(AuthenticodeSignature);
+        TEST_FT_WITH_TOLERANCE(AuthenticodeSignature, 1.0001); // signing times can vary due to rounding differences between signify (Python) and OpenSSL.
         // TEST_FT(PEFormatWarnings);
     }
 }

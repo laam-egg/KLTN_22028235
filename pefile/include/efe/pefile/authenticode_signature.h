@@ -15,7 +15,9 @@ struct PEAuthenticodeSignatureInfo {
     int64_t signingTimeDiff = 0;
 
     static PEAuthenticodeSignatureInfo extractFromPEFile(
-        LIEF::PE::Binary const& pe
+        LIEF::PE::Binary const& pe,
+        uint8_t const* fileData,
+        size_t fileSize
     );
 };
 

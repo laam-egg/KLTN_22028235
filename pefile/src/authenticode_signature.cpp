@@ -4,6 +4,8 @@
 #include <queue>
 #include "efe/common/timestamps.h"
 
+#include "authenticode-parser/authenticode.h"
+
 /**
  * Return the first program_name found in the signature's
  * authenticated attributes (SpcSpOpusInfo structures).
@@ -139,9 +141,53 @@ static CounterSignatureInfo getCounterSignatureInfo(LIEF::PE::Signature const& s
     return info;
 }
 
+class ThreadLocalInitialization {
+public:
+    static ThreadLocalInitialization& getInstance() {
+        thread_local ThreadLocalInitialization instance;
+        return instance;
+    }
+
+private:
+    ThreadLocalInitialization() {
+        initialize_authenticode_parser();
+    }
+    ~ThreadLocalInitialization() = default;
+    ThreadLocalInitialization(const ThreadLocalInitialization&) = delete;
+    ThreadLocalInitialization& operator=(const ThreadLocalInitialization&) = delete;
+};
+
+static CounterSignatureInfo getCounterSignatureInfo_Avast(uint8_t const* data, size_t dataSize) {
+    CounterSignatureInfo info = {};
+
+    ThreadLocalInitialization::getInstance();
+    AuthenticodeArray* auth = parse_authenticode(data, static_cast<uint64_t>(dataSize));
+    if (auth && auth->count > 0) {
+        for (size_t i = 0; i < auth->count; ++i) {
+            Authenticode const* authenticode = auth->signatures[i];
+
+            for (size_t i = 0; i < authenticode->countersigs->count; ++i) {
+                Countersignature *counter = authenticode->countersigs->counters[i];
+
+                int64_t signTime = counter->sign_time;
+                if (signTime > 0) {
+                    info.hasCounterSigner = true;
+                    info.signingTime = static_cast<uint64_t>(signTime);
+                    goto FINISH;
+                }
+            }
+        }
+    }
+    FINISH:
+    authenticode_array_free(auth); // null-safe operation
+    return info;
+}
+
 PEAuthenticodeSignatureInfo
 PEAuthenticodeSignatureInfo::extractFromPEFile(
-    LIEF::PE::Binary const& pe
+    LIEF::PE::Binary const& pe,
+    uint8_t const* fileData,
+    size_t fileSize
 ) {
     PEAuthenticodeSignatureInfo info = {};
 
@@ -161,23 +207,23 @@ PEAuthenticodeSignatureInfo::extractFromPEFile(
             info.emptyProgramName = true;
         }
 
-        CounterSignatureInfo counterSigInfo = getCounterSignatureInfo(sig);
-        if (counterSigInfo.hasCounterSigner) {
-            info.noCounterSigner = false;
-            info.latestSigningTime = std::max(
-                info.latestSigningTime,
-                counterSigInfo.signingTime
-            );
+        // CounterSignatureInfo counterSigInfo = getCounterSignatureInfo(sig);
+        // if (counterSigInfo.hasCounterSigner) {
+        //     info.noCounterSigner = false;
+        //     info.latestSigningTime = std::max(
+        //         info.latestSigningTime,
+        //         counterSigInfo.signingTime
+        //     );
 
-            uint64_t peTimestamp = pe.header().time_date_stamp();
-            int64_t diff = (
-                static_cast<int64_t>(counterSigInfo.signingTime)
-                - static_cast<int64_t>(peTimestamp)
-            );
-            info.signingTimeDiff = diff;
-        } else {
-            info.noCounterSigner = true;
-        }
+        //     uint64_t peTimestamp = pe.header().time_date_stamp();
+        //     int64_t diff = (
+        //         static_cast<int64_t>(counterSigInfo.signingTime)
+        //         - static_cast<int64_t>(peTimestamp)
+        //     );
+        //     info.signingTimeDiff = diff;
+        // } else {
+        //     info.noCounterSigner = true;
+        // }
         
         info.chainMaxDepth = std::max(
             info.chainMaxDepth,
@@ -192,6 +238,27 @@ PEAuthenticodeSignatureInfo::extractFromPEFile(
                 info.numSelfSignedCerts += 1;
             }
         }
+    }
+
+    CounterSignatureInfo counterSigInfo = getCounterSignatureInfo_Avast(
+        fileData,
+        fileSize
+    );
+    if (counterSigInfo.hasCounterSigner) {
+        info.noCounterSigner = false;
+        info.latestSigningTime = std::max(
+            info.latestSigningTime,
+            counterSigInfo.signingTime
+        );
+
+        uint64_t peTimestamp = pe.header().time_date_stamp();
+        int64_t diff = (
+            static_cast<int64_t>(counterSigInfo.signingTime)
+            - static_cast<int64_t>(peTimestamp)
+        );
+        info.signingTimeDiff = diff;
+    } else {
+        info.noCounterSigner = true;
     }
 
     return info;

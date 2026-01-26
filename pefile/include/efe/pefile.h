@@ -17,21 +17,23 @@
 class PEFile {
 private:
     std::unique_ptr<LIEF::PE::Binary> pe;
-    size_t fileSize;
+    size_t fileSize = 0;
 
     std::vector<PESection> sections;
     std::vector<ImportLibrary> imports;
     std::vector<ExportFunction> exportedFunctions;
 
-    DOSHeader dosHeader;
-    CoffHeader coffHeader;
-    OptionalHeader optionalHeader;
+    DOSHeader dosHeader = {};
+    CoffHeader coffHeader = {};
+    OptionalHeader optionalHeader = {};
 
     std::vector<DataDirectory> dataDirectories;
 
     std::vector<uint8_t> richHeaderRaw;
 
-    size_t entrypointRVA;
+    size_t entrypointRVA = 0;
+
+    PEAuthenticodeSignatureInfo authenticodeSignatureInfo = {};
 
 public:
     PEFile(uint8_t const* const buf, size_t bufSize);

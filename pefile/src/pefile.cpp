@@ -35,6 +35,12 @@ PEFile::PEFile(uint8_t const* const fileContent, size_t bufSize) {
             LIEF::PE::RichHeader const* rh = pe->rich_header();
             richHeaderRaw = rh->raw();
         }
+
+        authenticodeSignatureInfo = PEAuthenticodeSignatureInfo::extractFromPEFile(
+            *pe,
+            fileContent,
+            fileSize
+        );
     }
 }
 
@@ -146,5 +152,5 @@ uint32_t PEFile::getRichHeaderKey() const {
 
 PEAuthenticodeSignatureInfo PEFile::getAuthenticodeSignatureInfo() const {
     PE_DEFAULT(PEAuthenticodeSignatureInfo{});
-    return PEAuthenticodeSignatureInfo::extractFromPEFile(*pe);
+    return authenticodeSignatureInfo;
 }
