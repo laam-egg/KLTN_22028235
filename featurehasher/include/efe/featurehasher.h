@@ -2,6 +2,7 @@
 #define EFE_FEATURE_HASHER_INCLUDED
 
 #include <cstddef>
+#include <cstdint>
 #include <string>
 #include <vector>
 

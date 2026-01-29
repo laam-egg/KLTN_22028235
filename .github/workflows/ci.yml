@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y libomp-dev ninja-build clang cmake build-essential git openssl libssl-dev
+
+      - name: Verify OpenMP installation
+        run: |
+          echo 'int main(){}' > test.cpp
+          clang++ -fopenmp test.cpp -o test -lomp
+          rm -f test.cpp test
+          echo "OpenMP check exit code: $?"
+      
+      - name: Prepare build directories
+        run: mkdir -p build/_deps
+
+      - name: Cache CMake FetchContent
+        uses: actions/cache@v4
+        with:
+          path: build/_deps
+          key: ${{ runner.os }}-fetchcontent-${{ hashFiles('CMakeLists.txt', '**/CMakeLists.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-fetchcontent-
+
+      - name: Cache build directory
+        uses: actions/cache@v4
+        with:
+          path: build
+          key: ${{ runner.os }}-build-${{ hashFiles('CMakeLists.txt', '**/*.cmake', '**/*.cpp', '**/*.hpp') }}
+          restore-keys: |
+            ${{ runner.os }}-build-
+
+      - name: Configure CMake
+        env:
+          BUILD_TYPE: Release
+          GENERATOR: Ninja
+        run: |
+          mkdir -p build
+          cd build
+          cmake .. -G "$GENERATOR" -DCMAKE_BUILD_TYPE="$BUILD_TYPE" -DBUILD_TESTING=ON
+
+      - name: Build
+        run: |
+          cd build
+          cmake --build . --target all -j
+
+      - name: Run tests
+        run: |
+          cd build
+          ctest --test-dir . --output-on-failure

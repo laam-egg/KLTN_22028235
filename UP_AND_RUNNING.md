@@ -59,6 +59,10 @@ Expected output:
 
 Just make sure the last line contains the number `0`.
 
+Also, follow the setup guide here:
+
+<https://github.com/avast/authenticode-parser?tab=readme-ov-file#requirements>
+
 ### Windows: Build the Libraries only
 
 Compile:
@@ -130,6 +134,10 @@ Then, ensure that OpenMP is installed, with:
 # Expected output: 0
 echo 'int main(){}' > test.cpp && clang++ -fopenmp test.cpp -o test -lomp && rm -f test.cpp && rm -f test && echo $?
 ```
+
+Also, follow the setup guide here:
+
+<https://github.com/avast/authenticode-parser?tab=readme-ov-file#requirements>
 
 ### Ubuntu: Build the Libraries only
 
