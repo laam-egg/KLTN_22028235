@@ -9,7 +9,7 @@ void openAndDecodeFileContent(
     uint8_t const* key,
     char const* hash
 );
-void readFileToBuf(std::vector<uint8_t>& buf, const std::string &path);
+void readFileToBuf(std::vector<uint8_t>& buf, std::filesystem::path const& path);
 void xorDecryptBufInplace(std::vector<uint8_t>& buf, uint8_t const* key);
 
 #define COL_HASH 0
@@ -109,9 +109,9 @@ void openAndDecodeFileContent(
     xorDecryptBufInplace(outFileContent, key);
 }
 
-void readFileToBuf(std::vector<uint8_t>& buf, const std::string &path) {
+void readFileToBuf(std::vector<uint8_t>& buf, std::filesystem::path const& path) {
     std::ifstream f(path, std::ios::binary);
-    if (!f) throw std::runtime_error("Failed to open file: " + path);
+    if (!f) throw std::runtime_error("Failed to open file: " + path.string());
 
     buf.assign(
         std::istreambuf_iterator<char>(f),

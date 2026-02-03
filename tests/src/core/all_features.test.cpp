@@ -14,8 +14,8 @@
 #include "efe/core/f_authenticode_signature.h"
 #include "efe/core/f_pe_format_warnings.h"
 
-inline constexpr feature_t const tolerateDecimalPlaces(int const decimalPlaces) {
-    return std::pow(10.0, -decimalPlaces);
+inline feature_t tolerateDecimalPlaces(int const decimalPlaces) {
+    return std::pow<feature_t>(10.0, -decimalPlaces);
 }
 
 void testFeatureType(

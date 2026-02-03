@@ -57,9 +57,7 @@ file(
     COPY ${CMAKE_CURRENT_LIST_DIR}/resources
     DESTINATION ${TEST_DATA_DIR}
 )
-target_compile_definitions(efe_e2e_test
-    PRIVATE TEST_DATA_DIR="${TEST_DATA_DIR}"
-)
+target_compile_definitions(efe_e2e_test PRIVATE TEST_DATA_DIR="${TEST_DATA_DIR}")
 
 target_include_directories(efe_e2e_test PRIVATE include src sqlite3)
 target_link_libraries(efe_e2e_test PRIVATE sqlite3)
