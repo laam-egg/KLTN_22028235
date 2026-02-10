@@ -17,11 +17,9 @@ list(
     include/efe/pefile/section_characteristics.h
                     src/section_characteristics.cpp
     
-    include/efe/pefile/dll_characteristics_declarations.h
     include/efe/pefile/dll_characteristics.h
                     src/dll_characteristics.cpp
     
-    include/efe/pefile/machine_types_declarations.h
     include/efe/pefile/machine_types.h
                     src/machine_types.cpp
 
@@ -29,7 +27,6 @@ list(
     include/efe/pefile/subsystem_types.h
                     src/subsystem_types.cpp
     
-    include/efe/pefile/coff_characteristics_declarations.h
     include/efe/pefile/coff_characteristics.h
                     src/coff_characteristics.cpp
     
