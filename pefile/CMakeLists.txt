@@ -12,7 +12,6 @@ list(
 
     include/efe/pefile/common.h
                     src/common.cpp
-    include/efe/pefile/section_characteristics_declarations.h
 
     include/efe/pefile/section_characteristics.h
                     src/section_characteristics.cpp
@@ -23,7 +22,6 @@ list(
     include/efe/pefile/machine_types.h
                     src/machine_types.cpp
 
-    include/efe/pefile/subsystem_types_declarations.h
     include/efe/pefile/subsystem_types.h
                     src/subsystem_types.cpp
     

@@ -1,0 +1,548 @@
+{
+  "schema_version": "1.0",
+  "session": {
+    "start_time": 1767905060.428567,
+    "end_time": 1767905064.7980323,
+    "host": "Linux-5.15.0-164-generic-x86_64-with-glibc2.35"
+  },
+  "results": [
+    {
+      "test_case": {
+        "id": "tc01_less_than_100_KB",
+        "name": "tc01_less_than_100_KB"
+      },
+      "process": {
+        "pid": 112112,
+        "start_time": 1767905060.428995,
+        "end_time": 1767905060.4796212,
+        "exit_code": 0
+      },
+      "samples": [],
+      "summary": {
+        "runtime_sec": 0.050466060638427734,
+        "cpu": {
+          "avg": 0.0,
+          "max": 0.0
+        },
+        "memory": {
+          "max_rss_bytes": 0
+        },
+        "io": {
+          "read_bytes": 0,
+          "write_bytes": 0
+        },
+        "exit_code": 0,
+        "status": "completed"
+      }
+    },
+    {
+      "test_case": {
+        "id": "tc02_100_KB_to_1_MB",
+        "name": "tc02_100_KB_to_1_MB"
+      },
+      "process": {
+        "pid": 112113,
+        "start_time": 1767905060.4808326,
+        "end_time": 1767905060.5815375,
+        "exit_code": 0
+      },
+      "samples": [],
+      "summary": {
+        "runtime_sec": 0.10040831565856934,
+        "cpu": {
+          "avg": 0.0,
+          "max": 0.0
+        },
+        "memory": {
+          "max_rss_bytes": 0
+        },
+        "io": {
+          "read_bytes": 0,
+          "write_bytes": 0
+        },
+        "exit_code": 0,
+        "status": "completed"
+      }
+    },
+    {
+      "test_case": {
+        "id": "tc03_1_MB_to_10_MB",
+        "name": "tc03_1_MB_to_10_MB"
+      },
+      "process": {
+        "pid": 112115,
+        "start_time": 1767905060.582528,
+        "end_time": 1767905060.7832906,
+        "exit_code": 0
+      },
+      "samples": [
+        {
+          "cpu_percent": 89.7,
+          "rss_bytes": 30515200,
+          "vms_bytes": 40124416,
+          "io": {
+            "read_bytes": 0,
+            "write_bytes": 0
+          },
+          "ts": 1767905060.6828864
+        }
+      ],
+      "summary": {
+        "runtime_sec": 0.2005298137664795,
+        "cpu": {
+          "avg": 89.7,
+          "max": 89.7
+        },
+        "memory": {
+          "max_rss_bytes": 30515200
+        },
+        "io": {
+          "read_bytes": 0,
+          "write_bytes": 0
+        },
+        "exit_code": 0,
+        "status": "completed"
+      }
+    },
+    {
+      "test_case": {
+        "id": "tc04_10_MB_to_50_MB",
+        "name": "tc04_10_MB_to_50_MB"
+      },
+      "process": {
+        "pid": 112117,
+        "start_time": 1767905060.7837448,
+        "end_time": 1767905061.887337,
+        "exit_code": 0
+      },
+      "samples": [
+        {
+          "cpu_percent": 89.7,
+          "rss_bytes": 117325824,
+          "vms_bytes": 124133376,
+          "io": {
+            "read_bytes": 0,
+            "write_bytes": 0
+          },
+          "ts": 1767905060.8839457
+        },
+        {
+          "cpu_percent": 99.7,
+          "rss_bytes": 117325824,
+          "vms_bytes": 124133376,
+          "io": {
+            "read_bytes": 0,
+            "write_bytes": 0
+          },
+          "ts": 1767905060.9843013
+        },
+        {
+          "cpu_percent": 99.7,
+          "rss_bytes": 117325824,
+          "vms_bytes": 124133376,
+          "io": {
+            "read_bytes": 0,
+            "write_bytes": 0
+          },
+          "ts": 1767905061.084614
+        },
+        {
+          "cpu_percent": 89.7,
+          "rss_bytes": 117325824,
+          "vms_bytes": 124133376,
+          "io": {
+            "read_bytes": 0,
+            "write_bytes": 0
+          },
+          "ts": 1767905061.1849382
+        },
+        {
+          "cpu_percent": 99.7,
+          "rss_bytes": 117325824,
+          "vms_bytes": 124133376,
+          "io": {
+            "read_bytes": 0,
+            "write_bytes": 0
+          },
+          "ts": 1767905061.2852352
+        },
+        {
+          "cpu_percent": 99.7,
+          "rss_bytes": 117325824,
+          "vms_bytes": 124133376,
+          "io": {
+            "read_bytes": 0,
+            "write_bytes": 0
+          },
+          "ts": 1767905061.385529
+        },
+        {
+          "cpu_percent": 99.7,
+          "rss_bytes": 117325824,
+          "vms_bytes": 124133376,
+          "io": {
+            "read_bytes": 0,
+            "write_bytes": 0
+          },
+          "ts": 1767905061.4858365
+        },
+        {
+          "cpu_percent": 99.7,
+          "rss_bytes": 117325824,
+          "vms_bytes": 124133376,
+          "io": {
+            "read_bytes": 0,
+            "write_bytes": 0
+          },
+          "ts": 1767905061.5861712
+        },
+        {
+          "cpu_percent": 99.7,
+          "rss_bytes": 117325824,
+          "vms_bytes": 124133376,
+          "io": {
+            "read_bytes": 0,
+            "write_bytes": 0
+          },
+          "ts": 1767905061.6864939
+        },
+        {
+          "cpu_percent": 99.6,
+          "rss_bytes": 117325824,
+          "vms_bytes": 124133376,
+          "io": {
+            "read_bytes": 0,
+            "write_bytes": 0
+          },
+          "ts": 1767905061.7867239
+        }
+      ],
+      "summary": {
+        "runtime_sec": 1.1035070419311523,
+        "cpu": {
+          "avg": 97.69,
+          "max": 99.7
+        },
+        "memory": {
+          "max_rss_bytes": 117325824
+        },
+        "io": {
+          "read_bytes": 0,
+          "write_bytes": 0
+        },
+        "exit_code": 0,
+        "status": "completed"
+      }
+    },
+    {
+      "test_case": {
+        "id": "tc05_50_MB_to_100_MB",
+        "name": "tc05_50_MB_to_100_MB"
+      },
+      "process": {
+        "pid": 112129,
+        "start_time": 1767905061.8878696,
+        "end_time": 1767905064.7979932,
+        "exit_code": 0
+      },
+      "samples": [
+        {
+          "cpu_percent": 10.0,
+          "rss_bytes": 82366464,
+          "vms_bytes": 173977600,
+          "io": {
+            "read_bytes": 19009536,
+            "write_bytes": 0
+          },
+          "ts": 1767905061.9881191
+        },
+        {
+          "cpu_percent": 19.9,
+          "rss_bytes": 95199232,
+          "vms_bytes": 173977600,
+          "io": {
+            "read_bytes": 32903168,
+            "write_bytes": 0
+          },
+          "ts": 1767905062.0885875
+        },
+        {
+          "cpu_percent": 19.9,
+          "rss_bytes": 133013504,
+          "vms_bytes": 220073984,
+          "io": {
+            "read_bytes": 52826112,
+            "write_bytes": 0
+          },
+          "ts": 1767905062.1890883
+        },
+        {
+          "cpu_percent": 10.0,
+          "rss_bytes": 191770624,
+          "vms_bytes": 220073984,
+          "io": {
+            "read_bytes": 83628032,
+            "write_bytes": 0
+          },
+          "ts": 1767905062.2894874
+        },
+        {
+          "cpu_percent": 49.8,
+          "rss_bytes": 219136000,
+          "vms_bytes": 228941824,
+          "io": {
+            "read_bytes": 100069376,
+            "write_bytes": 0
+          },
+          "ts": 1767905062.3899794
+        },
+        {
+          "cpu_percent": 99.7,
+          "rss_bytes": 219136000,
+          "vms_bytes": 229076992,
+          "io": {
+            "read_bytes": 100069376,
+            "write_bytes": 0
+          },
+          "ts": 1767905062.4902663
+        },
+        {
+          "cpu_percent": 99.6,
+          "rss_bytes": 219136000,
+          "vms_bytes": 229076992,
+          "io": {
+            "read_bytes": 100069376,
+            "write_bytes": 0
+          },
+          "ts": 1767905062.5906534
+        },
+        {
+          "cpu_percent": 99.7,
+          "rss_bytes": 219136000,
+          "vms_bytes": 229076992,
+          "io": {
+            "read_bytes": 100069376,
+            "write_bytes": 0
+          },
+          "ts": 1767905062.6909819
+        },
+        {
+          "cpu_percent": 99.7,
+          "rss_bytes": 219136000,
+          "vms_bytes": 229076992,
+          "io": {
+            "read_bytes": 100069376,
+            "write_bytes": 0
+          },
+          "ts": 1767905062.791313
+        },
+        {
+          "cpu_percent": 99.7,
+          "rss_bytes": 219136000,
+          "vms_bytes": 229076992,
+          "io": {
+            "read_bytes": 100069376,
+            "write_bytes": 0
+          },
+          "ts": 1767905062.89162
+        },
+        {
+          "cpu_percent": 99.7,
+          "rss_bytes": 219136000,
+          "vms_bytes": 229076992,
+          "io": {
+            "read_bytes": 100069376,
+            "write_bytes": 0
+          },
+          "ts": 1767905062.991976
+        },
+        {
+          "cpu_percent": 99.7,
+          "rss_bytes": 219136000,
+          "vms_bytes": 229076992,
+          "io": {
+            "read_bytes": 100069376,
+            "write_bytes": 0
+          },
+          "ts": 1767905063.0922704
+        },
+        {
+          "cpu_percent": 99.7,
+          "rss_bytes": 219136000,
+          "vms_bytes": 229076992,
+          "io": {
+            "read_bytes": 100069376,
+            "write_bytes": 0
+          },
+          "ts": 1767905063.1926029
+        },
+        {
+          "cpu_percent": 99.7,
+          "rss_bytes": 219136000,
+          "vms_bytes": 229076992,
+          "io": {
+            "read_bytes": 100069376,
+            "write_bytes": 0
+          },
+          "ts": 1767905063.2929077
+        },
+        {
+          "cpu_percent": 99.7,
+          "rss_bytes": 219136000,
+          "vms_bytes": 229076992,
+          "io": {
+            "read_bytes": 100069376,
+            "write_bytes": 0
+          },
+          "ts": 1767905063.3932314
+        },
+        {
+          "cpu_percent": 99.6,
+          "rss_bytes": 219136000,
+          "vms_bytes": 229076992,
+          "io": {
+            "read_bytes": 100069376,
+            "write_bytes": 0
+          },
+          "ts": 1767905063.4935849
+        },
+        {
+          "cpu_percent": 99.7,
+          "rss_bytes": 219136000,
+          "vms_bytes": 229076992,
+          "io": {
+            "read_bytes": 100069376,
+            "write_bytes": 0
+          },
+          "ts": 1767905063.5938332
+        },
+        {
+          "cpu_percent": 99.7,
+          "rss_bytes": 219136000,
+          "vms_bytes": 229076992,
+          "io": {
+            "read_bytes": 100069376,
+            "write_bytes": 0
+          },
+          "ts": 1767905063.6941307
+        },
+        {
+          "cpu_percent": 99.6,
+          "rss_bytes": 219136000,
+          "vms_bytes": 229076992,
+          "io": {
+            "read_bytes": 100069376,
+            "write_bytes": 0
+          },
+          "ts": 1767905063.7945738
+        },
+        {
+          "cpu_percent": 99.7,
+          "rss_bytes": 219136000,
+          "vms_bytes": 229076992,
+          "io": {
+            "read_bytes": 100069376,
+            "write_bytes": 0
+          },
+          "ts": 1767905063.8948982
+        },
+        {
+          "cpu_percent": 99.7,
+          "rss_bytes": 219136000,
+          "vms_bytes": 229076992,
+          "io": {
+            "read_bytes": 100069376,
+            "write_bytes": 0
+          },
+          "ts": 1767905063.995164
+        },
+        {
+          "cpu_percent": 99.7,
+          "rss_bytes": 219795456,
+          "vms_bytes": 229076992,
+          "io": {
+            "read_bytes": 100069376,
+            "write_bytes": 0
+          },
+          "ts": 1767905064.095446
+        },
+        {
+          "cpu_percent": 99.7,
+          "rss_bytes": 219795456,
+          "vms_bytes": 229076992,
+          "io": {
+            "read_bytes": 100069376,
+            "write_bytes": 0
+          },
+          "ts": 1767905064.1957762
+        },
+        {
+          "cpu_percent": 99.7,
+          "rss_bytes": 219795456,
+          "vms_bytes": 229076992,
+          "io": {
+            "read_bytes": 100069376,
+            "write_bytes": 0
+          },
+          "ts": 1767905064.2960758
+        },
+        {
+          "cpu_percent": 99.7,
+          "rss_bytes": 219795456,
+          "vms_bytes": 229076992,
+          "io": {
+            "read_bytes": 100069376,
+            "write_bytes": 0
+          },
+          "ts": 1767905064.3964245
+        },
+        {
+          "cpu_percent": 99.7,
+          "rss_bytes": 219795456,
+          "vms_bytes": 229212160,
+          "io": {
+            "read_bytes": 100069376,
+            "write_bytes": 0
+          },
+          "ts": 1767905064.4966867
+        },
+        {
+          "cpu_percent": 99.7,
+          "rss_bytes": 219795456,
+          "vms_bytes": 229212160,
+          "io": {
+            "read_bytes": 100069376,
+            "write_bytes": 0
+          },
+          "ts": 1767905064.5970254
+        },
+        {
+          "cpu_percent": 99.7,
+          "rss_bytes": 219795456,
+          "vms_bytes": 229212160,
+          "io": {
+            "read_bytes": 100069376,
+            "write_bytes": 0
+          },
+          "ts": 1767905064.6972976
+        }
+      ],
+      "summary": {
+        "runtime_sec": 2.9099767208099365,
+        "cpu": {
+          "avg": 85.8,
+          "max": 99.7
+        },
+        "memory": {
+          "max_rss_bytes": 219795456
+        },
+        "io": {
+          "read_bytes": 81059840,
+          "write_bytes": 0
+        },
+        "exit_code": 0,
+        "status": "completed"
+      }
+    }
+  ]
+}

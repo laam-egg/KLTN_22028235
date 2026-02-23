@@ -1,0 +1,9 @@
+{
+  "schema_version": "1.0",
+  "id": "tc01_less_than_100_KB",
+  "command": ["../../build/demo/efe_demo", "/home/lam/Desktop/Viettel/MORE_DATA/BENIGN-WIN/Collected/_installers/8ffe8859d18a4dfaaeef5aba2d4de9943fc2e54520d8a941be89901de5fded83.dll"],
+  "monitor": {
+    "sampling_interval_ms": 50,
+    "timeout_sec": 30
+  }
+}

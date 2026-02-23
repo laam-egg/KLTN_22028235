@@ -5,6 +5,7 @@
   - [Getting It Up and Running](#getting-it-up-and-running)
   - [Implementation Key Points](#implementation-key-points)
   - [Known Issues](#known-issues)
+  - [Performance Benchmarking](#performance-benchmarking)
   - [Author and Licensing](#author-and-licensing)
 
 ## Introduction
@@ -86,6 +87,10 @@ Notable known issues:
     retrain the models without this feature type,
     either by cutting off the features or setting
     them all to zero.
+
+## Performance Benchmarking
+
+[See this file.](./benchmarks/procbench/README.md)
 
 ## Author and Licensing
 
