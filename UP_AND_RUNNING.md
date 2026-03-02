@@ -2,6 +2,7 @@
 
 - [Getting It Up and Running](#getting-it-up-and-running)
   - [Build Options](#build-options)
+  - [What to Expect](#what-to-expect)
   - [Windows](#windows)
     - [Windows: Setup](#windows-setup)
     - [Windows: Build the Libraries only](#windows-build-the-libraries-only)
@@ -19,6 +20,17 @@
 
 2. **Build for Testing:** so that you could run the
     tests.
+
+## What to Expect
+
+After building, the EFE (EMBER2024 Feature Extractor)'s
+
+- Static library would be located in `build/core/`
+- Demo program that uses this static library would be located in `build/demo/`
+- Dynamic library would be located in `build/shared/`
+- Demo program that uses this dynamic library would be located in `build/shared_demo/`
+- Test program would be located in `build/tests/`; however you could
+    use CTest to run the tests instead, as described below.
 
 ## Windows
 

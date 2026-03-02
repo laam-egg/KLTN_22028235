@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
 project("ember2024-fe-cpp")
 
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 option(BUILD_TESTING "Enable tests" OFF)
 
 if (MSVC)
@@ -48,3 +50,5 @@ add_subdirectory("common")
 add_subdirectory("pefile")
 add_subdirectory("core")
 add_subdirectory("demo")
+add_subdirectory("shared")
+add_subdirectory("shared_demo")
