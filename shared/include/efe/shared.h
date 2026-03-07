@@ -2,7 +2,7 @@
 #define shared
 
 #include "efe_shared_export.h"
-#include <cstdint>
+#include <stdint.h>
 
 #ifndef EXIT_SUCCESS
 #define EXIT_SUCCESS 0
