@@ -24,6 +24,7 @@ endif()
 
 list(APPEND LINKED_LIBRARIES
     efe_core
+    cmdline_tools
 )
 
 target_link_libraries(efe_demo PRIVATE ${LINKED_LIBRARIES})

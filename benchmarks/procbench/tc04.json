@@ -1,9 +1,10 @@
 {
   "schema_version": "1.0",
-  "id": "tc04_10_MB_to_50_MB",
-  "command": ["../../build/demo/efe_demo", "/home/lam/Desktop/Viettel/MORE_DATA/BENIGN-WIN/Collected/_installers/da1056565881da22ba1e87ce776184a300727a918519111f975331cbdd136ade.exe"],
+  "id": "tc04",
+  "name": "TC04: 50MB | delay 60s | x3",
+  "command": ["../../build/demo/efe_demo", "../bin/tc04.exe", "--time-gap-ms", "60000", "--silent", "--loop", "3"],
   "monitor": {
     "sampling_interval_ms": 100,
-    "timeout_sec": 30
+    "timeout_sec": 900
   }
 }

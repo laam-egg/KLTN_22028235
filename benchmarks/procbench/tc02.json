@@ -1,9 +1,10 @@
 {
   "schema_version": "1.0",
-  "id": "tc02_100_KB_to_1_MB",
-  "command": ["../../build/demo/efe_demo", "/home/lam/Desktop/Viettel/MORE_DATA/BENIGN-WIN/Collected/_installers/1f4dfe0f4e7421cf2fc7c0b57138c12d65f02b5edf6ee86f5d7627a1d5a4bad4.exe"],
+  "id": "tc02",
+  "name": "TC02: 1MB | delay 5s | x3",
+  "command": ["../../build/demo/efe_demo", "../bin/tc02.exe", "--time-gap-ms", "5000", "--silent", "--loop", "3"],
   "monitor": {
     "sampling_interval_ms": 100,
-    "timeout_sec": 30
+    "timeout_sec": 900
   }
 }
