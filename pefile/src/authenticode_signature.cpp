@@ -165,15 +165,16 @@ static CounterSignatureInfo getCounterSignatureInfo_Avast(uint8_t const* data, s
     if (auth && auth->count > 0) {
         for (size_t i = 0; i < auth->count; ++i) {
             Authenticode const* authenticode = auth->signatures[i];
+            if (authenticode && authenticode->countersigs) {
+                for (size_t i = 0; i < authenticode->countersigs->count; ++i) {
+                    Countersignature *counter = authenticode->countersigs->counters[i];
 
-            for (size_t i = 0; i < authenticode->countersigs->count; ++i) {
-                Countersignature *counter = authenticode->countersigs->counters[i];
-
-                int64_t signTime = counter->sign_time;
-                if (signTime > 0) {
-                    info.hasCounterSigner = true;
-                    info.signingTime = static_cast<uint64_t>(signTime);
-                    goto FINISH;
+                    int64_t signTime = counter->sign_time;
+                    if (signTime > 0) {
+                        info.hasCounterSigner = true;
+                        info.signingTime = static_cast<uint64_t>(signTime);
+                        goto FINISH;
+                    }
                 }
             }
         }
