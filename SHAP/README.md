@@ -13,6 +13,19 @@ cd $PROJECT_ROOT/my_scripts/xAI
 pip install -r ./requirements.txt
 ```
 
+Besides, on Linux you need to
+install OpenSSL, e.g. on Ubuntu:
+
+```sh
+sudo apt-get install openssl libssl-dev
+```
+
+since our C++ feature extractor (see below)
+depends on it. On Windows, the required
+OpenSSL DLLs are already included in the
+repository (`libcrypto-3-x64.dll` and
+`libssl-3-x64.dll`).
+
 ## Run
 
 ```powershell
