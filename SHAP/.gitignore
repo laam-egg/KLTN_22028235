@@ -1,2 +1,9 @@
 !efe_shared.dll
 !libefe_shared.so
+
+build/
+dataset/
+**/*.egg-info
+**/*.pyc
+dist/
+*.spec

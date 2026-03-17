@@ -236,7 +236,7 @@ class EMBER2024CppFeatureExtractor(AbstractFeatureExtractor):
 
 from pathlib import Path
 import lightgbm as lgb
-MODELS_PATH = Path("../../models")
+MODELS_PATH = Path("./models")
 class EMBER2024LGBMModel(AbstractModel):
     def __init__(self):
         self.model = lgb.Booster(model_file=MODELS_PATH / "EMBER2024_all.model")

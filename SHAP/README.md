@@ -5,11 +5,6 @@ To explain the models' decisions.
 ## Setup
 
 ```powershell
-cd $PROJECT_ROOT
-pip install .
-pip install -r myscripts/requirements.txt
-
-cd $PROJECT_ROOT/my_scripts/xAI
 pip install -r ./requirements.txt
 ```
 
