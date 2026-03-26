@@ -119,6 +119,146 @@ def train_LGBM_EMBER2024_and_OneHotCapa(
         model_save_path=model_save_path,
     )
 
+def train_LGBM_EMBER2024_and_PolynomialCapa(
+    data_dir: Path | str,
+    capa_features_path: Path | str,
+    lgbm_config_path: Path | str,
+    model_save_path: Path | str,
+):
+    from common_utils import read_vectorized_features, PEAndOneHotCapaFeatureExtractor
+    l("Loading Capa features...")
+    with open(capa_features_path, 'r', encoding='utf-8') as f:
+        capa_features = json.load(f)
+    extractor = PEAndOneHotCapaFeatureExtractor(capa_features=capa_features)
+    ndim: int = extractor.dim
+    # Add pairwise Capa co-occurrence features
+    from sklearn.preprocessing import PolynomialFeatures
+    ndim_EMBER2024 = PEFeatureExtractor().dim
+    CAPA_START = ndim_EMBER2024
+
+    poly_features: PolynomialFeatures | None = None
+    def vector_reader(data_dir: Path | str, split: str) -> tuple[np.ndarray, np.ndarray]:
+        nonlocal poly_features
+        X, y = read_vectorized_features(data_dir, ndim, split)
+        if split == 'train':
+            capa_cols = X[:, CAPA_START:]
+            poly = PolynomialFeatures(degree=2, interaction_only=True)
+            l(f"Train set: Fitting polynomials...")
+            poly_features = poly.fit(capa_cols)
+            l(f"Train set: Transforming polynomials...")
+            capa_interactions = poly_features.transform(capa_cols)
+            X = np.hstack([X[:, :CAPA_START], capa_interactions])
+            return X, y
+        else:
+            if not poly_features:
+                raise RuntimeError(f"Not trained in prior")
+            capa_cols = X[:, CAPA_START:]
+            l(f"{split.title()} set: Transforming polynomials...")
+            capa_interactions = poly_features.transform(capa_cols)
+            X = np.hstack([X[:, :CAPA_START], capa_interactions])
+            return X, y
+
+    train_LGBM(
+        data_dir=data_dir,
+        vector_reader=vector_reader,
+        lgbm_config_path=lgbm_config_path,
+        model_save_path=model_save_path,
+    )
+
+def train_LGBM_EMBER2024_and_TruncatedSVDCapa(
+    data_dir: Path | str,
+    capa_features_path: Path | str,
+    lgbm_config_path: Path | str,
+    model_save_path: Path | str,
+):
+    from common_utils import read_vectorized_features, PEAndOneHotCapaFeatureExtractor
+    l("Loading Capa features...")
+    with open(capa_features_path, 'r', encoding='utf-8') as f:
+        capa_features = json.load(f)
+    extractor = PEAndOneHotCapaFeatureExtractor(capa_features=capa_features)
+    ndim: int = extractor.dim
+    from sklearn.decomposition import TruncatedSVD
+    from scipy.sparse import csr_matrix
+    ndim_EMBER2024 = PEFeatureExtractor().dim
+    CAPA_START = ndim_EMBER2024
+
+    svd = TruncatedSVD(n_components=64, random_state=42)
+    def vector_reader(data_dir: Path | str, split: str) -> tuple[np.ndarray, np.ndarray]:
+        nonlocal svd
+        X, y = read_vectorized_features(data_dir, ndim, split)
+        if split == 'train':
+            l(f"Train set: Building CSR matrix...")
+            capa_train_sparse = csr_matrix(X[:, CAPA_START:])
+            l(f"Train set: Truncated SVD: Fit+Transform...")
+            capa_train_svd = svd.fit_transform(capa_train_sparse)
+            X = hstack_memmap(X[:, :CAPA_START], capa_train_svd, out_path='temp_X_train_svd.dat')
+            return X, y
+        else:
+            l(f"Test set: Building CSR matrix...")
+            capa_test_sparse  = csr_matrix(X[:, CAPA_START:])
+            l(f"Test set: Truncated SVD: Transform...")
+            capa_test_svd  = svd.transform(capa_test_sparse)
+            # X = np.hstack([X[:, :CAPA_START], capa_test_svd])
+            X = hstack_memmap(X[:, :CAPA_START], capa_test_svd, out_path='temp_X_test_svd.dat')
+            return X, y
+
+    train_LGBM(
+        data_dir=data_dir,
+        vector_reader=vector_reader,
+        lgbm_config_path=lgbm_config_path,
+        model_save_path=model_save_path,
+    )
+
+    import joblib
+    joblib.dump(svd, Path(model_save_path).parent / "_Truncated_SVD_64.pkl")
+
+def train_LGBM_EMBER2024_and_TruncatedSVDCapa128(
+    data_dir: Path | str,
+    capa_features_path: Path | str,
+    lgbm_config_path: Path | str,
+    model_save_path: Path | str,
+):
+    from common_utils import read_vectorized_features, PEAndOneHotCapaFeatureExtractor
+    l("Loading Capa features...")
+    with open(capa_features_path, 'r', encoding='utf-8') as f:
+        capa_features = json.load(f)
+    extractor = PEAndOneHotCapaFeatureExtractor(capa_features=capa_features)
+    ndim: int = extractor.dim
+    from sklearn.decomposition import TruncatedSVD
+    from scipy.sparse import csr_matrix
+    ndim_EMBER2024 = PEFeatureExtractor().dim
+    CAPA_START = ndim_EMBER2024
+
+    svd = TruncatedSVD(n_components=128, random_state=42)
+    def vector_reader(data_dir: Path | str, split: str) -> tuple[np.ndarray, np.ndarray]:
+        nonlocal svd
+        X, y = read_vectorized_features(data_dir, ndim, split)
+        if split == 'train':
+            l(f"Train set: Building CSR matrix...")
+            capa_train_sparse = csr_matrix(X[:, CAPA_START:])
+            l(f"Train set: Truncated SVD: Fit+Transform...")
+            capa_train_svd = svd.fit_transform(capa_train_sparse)
+            X = hstack_memmap(X[:, :CAPA_START], capa_train_svd, out_path='temp_X_train_svd.dat')
+            return X, y
+        else:
+            l(f"Test set: Building CSR matrix...")
+            capa_test_sparse  = csr_matrix(X[:, CAPA_START:])
+            l(f"Test set: Truncated SVD: Transform...")
+            capa_test_svd  = svd.transform(capa_test_sparse)
+            # X = np.hstack([X[:, :CAPA_START], capa_test_svd])
+            X = hstack_memmap(X[:, :CAPA_START], capa_test_svd, out_path='temp_X_test_svd.dat')
+            return X, y
+
+    train_LGBM(
+        data_dir=data_dir,
+        vector_reader=vector_reader,
+        lgbm_config_path=lgbm_config_path,
+        model_save_path=model_save_path,
+    )
+
+    import joblib
+    joblib.dump(svd, Path(model_save_path).parent / "_Truncated_SVD_128.pkl")
+
 if __name__ == '__main__':
     import argparse
 
@@ -141,6 +281,33 @@ if __name__ == '__main__':
         if not args.capa_features_path:
             raise RuntimeError("No capa features path specified")
         train_LGBM_EMBER2024_and_OneHotCapa(
+            data_dir=args.data_dir,
+            capa_features_path=args.capa_features_path,
+            lgbm_config_path=args.lgbm_config_path,
+            model_save_path=args.model_save_path,
+        )
+    elif t == 'EMBER2024+CapaPoly':
+        if not args.capa_features_path:
+            raise RuntimeError("No capa features path specified")
+        train_LGBM_EMBER2024_and_PolynomialCapa(
+            data_dir=args.data_dir,
+            capa_features_path=args.capa_features_path,
+            lgbm_config_path=args.lgbm_config_path,
+            model_save_path=args.model_save_path,
+        )
+    elif t == 'EMBER2024+CapaTruncatedSVD':
+        if not args.capa_features_path:
+            raise RuntimeError("No capa features path specified")
+        train_LGBM_EMBER2024_and_TruncatedSVDCapa(
+            data_dir=args.data_dir,
+            capa_features_path=args.capa_features_path,
+            lgbm_config_path=args.lgbm_config_path,
+            model_save_path=args.model_save_path,
+        )
+    elif t == 'EMBER2024+CapaTruncatedSVD128':
+        if not args.capa_features_path:
+            raise RuntimeError("No capa features path specified")
+        train_LGBM_EMBER2024_and_TruncatedSVDCapa128(
             data_dir=args.data_dir,
             capa_features_path=args.capa_features_path,
             lgbm_config_path=args.lgbm_config_path,
