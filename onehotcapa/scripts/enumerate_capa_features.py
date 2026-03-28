@@ -27,9 +27,9 @@ def enumerate_capa_features(
                 line = line.strip()
                 raw_obj = json.loads(line)
 
-                caps = [x['Namespace'] + ':' + x['Capability'] for x in raw_obj['caps']]
-                ttps = [x['Tactic'] + ':' + x['Technique'] for x in raw_obj['ttps']]
-                mbcs = [x['Objective'] + ':' + x['Behavior'] for x in raw_obj['mbc']]
+                caps = [(x['Namespace'] + ':' + x['Capability']).lower() for x in raw_obj['caps']]
+                ttps = [(x['Tactic'] + ':' + x['Technique']).lower() for x in raw_obj['ttps']]
+                mbcs = [(x['Objective'] + ':' + x['Behavior']).lower() for x in raw_obj['mbc']]
 
                 ALL_CAPS.update(caps)
                 ALL_TTPS.update(ttps)

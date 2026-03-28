@@ -17,9 +17,9 @@ class PEAndOneHotCapaFeatureExtractor(PEFeatureExtractor):
         extension_vector = np.zeros(self.extended_dim)
         feature_vectors.append(extension_vector)
 
-        caps = [x['Namespace'] + ':' + x['Capability'] for x in raw_obj['caps']]
-        ttps = [x['Tactic'] + ':' + x['Technique'] for x in raw_obj['ttps']]
-        mbcs = [x['Objective'] + ':' + x['Behavior'] for x in raw_obj['mbc']]
+        caps = [(x['Namespace'] + ':' + x['Capability']).lower() for x in raw_obj['caps']]
+        ttps = [(x['Tactic'] + ':' + x['Technique']).lower() for x in raw_obj['ttps']]
+        mbcs = [(x['Objective'] + ':' + x['Behavior']).lower() for x in raw_obj['mbc']]
         for x in (*caps, *ttps, *mbcs):
             index = self.capa_features.get(x, -1)
             if index >= 0:

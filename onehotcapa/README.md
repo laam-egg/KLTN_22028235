@@ -52,14 +52,14 @@ python train_lgbm.py EMBER2024+CapaTruncatedSVD128 $DS ./lgbm_config.json ./EMBE
 
 ## Training and Evaluation Results
 
-|       Iteration        | EMBER2024                                                 | EMBER2024+Capa1                | EMBER2024+CapaTruncatedSVD (64) | EMBER2024+CapaTruncatedSVD128  |
-| :--------------------: | --------------------------------------------------------- | ------------------------------ | ------------------------------- | ------------------------------ |
-|          100           | ROC-AUC = 0.991358                                        | ROC-AUC = 0.991191             | ROC-AUC = 0.991366              | ROC-AUC = 0.990966             |
-|          200           | ROC-AUC = 0.992569                                        | ROC-AUC = 0.992588             | ROC-AUC = 0.992807              | ROC-AUC = 0.992656             |
-|          300           | ROC-AUC = 0.992794                                        | ROC-AUC = 0.992931             | ROC-AUC = 0.993162              | ROC-AUC = 0.993075             |
-|          400           | (Early stopped at iteration 251, with ROC-AUC = 0.992813) | ROC-AUC = 0.993129             | ROC-AUC = 0.993324              | ROC-AUC = 0.993233             |
-|          500           |                                                           | ROC-AUC = 0.993244             | ROC-AUC = 0.993395              | ROC-AUC = 0.993378             |
-| Evaluation on test set | Partial AUC (FPR≤0.5%): 0.8816                            | Partial AUC (FPR≤0.5%): 0.8832 | Partial AUC (FPR≤0.5%): 0.8838  | Partial AUC (FPR≤0.5%): 0.8859 |
-|                        | Full AUC: 0.9922                                          | Full AUC: 0.9927               | Full AUC: 0.9927                | Full AUC: 0.9927               |
+|       Iteration        | EMBER2024                                                 | EMBER2024+Capa1                | EMBER2024+CapaTruncatedSVD (64) | EMBER2024+CapaTruncatedSVD128                             |
+| :--------------------: | --------------------------------------------------------- | ------------------------------ | ------------------------------- | --------------------------------------------------------- |
+|          100           | ROC-AUC = 0.991358                                        | ROC-AUC = 0.991224             | ROC-AUC = 0.991288              | ROC-AUC = 0.991317                                        |
+|          200           | ROC-AUC = 0.992569                                        | ROC-AUC = 0.992687             | ROC-AUC = 0.992706              | ROC-AUC = 0.992782                                        |
+|          300           | ROC-AUC = 0.992794                                        | ROC-AUC = 0.993042             | ROC-AUC = 0.992997              | ROC-AUC = 0.993162                                        |
+|          400           | (Early stopped at iteration 251, with ROC-AUC = 0.992813) | ROC-AUC = 0.993130             | ROC-AUC = 0.993082              | ROC-AUC = 0.993283                                        |
+|          500           |                                                           | ROC-AUC = 0.993251             | ROC-AUC = 0.993194              | (Early stopped at iteration 446, with ROC-AUC = 0.993314) |
+| Evaluation on test set | Partial AUC (FPR≤0.5%): 0.8816                            | Partial AUC (FPR≤0.5%): 0.8843 | Partial AUC (FPR≤0.5%): 0.8830  | Partial AUC (FPR≤0.5%): 0.8838                            |
+|                        | Full AUC: 0.9922                                          | Full AUC: 0.9927               | Full AUC: 0.9927                | Full AUC: 0.9925                                          |
 
 (with `lgb.early_stopping(50)` - stop training if validation score doesn't improve for 50 consecutive rounds)
