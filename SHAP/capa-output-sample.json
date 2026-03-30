@@ -1,0 +1,1686 @@
+{
+    "meta": {
+        "timestamp": "2026-05-20T16:05:24.142587",
+        "version": "9.3.1",
+        "argv": [
+            "--json",
+            "/home/lam/Downloads/for-win10-offline/FOR_TESTING/MALWARE/Trojan.Autorun.ATA_virussign.com_984d76fa534016d9e8a23f575d56e7c2.vir"
+        ],
+        "sample": {
+            "md5": "984d76fa534016d9e8a23f575d56e7c2",
+            "sha1": "52a2ecd0a74c4ffda8484639cb81d67c46cee1bb",
+            "sha256": "57d0068b412269f08af1496f316d809d6bf8313f789630676b736b1cfeef609c",
+            "path": "/home/lam/Downloads/for-win10-offline/FOR_TESTING/MALWARE/Trojan.Autorun.ATA_virussign.com_984d76fa534016d9e8a23f575d56e7c2.vir"
+        },
+        "flavor": "static",
+        "analysis": {
+            "format": "pe",
+            "arch": "i386",
+            "os": "windows",
+            "extractor": "VivisectFeatureExtractor",
+            "rules": [
+                "/tmp/_MEIzr8vks/rules"
+            ],
+            "base_address": {
+                "type": "absolute",
+                "value": 4194304
+            },
+            "layout": {
+                "functions": []
+            },
+            "feature_counts": {
+                "file": 3295,
+                "functions": [
+                    {
+                        "address": {
+                            "type": "absolute",
+                            "value": 4443854
+                        },
+                        "count": 5
+                    }
+                ]
+            },
+            "library_functions": []
+        }
+    },
+    "rules": {
+        "reference analysis tools strings": {
+            "meta": {
+                "name": "reference analysis tools strings",
+                "namespace": "anti-analysis",
+                "authors": [
+                    "michael.hunhoff@mandiant.com"
+                ],
+                "scopes": {
+                    "static": "file",
+                    "dynamic": "file"
+                },
+                "attack": [],
+                "mbc": [
+                    {
+                        "parts": [
+                            "Discovery",
+                            "Analysis Tool Discovery",
+                            "Process detection"
+                        ],
+                        "objective": "Discovery",
+                        "behavior": "Analysis Tool Discovery",
+                        "method": "Process detection",
+                        "id": "B0013.001"
+                    }
+                ],
+                "references": [
+                    "https://github.com/LordNoteworthy/al-khaser/blob/master/al-khaser/AntiAnalysis/process.cpp"
+                ],
+                "examples": [
+                    "al-khaser_x86.exe_"
+                ],
+                "description": "",
+                "lib": false,
+                "is_subscope_rule": false,
+                "maec": {}
+            },
+            "source": "rule:\n  meta:\n    name: reference analysis tools strings\n    namespace: anti-analysis\n    authors:\n      - michael.hunhoff@mandiant.com\n    scopes:\n      static: file\n      dynamic: file\n    mbc:\n      - Discovery::Analysis Tool Discovery::Process detection [B0013.001]\n    references:\n      - https://github.com/LordNoteworthy/al-khaser/blob/master/al-khaser/AntiAnalysis/process.cpp\n    examples:\n      - al-khaser_x86.exe_\n  features:\n    - or:\n      - string: /ollydbg(\\.exe)?/i\n      - string: /ProcessHacker(\\.exe)?/i\n      - string: /tcpview(\\.exe)?/i\n      - string: /autoruns(\\.exe)?/i\n      - string: /autorunsc(\\.exe)?/i\n      - string: /filemon(\\.exe)?/i\n      - string: /procmon(\\.exe)?/i\n      - string: /regmon(\\.exe)?/i\n      - string: /procexp(\\.exe)?/i\n      - string: /(?<!\\w)ida[gqtuw]?(\\.exe)?$/i\n      - string: /ida[gqtuw]?64(\\.exe)?$/i\n      - string: /ImmunityDebugger(\\.exe)?/i\n      - string: /Wireshark(\\.exe)?/i\n      - string: /dumpcap(\\.exe)?/i\n      - string: /HookExplorer(\\.exe)?/i\n      - string: /ImportREC(\\.exe)?/i\n      - string: /PETools(\\.exe)?/i\n      - string: /LordPE(\\.exe)?/i\n      - string: /SysInspector(\\.exe)?/i\n      - string: /proc_analyzer(\\.exe)?/i\n      - string: /sysAnalyzer(\\.exe)?/i\n      - string: /sniff_hit(\\.exe)?/i\n      - string: /windbg(\\.exe)?/i\n      - string: /joeboxcontrol(\\.exe)?/i\n      - string: /joeboxserver(\\.exe)?/i\n      - string: /ResourceHacker(\\.exe)?/i\n      - string: /x32dbg(\\.exe)?/i\n      - string: /x64dbg(\\.exe)?/i\n      - string: /Fiddler(\\.exe)?/i\n      - string: /httpdebugger(\\.exe)?/i\n      - string: /fakenet(\\.exe)?/i\n      - string: /netmon(\\.exe)?/i\n      - string: /WPE PRO(\\.exe)?/i\n      - string: /decompile(\\.exe)?/i\n      - string: /scylla/i\n      - string: /megadumper/i\n",
+            "matches": [
+                [
+                    {
+                        "type": "no address"
+                    },
+                    {
+                        "success": true,
+                        "node": {
+                            "type": "statement",
+                            "statement": {
+                                "type": "or"
+                            }
+                        },
+                        "children": [
+                            {
+                                "success": false,
+                                "node": {
+                                    "type": "feature",
+                                    "feature": {
+                                        "type": "regex",
+                                        "regex": "/ollydbg(\\.exe)?/i"
+                                    }
+                                },
+                                "children": [],
+                                "locations": [],
+                                "captures": {}
+                            },
+                            {
+                                "success": false,
+                                "node": {
+                                    "type": "feature",
+                                    "feature": {
+                                        "type": "regex",
+                                        "regex": "/ProcessHacker(\\.exe)?/i"
+                                    }
+                                },
+                                "children": [],
+                                "locations": [],
+                                "captures": {}
+                            },
+                            {
+                                "success": false,
+                                "node": {
+                                    "type": "feature",
+                                    "feature": {
+                                        "type": "regex",
+                                        "regex": "/tcpview(\\.exe)?/i"
+                                    }
+                                },
+                                "children": [],
+                                "locations": [],
+                                "captures": {}
+                            },
+                            {
+                                "success": false,
+                                "node": {
+                                    "type": "feature",
+                                    "feature": {
+                                        "type": "regex",
+                                        "regex": "/autoruns(\\.exe)?/i"
+                                    }
+                                },
+                                "children": [],
+                                "locations": [],
+                                "captures": {}
+                            },
+                            {
+                                "success": false,
+                                "node": {
+                                    "type": "feature",
+                                    "feature": {
+                                        "type": "regex",
+                                        "regex": "/autorunsc(\\.exe)?/i"
+                                    }
+                                },
+                                "children": [],
+                                "locations": [],
+                                "captures": {}
+                            },
+                            {
+                                "success": false,
+                                "node": {
+                                    "type": "feature",
+                                    "feature": {
+                                        "type": "regex",
+                                        "regex": "/filemon(\\.exe)?/i"
+                                    }
+                                },
+                                "children": [],
+                                "locations": [],
+                                "captures": {}
+                            },
+                            {
+                                "success": false,
+                                "node": {
+                                    "type": "feature",
+                                    "feature": {
+                                        "type": "regex",
+                                        "regex": "/procmon(\\.exe)?/i"
+                                    }
+                                },
+                                "children": [],
+                                "locations": [],
+                                "captures": {}
+                            },
+                            {
+                                "success": false,
+                                "node": {
+                                    "type": "feature",
+                                    "feature": {
+                                        "type": "regex",
+                                        "regex": "/regmon(\\.exe)?/i"
+                                    }
+                                },
+                                "children": [],
+                                "locations": [],
+                                "captures": {}
+                            },
+                            {
+                                "success": false,
+                                "node": {
+                                    "type": "feature",
+                                    "feature": {
+                                        "type": "regex",
+                                        "regex": "/procexp(\\.exe)?/i"
+                                    }
+                                },
+                                "children": [],
+                                "locations": [],
+                                "captures": {}
+                            },
+                            {
+                                "success": true,
+                                "node": {
+                                    "type": "feature",
+                                    "feature": {
+                                        "type": "regex",
+                                        "regex": "/(?<!\\w)ida[gqtuw]?(\\.exe)?$/i"
+                                    }
+                                },
+                                "children": [],
+                                "locations": [
+                                    {
+                                        "type": "file",
+                                        "value": 5912497
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 5954929
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 5946725
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 5979541
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 5938521
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 5963133
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 5920701
+                                    }
+                                ],
+                                "captures": {
+                                    "IDAT": [
+                                        {
+                                            "type": "file",
+                                            "value": 5912497
+                                        },
+                                        {
+                                            "type": "file",
+                                            "value": 5954929
+                                        },
+                                        {
+                                            "type": "file",
+                                            "value": 5946725
+                                        },
+                                        {
+                                            "type": "file",
+                                            "value": 5979541
+                                        },
+                                        {
+                                            "type": "file",
+                                            "value": 5938521
+                                        },
+                                        {
+                                            "type": "file",
+                                            "value": 5963133
+                                        },
+                                        {
+                                            "type": "file",
+                                            "value": 5920701
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "success": false,
+                                "node": {
+                                    "type": "feature",
+                                    "feature": {
+                                        "type": "regex",
+                                        "regex": "/ida[gqtuw]?64(\\.exe)?$/i"
+                                    }
+                                },
+                                "children": [],
+                                "locations": [],
+                                "captures": {}
+                            },
+                            {
+                                "success": false,
+                                "node": {
+                                    "type": "feature",
+                                    "feature": {
+                                        "type": "regex",
+                                        "regex": "/ImmunityDebugger(\\.exe)?/i"
+                                    }
+                                },
+                                "children": [],
+                                "locations": [],
+                                "captures": {}
+                            },
+                            {
+                                "success": false,
+                                "node": {
+                                    "type": "feature",
+                                    "feature": {
+                                        "type": "regex",
+                                        "regex": "/Wireshark(\\.exe)?/i"
+                                    }
+                                },
+                                "children": [],
+                                "locations": [],
+                                "captures": {}
+                            },
+                            {
+                                "success": false,
+                                "node": {
+                                    "type": "feature",
+                                    "feature": {
+                                        "type": "regex",
+                                        "regex": "/dumpcap(\\.exe)?/i"
+                                    }
+                                },
+                                "children": [],
+                                "locations": [],
+                                "captures": {}
+                            },
+                            {
+                                "success": false,
+                                "node": {
+                                    "type": "feature",
+                                    "feature": {
+                                        "type": "regex",
+                                        "regex": "/HookExplorer(\\.exe)?/i"
+                                    }
+                                },
+                                "children": [],
+                                "locations": [],
+                                "captures": {}
+                            },
+                            {
+                                "success": false,
+                                "node": {
+                                    "type": "feature",
+                                    "feature": {
+                                        "type": "regex",
+                                        "regex": "/ImportREC(\\.exe)?/i"
+                                    }
+                                },
+                                "children": [],
+                                "locations": [],
+                                "captures": {}
+                            },
+                            {
+                                "success": false,
+                                "node": {
+                                    "type": "feature",
+                                    "feature": {
+                                        "type": "regex",
+                                        "regex": "/PETools(\\.exe)?/i"
+                                    }
+                                },
+                                "children": [],
+                                "locations": [],
+                                "captures": {}
+                            },
+                            {
+                                "success": false,
+                                "node": {
+                                    "type": "feature",
+                                    "feature": {
+                                        "type": "regex",
+                                        "regex": "/LordPE(\\.exe)?/i"
+                                    }
+                                },
+                                "children": [],
+                                "locations": [],
+                                "captures": {}
+                            },
+                            {
+                                "success": false,
+                                "node": {
+                                    "type": "feature",
+                                    "feature": {
+                                        "type": "regex",
+                                        "regex": "/SysInspector(\\.exe)?/i"
+                                    }
+                                },
+                                "children": [],
+                                "locations": [],
+                                "captures": {}
+                            },
+                            {
+                                "success": false,
+                                "node": {
+                                    "type": "feature",
+                                    "feature": {
+                                        "type": "regex",
+                                        "regex": "/proc_analyzer(\\.exe)?/i"
+                                    }
+                                },
+                                "children": [],
+                                "locations": [],
+                                "captures": {}
+                            },
+                            {
+                                "success": false,
+                                "node": {
+                                    "type": "feature",
+                                    "feature": {
+                                        "type": "regex",
+                                        "regex": "/sysAnalyzer(\\.exe)?/i"
+                                    }
+                                },
+                                "children": [],
+                                "locations": [],
+                                "captures": {}
+                            },
+                            {
+                                "success": false,
+                                "node": {
+                                    "type": "feature",
+                                    "feature": {
+                                        "type": "regex",
+                                        "regex": "/sniff_hit(\\.exe)?/i"
+                                    }
+                                },
+                                "children": [],
+                                "locations": [],
+                                "captures": {}
+                            },
+                            {
+                                "success": false,
+                                "node": {
+                                    "type": "feature",
+                                    "feature": {
+                                        "type": "regex",
+                                        "regex": "/windbg(\\.exe)?/i"
+                                    }
+                                },
+                                "children": [],
+                                "locations": [],
+                                "captures": {}
+                            },
+                            {
+                                "success": false,
+                                "node": {
+                                    "type": "feature",
+                                    "feature": {
+                                        "type": "regex",
+                                        "regex": "/joeboxcontrol(\\.exe)?/i"
+                                    }
+                                },
+                                "children": [],
+                                "locations": [],
+                                "captures": {}
+                            },
+                            {
+                                "success": false,
+                                "node": {
+                                    "type": "feature",
+                                    "feature": {
+                                        "type": "regex",
+                                        "regex": "/joeboxserver(\\.exe)?/i"
+                                    }
+                                },
+                                "children": [],
+                                "locations": [],
+                                "captures": {}
+                            },
+                            {
+                                "success": false,
+                                "node": {
+                                    "type": "feature",
+                                    "feature": {
+                                        "type": "regex",
+                                        "regex": "/ResourceHacker(\\.exe)?/i"
+                                    }
+                                },
+                                "children": [],
+                                "locations": [],
+                                "captures": {}
+                            },
+                            {
+                                "success": false,
+                                "node": {
+                                    "type": "feature",
+                                    "feature": {
+                                        "type": "regex",
+                                        "regex": "/x32dbg(\\.exe)?/i"
+                                    }
+                                },
+                                "children": [],
+                                "locations": [],
+                                "captures": {}
+                            },
+                            {
+                                "success": false,
+                                "node": {
+                                    "type": "feature",
+                                    "feature": {
+                                        "type": "regex",
+                                        "regex": "/x64dbg(\\.exe)?/i"
+                                    }
+                                },
+                                "children": [],
+                                "locations": [],
+                                "captures": {}
+                            },
+                            {
+                                "success": false,
+                                "node": {
+                                    "type": "feature",
+                                    "feature": {
+                                        "type": "regex",
+                                        "regex": "/Fiddler(\\.exe)?/i"
+                                    }
+                                },
+                                "children": [],
+                                "locations": [],
+                                "captures": {}
+                            },
+                            {
+                                "success": false,
+                                "node": {
+                                    "type": "feature",
+                                    "feature": {
+                                        "type": "regex",
+                                        "regex": "/httpdebugger(\\.exe)?/i"
+                                    }
+                                },
+                                "children": [],
+                                "locations": [],
+                                "captures": {}
+                            },
+                            {
+                                "success": false,
+                                "node": {
+                                    "type": "feature",
+                                    "feature": {
+                                        "type": "regex",
+                                        "regex": "/fakenet(\\.exe)?/i"
+                                    }
+                                },
+                                "children": [],
+                                "locations": [],
+                                "captures": {}
+                            },
+                            {
+                                "success": false,
+                                "node": {
+                                    "type": "feature",
+                                    "feature": {
+                                        "type": "regex",
+                                        "regex": "/netmon(\\.exe)?/i"
+                                    }
+                                },
+                                "children": [],
+                                "locations": [],
+                                "captures": {}
+                            },
+                            {
+                                "success": false,
+                                "node": {
+                                    "type": "feature",
+                                    "feature": {
+                                        "type": "regex",
+                                        "regex": "/WPE PRO(\\.exe)?/i"
+                                    }
+                                },
+                                "children": [],
+                                "locations": [],
+                                "captures": {}
+                            },
+                            {
+                                "success": false,
+                                "node": {
+                                    "type": "feature",
+                                    "feature": {
+                                        "type": "regex",
+                                        "regex": "/decompile(\\.exe)?/i"
+                                    }
+                                },
+                                "children": [],
+                                "locations": [],
+                                "captures": {}
+                            },
+                            {
+                                "success": false,
+                                "node": {
+                                    "type": "feature",
+                                    "feature": {
+                                        "type": "regex",
+                                        "regex": "/scylla/i"
+                                    }
+                                },
+                                "children": [],
+                                "locations": [],
+                                "captures": {}
+                            },
+                            {
+                                "success": false,
+                                "node": {
+                                    "type": "feature",
+                                    "feature": {
+                                        "type": "regex",
+                                        "regex": "/megadumper/i"
+                                    }
+                                },
+                                "children": [],
+                                "locations": [],
+                                "captures": {}
+                            }
+                        ],
+                        "locations": [],
+                        "captures": {}
+                    }
+                ]
+            ]
+        },
+        "packed with upack": {
+            "meta": {
+                "name": "packed with upack",
+                "namespace": "anti-analysis/packer/upack",
+                "authors": [
+                    "@_re_fox"
+                ],
+                "scopes": {
+                    "static": "file",
+                    "dynamic": "file"
+                },
+                "attack": [
+                    {
+                        "parts": [
+                            "Defense Evasion",
+                            "Obfuscated Files or Information",
+                            "Software Packing"
+                        ],
+                        "tactic": "Defense Evasion",
+                        "technique": "Obfuscated Files or Information",
+                        "subtechnique": "Software Packing",
+                        "id": "T1027.002"
+                    }
+                ],
+                "mbc": [
+                    {
+                        "parts": [
+                            "Anti-Static Analysis",
+                            "Software Packing"
+                        ],
+                        "objective": "Anti-Static Analysis",
+                        "behavior": "Software Packing",
+                        "method": "",
+                        "id": "F0001"
+                    }
+                ],
+                "references": [
+                    "https://www.hexacorn.com/blog/2016/12/15/pe-section-names-re-visited/"
+                ],
+                "examples": [
+                    "9d98f8519d9fee8219caca5b31eef0bd"
+                ],
+                "description": "",
+                "lib": false,
+                "is_subscope_rule": false,
+                "maec": {}
+            },
+            "source": "rule:\n  meta:\n    name: packed with upack\n    namespace: anti-analysis/packer/upack\n    authors:\n      - \"@_re_fox\"\n    scopes:\n      static: file\n      dynamic: file\n    att&ck:\n      - Defense Evasion::Obfuscated Files or Information::Software Packing [T1027.002]\n    mbc:\n      - Anti-Static Analysis::Software Packing [F0001]\n    references:\n      - https://www.hexacorn.com/blog/2016/12/15/pe-section-names-re-visited/\n    examples:\n      - 9d98f8519d9fee8219caca5b31eef0bd\n  features:\n    - or:\n      - section: .Upack\n      - section: .ByDwing\n      - string: \"UpackByDwing@\"\n",
+            "matches": [
+                [
+                    {
+                        "type": "no address"
+                    },
+                    {
+                        "success": true,
+                        "node": {
+                            "type": "statement",
+                            "statement": {
+                                "type": "or"
+                            }
+                        },
+                        "children": [
+                            {
+                                "success": true,
+                                "node": {
+                                    "type": "feature",
+                                    "feature": {
+                                        "type": "section",
+                                        "section": ".Upack"
+                                    }
+                                },
+                                "children": [],
+                                "locations": [
+                                    {
+                                        "type": "absolute",
+                                        "value": 4198400
+                                    }
+                                ],
+                                "captures": {}
+                            },
+                            {
+                                "success": false,
+                                "node": {
+                                    "type": "feature",
+                                    "feature": {
+                                        "type": "section",
+                                        "section": ".ByDwing"
+                                    }
+                                },
+                                "children": [],
+                                "locations": [],
+                                "captures": {}
+                            },
+                            {
+                                "success": false,
+                                "node": {
+                                    "type": "feature",
+                                    "feature": {
+                                        "type": "string",
+                                        "string": "UpackByDwing@"
+                                    }
+                                },
+                                "children": [],
+                                "locations": [],
+                                "captures": {}
+                            }
+                        ],
+                        "locations": [],
+                        "captures": {}
+                    }
+                ]
+            ]
+        },
+        "contain an embedded PE file": {
+            "meta": {
+                "name": "contain an embedded PE file",
+                "namespace": "executable/subfile/pe",
+                "authors": [
+                    "moritz.raabe@mandiant.com"
+                ],
+                "scopes": {
+                    "static": "file",
+                    "dynamic": "file"
+                },
+                "attack": [],
+                "mbc": [
+                    {
+                        "parts": [
+                            "Execution",
+                            "Install Additional Program"
+                        ],
+                        "objective": "Execution",
+                        "behavior": "Install Additional Program",
+                        "method": "",
+                        "id": "B0023"
+                    }
+                ],
+                "references": [],
+                "examples": [
+                    "Practical Malware Analysis Lab 01-04.exe_:0x4060"
+                ],
+                "description": "",
+                "lib": false,
+                "is_subscope_rule": false,
+                "maec": {}
+            },
+            "source": "rule:\n  meta:\n    name: contain an embedded PE file\n    namespace: executable/subfile/pe\n    authors:\n      - moritz.raabe@mandiant.com\n    scopes:\n      static: file\n      dynamic: file\n    mbc:\n      - Execution::Install Additional Program [B0023]\n    examples:\n      - Practical Malware Analysis Lab 01-04.exe_:0x4060\n  features:\n    - or:\n      - count(characteristic(embedded pe)): 1 or more\n      - count(string(This program cannot be run in DOS mode.)): 2 or more\n",
+            "matches": [
+                [
+                    {
+                        "type": "no address"
+                    },
+                    {
+                        "success": true,
+                        "node": {
+                            "type": "statement",
+                            "statement": {
+                                "type": "or"
+                            }
+                        },
+                        "children": [
+                            {
+                                "success": true,
+                                "node": {
+                                    "type": "statement",
+                                    "statement": {
+                                        "type": "range",
+                                        "min": 1,
+                                        "max": 9223372036854775808,
+                                        "child": {
+                                            "type": "characteristic",
+                                            "characteristic": "embedded pe"
+                                        }
+                                    }
+                                },
+                                "children": [],
+                                "locations": [
+                                    {
+                                        "type": "file",
+                                        "value": 2522625
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 5045250
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 437255
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 2959880
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 5482505
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 874510
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 3397135
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 1311765
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 3834390
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 1749020
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 4271645
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 2186275
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 4708900
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 100905
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 2623530
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 5146155
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 538160
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 3060785
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 5583410
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 975415
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 3498040
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 1412670
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 3935295
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 1849925
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 4372550
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 2287180
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 4809805
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 201810
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 2724435
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 5247060
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 639065
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 3161690
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 1076320
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 3598945
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 1513575
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 4036200
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 1950830
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 4473455
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 2388085
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 4910710
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 302715
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 2825340
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 5347965
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 739970
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 3262595
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 1177225
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 3699850
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 1614480
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 4137105
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 2051735
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 4574360
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 2488990
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 5011615
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 403620
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 2926245
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 5448870
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 840875
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 3363500
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 1278130
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 3800755
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 1715385
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 4238010
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 2152640
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 4675265
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 67270
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 2589895
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 5112520
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 504525
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 3027150
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 5549775
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 941780
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 3464405
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 1379035
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 3901660
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 1816290
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 4338915
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 2253545
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 4776170
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 168175
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 2690800
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 5213425
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 605430
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 3128055
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 5650680
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 1042685
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 3565310
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 1479940
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 4002565
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 1917195
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 4439820
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 2354450
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 4877075
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 269080
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 2791705
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 5314330
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 706335
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 3228960
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 1143590
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 3666215
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 1580845
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 4103470
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 2018100
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 4540725
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 2455355
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 4977980
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 369985
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 2892610
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 5415235
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 807240
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 3329865
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 1244495
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 3767120
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 1681750
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 4204375
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 2119005
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 4641630
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 33635
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 2556260
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 5078885
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 470890
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 2993515
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 5516140
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 908145
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 3430770
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 1345400
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 3868025
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 1782655
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 4305280
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 2219910
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 4742535
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 134540
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 2657165
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 5179790
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 571795
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 3094420
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 5617045
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 1009050
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 3531675
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 1446305
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 3968930
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 1883560
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 4406185
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 2320815
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 4843440
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 235445
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 2758070
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 5280695
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 672700
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 3195325
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 1109955
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 3632580
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 1547210
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 4069835
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 1984465
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 4507090
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 2421720
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 4944345
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 336350
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 2858975
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 5381600
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 773605
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 3296230
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 1210860
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 3733485
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 1648115
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 4170740
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 2085370
+                                    },
+                                    {
+                                        "type": "file",
+                                        "value": 4607995
+                                    }
+                                ],
+                                "captures": {}
+                            },
+                            {
+                                "success": false,
+                                "node": {
+                                    "type": "statement",
+                                    "statement": {
+                                        "type": "range",
+                                        "min": 2,
+                                        "max": 9223372036854775808,
+                                        "child": {
+                                            "type": "string",
+                                            "string": "This program cannot be run in DOS mode."
+                                        }
+                                    }
+                                },
+                                "children": [],
+                                "locations": [],
+                                "captures": {}
+                            }
+                        ],
+                        "locations": [],
+                        "captures": {}
+                    }
+                ]
+            ]
+        },
+        "contains PDB path": {
+            "meta": {
+                "name": "contains PDB path",
+                "namespace": "executable/pe/pdb",
+                "authors": [
+                    "moritz.raabe@mandiant.com"
+                ],
+                "scopes": {
+                    "static": "file",
+                    "dynamic": "file"
+                },
+                "attack": [],
+                "mbc": [],
+                "references": [],
+                "examples": [
+                    "464EF2CA59782CE697BC329713698CCC"
+                ],
+                "description": "",
+                "lib": false,
+                "is_subscope_rule": false,
+                "maec": {}
+            },
+            "source": "rule:\n  meta:\n    name: contains PDB path\n    namespace: executable/pe/pdb\n    authors:\n      - moritz.raabe@mandiant.com\n    scopes:\n      static: file\n      dynamic: file\n    examples:\n      - 464EF2CA59782CE697BC329713698CCC  # level32.exe\n  features:\n    - string: /:\\\\.*\\.pdb/\n",
+            "matches": [
+                [
+                    {
+                        "type": "no address"
+                    },
+                    {
+                        "success": true,
+                        "node": {
+                            "type": "feature",
+                            "feature": {
+                                "type": "regex",
+                                "regex": "/:\\\\.*\\.pdb/"
+                            }
+                        },
+                        "children": [],
+                        "locations": [
+                            {
+                                "type": "file",
+                                "value": 5850416
+                            }
+                        ],
+                        "captures": {
+                            "C:\\dvs\\p4\\build\\sw\\rel\\gpu_drv\\installer_core\\Build\\Core\\Out\\Win32\\Release\\setup.pdb": [
+                                {
+                                    "type": "file",
+                                    "value": 5850416
+                                }
+                            ]
+                        }
+                    }
+                ]
+            ]
+        },
+        "(internal) packer file limitation": {
+            "meta": {
+                "name": "(internal) packer file limitation",
+                "namespace": "internal/limitation/static",
+                "authors": [
+                    "william.ballenthin@mandiant.com"
+                ],
+                "scopes": {
+                    "static": "file",
+                    "dynamic": "file"
+                },
+                "attack": [],
+                "mbc": [],
+                "references": [],
+                "examples": [
+                    "CD2CBA9E6313E8DF2C1273593E649682"
+                ],
+                "description": "This sample appears to be packed.\n\nPacked samples have often been obfuscated to hide their logic.\ncapa cannot handle obfuscation well using static analysis. This means the results may be misleading or incomplete.\nIf possible, you should try to unpack this input file before analyzing it with capa.\nAlternatively, run the sample in a supported sandbox and invoke capa against the report to obtain dynamic analysis results.\n",
+                "lib": false,
+                "is_subscope_rule": false,
+                "maec": {}
+            },
+            "source": "rule:\n  meta:\n    name: (internal) packer file limitation\n    namespace: internal/limitation/static\n    authors:\n      - william.ballenthin@mandiant.com\n    description: |\n      This sample appears to be packed.\n\n      Packed samples have often been obfuscated to hide their logic.\n      capa cannot handle obfuscation well using static analysis. This means the results may be misleading or incomplete.\n      If possible, you should try to unpack this input file before analyzing it with capa.\n      Alternatively, run the sample in a supported sandbox and invoke capa against the report to obtain dynamic analysis results.\n    scopes:\n      static: file\n      dynamic: file\n    examples:\n      - CD2CBA9E6313E8DF2C1273593E649682\n  features:\n    - or:\n      - match: anti-analysis/packer\n",
+            "matches": [
+                [
+                    {
+                        "type": "no address"
+                    },
+                    {
+                        "success": true,
+                        "node": {
+                            "type": "statement",
+                            "statement": {
+                                "type": "or"
+                            }
+                        },
+                        "children": [
+                            {
+                                "success": true,
+                                "node": {
+                                    "type": "feature",
+                                    "feature": {
+                                        "type": "match",
+                                        "match": "anti-analysis/packer"
+                                    }
+                                },
+                                "children": [
+                                    {
+                                        "success": true,
+                                        "node": {
+                                            "type": "statement",
+                                            "statement": {
+                                                "type": "or"
+                                            }
+                                        },
+                                        "children": [
+                                            {
+                                                "success": true,
+                                                "node": {
+                                                    "type": "feature",
+                                                    "feature": {
+                                                        "type": "section",
+                                                        "section": ".Upack"
+                                                    }
+                                                },
+                                                "children": [],
+                                                "locations": [
+                                                    {
+                                                        "type": "absolute",
+                                                        "value": 4198400
+                                                    }
+                                                ],
+                                                "captures": {}
+                                            },
+                                            {
+                                                "success": false,
+                                                "node": {
+                                                    "type": "feature",
+                                                    "feature": {
+                                                        "type": "section",
+                                                        "section": ".ByDwing"
+                                                    }
+                                                },
+                                                "children": [],
+                                                "locations": [],
+                                                "captures": {}
+                                            },
+                                            {
+                                                "success": false,
+                                                "node": {
+                                                    "type": "feature",
+                                                    "feature": {
+                                                        "type": "string",
+                                                        "string": "UpackByDwing@"
+                                                    }
+                                                },
+                                                "children": [],
+                                                "locations": [],
+                                                "captures": {}
+                                            }
+                                        ],
+                                        "locations": [],
+                                        "captures": {}
+                                    }
+                                ],
+                                "locations": [
+                                    {
+                                        "type": "no address"
+                                    }
+                                ],
+                                "captures": {}
+                            }
+                        ],
+                        "locations": [],
+                        "captures": {}
+                    }
+                ]
+            ]
+        }
+    }
+}
