@@ -22,13 +22,16 @@ Unzip it into some directory.
 
 Please set the following environment variables:
 
-- `$PROJECT_ROOT` is the root directory of this project
-- `$LGBM_ROOT` is the root directory of the LightGBM project
-    (that you've just downloaded). This should be set
-    system-wide
-- `$LGBM_MODEL_FILE` is the path to a trained LightGBM model file
-    that you wish to use.
+- `$PROJECT_ROOT` is the root directory of this project.
+    (This variable will only be used in the commands below,
+    so it's optional that you set this variable.)
 
+- `$LGBM_ROOT` is the root directory of the LightGBM project
+    (that you've just downloaded). Since this variable is
+    used in `CMakeLists.txt` files in this project, it
+    should be set system-wide (so that IDEs and compilers
+    could read it).
+                                                                            
 Then, build the (static) LightGBM C library.
 
 - On Linux, Bash:
