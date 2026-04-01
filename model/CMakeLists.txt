@@ -26,13 +26,18 @@ target_include_directories(ember2024_lgbm_model PUBLIC
 target_include_directories(ember2024_lgbm_model PRIVATE src)
 
 if (MSVC)
-    # MSVC builds put static lib in Release/ by default
+    # MSVC with Ninja
     set(LIGHTGBM_STATIC_LIB_FILE
-        "${LGBM_ROOT}/Release/lib_lightgbm.lib")
+        "${LGBM_ROOT}/lib_lightgbm.lib")
 else()
     # Linux / macOS
     set(LIGHTGBM_STATIC_LIB_FILE
         "${LGBM_ROOT}/lib_lightgbm.a")
+endif()
+
+if (WIN32)
+    # Fix errors linking against LightGBM (probably) on Windows
+    target_link_libraries(ember2024_lgbm_model PUBLIC ws2_32 iphlpapi)
 endif()
 
 set(LINKED_LIBRARIES "${LIGHTGBM_STATIC_LIB_FILE}" efe_core)
