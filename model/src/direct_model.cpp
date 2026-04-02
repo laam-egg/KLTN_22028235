@@ -14,6 +14,7 @@ constexpr int getLGBMInputDataType() {
 
 
 #include "direct_model.h"
+#include <iostream>
 
 void* loadModel(const char* lgbmModelFileContent, int& numFeatures) {
     BoosterHandle boosterHandle = NULL;
@@ -27,7 +28,9 @@ void* loadModel(const char* lgbmModelFileContent, int& numFeatures) {
                         if (boosterHandle != NULL) { \
                             LGBM_BoosterFree(boosterHandle); \
                         } \
-            throw std::runtime_error(LGBM_GetLastError()); \
+            char const* c_err = LGBM_GetLastError(); \
+            std::string const err(c_err, std::min<size_t>(100, strlen(c_err))); \
+            throw std::runtime_error(err); \
         } \
         (void)0 \
     

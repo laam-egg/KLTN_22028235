@@ -9,8 +9,14 @@
 
 This project allows running any LightGBM
 model that receives an EMBER2024 feature
-vector as input. Such a model could be
+vector as input, and produces a real number
+(`double`) as output. Such a model could be
 used for PE malware detection.
+
+The model could be one of the pretrained
+LightGBM models in the EMBER2024 project
+itself. See the [Get It Up and Running guide](#get-it-up-and-running)
+for details.
 
 ## Get It Up and Running
 

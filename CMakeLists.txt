@@ -7,11 +7,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 option(BUILD_TESTING "Enable tests" OFF)
 
 if (MSVC)
+    add_compile_options("/MT$<$<CONFIG:Release>:>")
+    set(CMAKE_POLICY_DEFAULT_CMP0091 NEW)
     if (BUILD_TESTING)
         # Stupid GoogleTest won't let us link static CRT easily
         set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
     else()
         # Link statically to ensure portability
+        add_compile_options("/MT$<$<CONFIG:Release>:>")
         set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
     endif()
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /O2 /fp:precise /DNDEBUG") # /GL

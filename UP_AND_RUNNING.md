@@ -16,6 +16,7 @@ with some tweaks.
     - [Pick your Model](#pick-your-model)
     - [Compile](#compile)
   - [Run](#run)
+  - [Replacing the Model](#replacing-the-model)
   - [Troubleshooting](#troubleshooting)
     - [`FAILED: [code=2] ... C1041: cannot open program database ... same .PDB file, please use /FS`](#failed-code2--c1041-cannot-open-program-database--same-pdb-file-please-use-fs)
     - [`FAILED: [code=1] ... deleting depfile: No error`](#failed-code1--deleting-depfile-no-error)
@@ -26,9 +27,9 @@ with some tweaks.
 ### Prerequisites
 
 - On Linux:
-  - GCC (gcc, g++)
+  - GNU compiler toolchain (gcc, g++)
   - Clang
-  - Cmake
+  - CMake
   - Ninja 1.10+
   - sccache (optional, but recommended)
 
@@ -54,8 +55,8 @@ Please set the following environment variables:
 - `$LGBM_ROOT` is the root directory of the LightGBM project
     (that you've just downloaded and unzipped). Since this
     variable is used in `CMakeLists.txt` files in this project,
-    it should be set system-wide (so that IDEs and compilers
-    could read it).
+    **it should be set system-wide** (so that CMake and the
+    compiler toolchain could read it).
                                                                             
 Then, build the (static) LightGBM C library.
 
@@ -65,26 +66,54 @@ Then, build the (static) LightGBM C library.
     cd $LGBM_ROOT
     mkdir build && cd build
     cmake .. -G "Ninja" -DBUILD_STATIC_LIB=ON -DCMAKE_BUILD_TYPE=Release
-    make -j$(nproc)
+    cmake --build . --target all -j
     ```
 
-- On Windows, Developer PowerShell for VS2022:
+- On Windows: From Start Menu, search for
+    **x64 Native Tools Command Prompt for VS2022**,
+    run it, then run `powershell` inside it.
+    We shall call this
+    **x64 Native Tools PowerShell for VS2022**.
+    We will be using it for compilation on Windows for
+    the rest of this guide.
+
+    Okay, now type in:
 
     ```powershell
     cd "$env:LGBM_ROOT"
     mkdir build
     cd build
-    cmake .. -G "Ninja" -DBUILD_STATIC_LIB=ON -DCMAKE_BUILD_TYPE=Release
+    cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE=Release `
+        -DBUILD_STATIC_LIB=ON `
+        -DBUILD_SHARED_LIBS=OFF `
+        -DCMAKE_CXX_FLAGS="/MT /EHsc" `
+        -DCMAKE_CXX_FLAGS_RELEASE="/MT /EHsc /O2 /DNDEBUG" `
+        -DCMAKE_C_FLAGS="/MT" `
+        -DCMAKE_C_FLAGS_RELEASE="/MT /O2 /DNDEBUG" `
+        -DCMAKE_MSVC_RUNTIME_LIBRARY="MultiThreaded" `
+        -D__BUILD_FOR_R=OFF `
+        -DUSE_OPENMP=ON
+    
     cmake --build . --config Release --target all -j
     ```
 
-    If you encounter some error like "file X cannot be opened
-    because it is currently opened by another process"
+    This CMake flag hell is due to MSVC libraries
+    clashing each other if they have different settings
+    on linking against the C Runtime, Debug/Release
+    configurations, among other things. Yes, I hate
+    that too.
+
+    Why would we want to link against static libraries?
+    This way the compiled binaries no longer need
+    VC Redistributables! Within the context of
+    developing antivirus software, I think that is
+    an extremely valuable trait - less dynamic
+    dependencies, less attack surface.
 
 ### Pick your Model
 
 A pretrained model from the EMBER2024
-project, named `EMBER2024_all.model`, has
+project, named `EMBER2024_all.txt`, has
 been added in the source code of this
 project, under `$PROJECT_ROOT/model/resources`.
 
@@ -93,6 +122,23 @@ You could replace it with another
 keep the same file name (or you will
 have to change the file name in
 `$PROJECT_ROOT/model/src/resource.cpp`).
+
+[The model files are uploaded onto here](https://huggingface.co/joyce8/EMBER2024-benchmark-models/tree/main)
+by the authors of the EMBER2024 project.
+Note that once downloaded, rename them
+so that they have `.txt` extensions.
+This is because LightGBM on Windows
+will refuse to load models with newlines
+that are not CRLF. When we let the model
+files be text files, newlines should be
+converted seamlessly by Git on Windows.
+If not, run this on Windows:
+
+```powershell
+git config --global core.autocrlf true
+```
+
+On Linux, this is a non-issue.
 
 ### Compile
 
@@ -103,10 +149,11 @@ have to change the file name in
     mkdir build
     cd build
     cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE=Release
-    cmake --build build --target all -j
+    cmake --build . --target all -j
     ```
 
-- On Windows, Developer PowerShell for VS2022:
+- On Windows, again, in
+    **x64 Native Tools PowerShell for VS2022**:
 
     ```powershell
     cd $env:PROJECT_ROOT
@@ -115,6 +162,24 @@ have to change the file name in
     cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF
     cmake --build . --config Release --target all -j
     ```
+
+    Again, we want to link against static libraries,
+    including the C runtime. I've got you covered
+    for that though, through holy hacks written in
+    the `CMakeLists.txt` files, so you don't
+    see nasty flags here anymore.
+
+    While it is compiling, you could see some
+    logs like
+
+    ```
+    cl : Command line warning D9025 : overriding '/MT' with '/MD'
+    cl : Command line warning D9025 : overriding '/MD' with '/MT'
+    ```
+
+    Yes, that are our *hacks* at work, trying
+    to get it compile and link against all libraries
+    *statically*. Don't worry about that though.
 
 ## Run
 
@@ -134,7 +199,44 @@ have to change the file name in
     cd $env:PROJECT_ROOT
     cd build
     cd demo
+
     .\ember2024_lgbm_demo.exe <path/to/PE/file/to/scan>
+    ```
+
+## Replacing the Model
+
+Note that the model file (which we selected
+[here](#pick-your-model)) will be
+embedded straight into the finally
+compiled binaries, just like
+Windows resources. **So if you change**
+**the model, be sure to recompile.**
+
+If you have compiled the whole project
+before replacing the model, `ninja` would
+not recompile since it sees no source
+code change. In this case you
+have to manually clean the
+`ember2024_lgbm_model` target,
+so that it appears to have not
+been compiled, and `ninja` is
+forced to recompile it, among
+anything that depends on it.
+
+- On Linux, Bash:
+    
+    ```sh
+    cd build
+    ninja -t clean ember2024_lgbm_model
+    cmake --build . --target all -j
+    ```
+
+- On Windows, **x64 Native Tools PowerShell for VS2022**:
+    
+    ```powershell
+    cd build
+    ninja -t clean ember2024_lgbm_model
+    cmake --build . --config Release --target all -j
     ```
 
 ## Troubleshooting
@@ -142,7 +244,7 @@ have to change the file name in
 ### `FAILED: [code=2] ... C1041: cannot open program database ... same .PDB file, please use /FS`
 
 It's because multiple instances of the compiler
-trying to access some intermediate build files
+were trying to access some intermediate build files
 (e.g. `.PDB`, `.o`, etc.). Those files could
 also be locked by antivirus software.
 
@@ -163,8 +265,8 @@ continue the progress, so after multiple fails
 you would get the program compile.
 
 **Note that you should rerun only when you see**
-**this particular error.** Beware for your own
-mistakes though - you must fix them since reruns
+**this particular error.** Beware for *your own*
+*mistakes* though - you must fix them since reruns
 don't do that for you, apparently.
 
 If you don't have time to babysit this,
@@ -185,7 +287,9 @@ be running at a time. No parallelization.
     instance running at a time.
 - It still won't fix the problem if it is caused by
     antivirus locking files. In that case you have
-    to turn back to the "retry" strategy above.
+    to turn back to the "retry" strategy above, or
+    temporarily disable your antivirus' real-time
+    protection or something.
 
 ### `FAILED: [code=1] ... deleting depfile: No error`
 

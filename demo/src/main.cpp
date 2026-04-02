@@ -49,7 +49,6 @@ bool scanSingleFile(EMBER2024Model& model, EMBER2024FeatureExtractor& fe, std::f
 
     size_t const dim = fe.getDim();
 
-    // TODO: Maybe force ember2024-fe-cpp to switch to double?
     std::vector<feature_t> featureVectorDouble(dim);
     for (size_t i = 0; i < dim; ++i) {
         featureVectorDouble[i] = static_cast<double>(featureVector[i]);
