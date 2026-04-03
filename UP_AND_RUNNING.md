@@ -13,6 +13,7 @@ with some tweaks.
   - [Setup](#setup)
     - [Prerequisites](#prerequisites)
     - [Build LightGBM](#build-lightgbm)
+    - [Setup for Avast Authenticode](#setup-for-avast-authenticode)
     - [Pick your Model](#pick-your-model)
     - [Compile](#compile)
   - [Run](#run)
@@ -21,6 +22,8 @@ with some tweaks.
     - [`FAILED: [code=2] ... C1041: cannot open program database ... same .PDB file, please use /FS`](#failed-code2--c1041-cannot-open-program-database--same-pdb-file-please-use-fs)
     - [`FAILED: [code=1] ... deleting depfile: No error`](#failed-code1--deleting-depfile-no-error)
     - [`error: remove(...): The process cannot access the file because it is being used by another process.`](#error-remove-the-process-cannot-access-the-file-because-it-is-being-used-by-another-process)
+    - [`cl.exe not found` or `CMAKE_C_COMPILER not set` in a VSCode terminal](#clexe-not-found-or-cmake_c_compiler-not-set-in-a-vscode-terminal)
+    - [`FetchContent_MakeAvailable ... Configuring incomplete, errors occurred!`](#fetchcontent_makeavailable--configuring-incomplete-errors-occurred)
 
 ## Setup
 
@@ -92,7 +95,8 @@ Then, build the (static) LightGBM C library.
         -DCMAKE_C_FLAGS_RELEASE="/MT /O2 /DNDEBUG" `
         -DCMAKE_MSVC_RUNTIME_LIBRARY="MultiThreaded" `
         -D__BUILD_FOR_R=OFF `
-        -DUSE_OPENMP=ON
+        -DUSE_OPENMP=ON `
+        -DCMAKE_POLICY_VERSION_MINIMUM="3.5"
     
     cmake --build . --config Release --target all -j
     ```
@@ -109,6 +113,13 @@ Then, build the (static) LightGBM C library.
     developing antivirus software, I think that is
     an extremely valuable trait - less dynamic
     dependencies, less attack surface.
+
+### Setup for Avast Authenticode
+
+[Follow the guide here](https://github.com/avast/authenticode-parser?tab=readme-ov-file#build-installation-and-testing)
+(for the requirements part only).
+Primarily, you need to install
+OpenSSL.
 
 ### Pick your Model
 
@@ -159,7 +170,7 @@ On Linux, this is a non-issue.
     cd $env:PROJECT_ROOT
     mkdir build
     cd build
-    cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF
+    cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DCMAKE_POLICY_VERSION_MINIMUM="3.5"
     cmake --build . --config Release --target all -j
     ```
 
@@ -177,7 +188,7 @@ On Linux, this is a non-issue.
     cl : Command line warning D9025 : overriding '/MD' with '/MT'
     ```
 
-    Yes, that are our *hacks* at work, trying
+    Yes, those are our *hacks* at work, trying
     to get it compile and link against all libraries
     *statically*. Don't worry about that though.
 
@@ -301,3 +312,24 @@ Same cause, same fix as [this error](#failed-code2--c1041-cannot-open-program-da
 
 It is just that now it comes from **MinGW on Windows**,
 doesn't it?
+
+### `cl.exe not found` or `CMAKE_C_COMPILER not set` in a VSCode terminal
+
+The latest version of VSCode (1.107) seems to not
+inherit environment variables set
+by the **x64 Native Tools Command Prompt for VS2022**
+if there is another window of VSCode
+already running.
+
+To fix this, simply close all VSCode windows,
+then launch VSCode from within that
+MSVC command prompt again, and finally retry
+intended cl/CMake commands.
+
+### `FetchContent_MakeAvailable ... Configuring incomplete, errors occurred!`
+
+This is likely due to CMake not being
+able to access the internet or just
+some temporary network glitch.
+
+Run your intended CMake command again.
