@@ -67,7 +67,7 @@ endif()
 FetchContent_Declare(
     ember2024_fe_cpp
     GIT_REPOSITORY https://github.com/pe-malware-detection/ember2024-fe-cpp.git
-    GIT_TAG 423ff0d111f7a77867922298648370a0a1c09b63
+    GIT_TAG 984285d1cda428d6546128706ec8794b2a48f7f9
     GIT_SHALLOW TRUE
 )
 
