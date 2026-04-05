@@ -3,6 +3,7 @@
 - [ember2024-lgbm](#ember2024-lgbm)
   - [Introduction](#introduction)
   - [Get It Up and Running](#get-it-up-and-running)
+  - [Performance Benchmarking](#performance-benchmarking)
   - [License](#license)
 
 ## Introduction
@@ -21,6 +22,10 @@ for details.
 ## Get It Up and Running
 
 [Read this guide](./UP_AND_RUNNING.md).
+
+## Performance Benchmarking
+
+[See this file](./benchmarks/procbench/README.md).
 
 ## License
 
