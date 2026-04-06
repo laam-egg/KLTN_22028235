@@ -6,7 +6,7 @@ still work on other POSIX platforms (e.g. MacOS)
 with some tweaks.
 
 **ATTENTION: If you stumble upon a problem,**
-**besure to check the [Troubleshooting](#troubleshooting-building-on-windows)**
+**be sure to check the [Troubleshooting](#troubleshooting-building-on-windows)**
 **section first. Plenty of gotcha's there!**
 
 - [Getting It Up and Running](#getting-it-up-and-running)
@@ -116,10 +116,20 @@ Then, build the (static) LightGBM C library.
 
 ### Setup for Avast Authenticode
 
-[Follow the guide here](https://github.com/avast/authenticode-parser?tab=readme-ov-file#build-installation-and-testing)
-(for the requirements part only).
-Primarily, you need to install
-OpenSSL.
+Install OpenSSL.
+
+On Windows, approaches include:
+
+- Using chocolatey: `choco install openssl`
+- Using Shining Light's Win64 OpenSSL installer: <https://slproweb.com/products/Win32OpenSSL.html>
+
+On Ubuntu/Debian:
+
+```sh
+sudo apt-get install openssl libssl-dev 
+```
+
+[Reference](https://github.com/avast/authenticode-parser?tab=readme-ov-file#build-installation-and-testing)
 
 ### Pick your Model
 
