@@ -67,7 +67,7 @@ endif()
 FetchContent_Declare(
     ember2024_fe_cpp
     GIT_REPOSITORY https://github.com/pe-malware-detection/ember2024-fe-cpp.git
-    GIT_TAG fccef1c084e64ed36b7373483ce954e116a9dfba
+    GIT_TAG 9bea7f2c3e7a3c387dc7ab42e488e506ca5e8de8
     # Fix error "fatal: unable to read tree" / failed to checkout tag
     GIT_SHALLOW FALSE # TRUE
 )

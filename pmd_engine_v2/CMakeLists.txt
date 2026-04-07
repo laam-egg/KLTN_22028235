@@ -14,17 +14,17 @@ if (MINGW)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -static-libgcc -static-libstdc++")
 endif()
 
-set(TARGET_NAME e24lgbm_pmd_engine)
+set(TARGET_NAME e24lgbm_pmd_engine_v2)
 
 add_library(${TARGET_NAME} SHARED
-    include/e24lgbm_pmd_engine.h
-        src/e24lgbm_pmd_engine.cpp
-    include/e24lgbm_pmd_engine_impl.h
-        src/e24lgbm_pmd_engine_impl.cpp
+    include/pmd_engine_v2.h
+        src/pmd_engine_v2.cpp
+    include/pmd_engine_v2_impl.h
+        src/pmd_engine_v2_impl.cpp
 )
 
 # Define export macro for DLL build
-target_compile_definitions(${TARGET_NAME} PRIVATE PMD_ENGINE_EXPORTS)
+target_compile_definitions(${TARGET_NAME} PRIVATE PMD_ENGINE_V2_EXPORTS)
 
 target_include_directories(${TARGET_NAME} PUBLIC include)
 

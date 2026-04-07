@@ -34,4 +34,5 @@ add_subdirectory("demo")
 # Only available on Win32
 if (WIN32)
     add_subdirectory("pmd_engine")
+    add_subdirectory("pmd_engine_v2")
 endif()
