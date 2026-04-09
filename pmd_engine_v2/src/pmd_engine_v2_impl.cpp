@@ -19,11 +19,7 @@ void* PMD2Impl_Engine_Init(void) {
 }
 
 void PMD2Impl_Engine_Destroy(IN void* engine) {
-    PMD2Impl_Engine* eng = static_cast<PMD2Impl_Engine*>(engine);
-    eng->fe.~EMBER2024FeatureExtractor();
-    eng->model.~EMBER2024Model();
-    memset(eng, 0, sizeof(PMD2Impl_Engine));
-    delete eng;
+    delete static_cast<PMD2Impl_Engine*>(engine);
 }
 
 

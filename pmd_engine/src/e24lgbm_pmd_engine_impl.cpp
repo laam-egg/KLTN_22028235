@@ -18,11 +18,7 @@ void* PMDImpl_Engine_Init(void) {
 }
 
 void PMDImpl_Engine_Destroy(void* engine) {
-    PMDImpl_Engine* eng = static_cast<PMDImpl_Engine*>(engine);
-    eng->fe.~EMBER2024FeatureExtractor();
-    eng->model.~EMBER2024Model();
-    memset(eng, 0, sizeof(PMDImpl_Engine));
-    delete eng;
+    delete static_cast<PMDImpl_Engine*>(engine);
 }
 
 int PMDImpl_Engine_Predict(
