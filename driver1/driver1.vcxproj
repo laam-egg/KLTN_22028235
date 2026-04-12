@@ -117,12 +117,12 @@
     <ClCompile Include="attest.c" />
     <ClCompile Include="config.c" />
     <ClCompile Include="driver.c" />
-    <ClCompile Include="termproc.c" />
+    <ClCompile Include="proctools.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="attest.h" />
     <ClInclude Include="config.h" />
-    <ClInclude Include="termproc.h" />
+    <ClInclude Include="proctools.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="generate_secret.py" />

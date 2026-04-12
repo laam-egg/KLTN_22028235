@@ -5,7 +5,7 @@
 #include <wdf.h>
 #include <bcrypt.h>
 #include "config.h"
-#include "termproc.h"
+#include "proctools.h"
 #include "attest.h"
 
 // Copied from <ntifs.h>
@@ -25,6 +25,14 @@ typedef struct _FILE_ID_INFORMATION {
 ////////////////////////////
 
 WDFDEVICE g_Device = NULL;
+
+typedef struct _TRUSTED_PARTNER {
+    HANDLE Pid;
+    KSPIN_LOCK Lock;
+} TRUSTED_PARTNER;
+
+TRUSTED_PARTNER g_Model = { 0 };
+TRUSTED_PARTNER g_UI = { 0 };
 
 ////////////////////////////
 ///////// Macros ///////////
@@ -184,6 +192,7 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath)
 // ============================================================
 // DeviceAdd — create device + SDDL + interface
 // ============================================================
+_IRQL_requires_max_(PASSIVE_LEVEL)
 NTSTATUS EvtDeviceAdd(WDFDRIVER Driver, PWDFDEVICE_INIT DeviceInit)
 {
     UNREFERENCED_PARAMETER(Driver);
@@ -191,6 +200,12 @@ NTSTATUS EvtDeviceAdd(WDFDRIVER Driver, PWDFDEVICE_INIT DeviceInit)
     LOG_INFO("EvtDeviceAdd starting");
 
     SAFETY_BEGIN();
+
+    LOG_INFO("Resetting trusted partners");
+    NEVER_FAIL(KeInitializeSpinLock(&g_Model.Lock));
+    g_Model.Pid = NULL;
+    NEVER_FAIL(KeInitializeSpinLock(&g_UI.Lock));
+    g_UI.Pid = NULL;
 
     WDF_OBJECT_ATTRIBUTES deviceAttributes;
     WDFDEVICE device;
@@ -246,9 +261,52 @@ VOID RoutineProcessNotify(PEPROCESS Process, HANDLE ProcessId, PPS_CREATE_NOTIFY
     LOG_INFO("Process ID: %p", ProcessId);
 
     if (CreateInfo == NULL) {
-        SUCCEED_FAST(); // process terminating
+        // Process terminating - if that is a trusted partner,
+        // deregister it
+        {
+            KIRQL oldIrql = 0;
+            BOOL matched = FALSE;
+            KeAcquireSpinLock(&g_Model.Lock, &oldIrql);
+            if (g_Model.Pid == ProcessId) {
+                g_Model.Pid = NULL;
+                matched = TRUE;
+            }
+            KeReleaseSpinLock(&g_Model.Lock, oldIrql);
+            if (matched) {
+                LOG_INFO("Trusted usermode process %p (AI model) exited, untrust this PID", ProcessId);
+            }
+        }
+
+        {
+            KIRQL oldIrql = 0;
+            BOOL matched = FALSE;
+            KeAcquireSpinLock(&g_UI.Lock, &oldIrql);
+            if (g_UI.Pid == ProcessId) {
+                g_UI.Pid = NULL;
+                matched = TRUE;
+            }
+            KeReleaseSpinLock(&g_UI.Lock, oldIrql);
+            if (matched) {
+                LOG_INFO("Trusted usermode process %p (UI) exited, driver enters rest", ProcessId);
+            }
+        }
+        
+        SUCCEED_FAST();
     }
 
+    {
+        // Check if the AI model is there. If not, well, do not do anything
+        // to prevent malware :) (this stuff too hard)
+        BOOL isModelPresent = FALSE;
+        KIRQL oldIrql = 0;
+        KeAcquireSpinLock(&g_Model.Lock, &oldIrql);
+        isModelPresent = (g_Model.Pid != NULL);
+        KeReleaseSpinLock(&g_Model.Lock, oldIrql);
+        if (!isModelPresent) {
+            LOG_INFO("AI model is not present, so skipped scanning process with PID = %p", ProcessId);
+            SUCCEED_FAST();
+        }
+    }
     // Defer work to PASSIVE_LEVEL
     NEVER_FAIL(EnqueueScanTaskAddWorkItem(g_Device, ProcessId, CreateInfo->ImageFileName));
 
@@ -434,6 +492,18 @@ VOID HandleIOCTLGetPendingExecutable(
 ) {
     UNREFERENCED_PARAMETER(device);
     UNREFERENCED_PARAMETER(InputBufferLength);
+
+    //ULONG callerPid = WdfRequestGetRequestorProcessId(Request);
+    ULONG callerPid = IoGetRequestorProcessId(WdfRequestWdmGetIrp(Request));
+    // So, the caller is able to get pending executable => it's the AI model.
+    // Register it as a trusted partner.
+    {
+        KIRQL oldIrql = 0;
+        BOOL matched = FALSE;
+        KeAcquireSpinLock(&g_Model.Lock, &oldIrql);
+        g_Model.Pid = callerPid;
+        KeReleaseSpinLock(&g_Model.Lock, oldIrql);
+    }
 
     SAFETY_BEGIN();
     WILL_USE_LOCK(LPending);
@@ -692,6 +762,8 @@ VOID DriverUnload(WDFDRIVER driver)
         WAITLOCK_CLEANUP(LPending, ctx->PendingListLock);
         WAITLOCK_CLEANUP(LScanning, ctx->ScanningListLock);
     });
+
+    // No need to deinitialize spin locks.
 }
 
 
