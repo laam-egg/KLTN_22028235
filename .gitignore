@@ -17,6 +17,7 @@ Win32/
 *.exp
 *.sys
 *.inf
+!*driver*/*.inf
 *.cat
 *.cer
 *.pfx
