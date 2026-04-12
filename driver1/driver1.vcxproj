@@ -114,13 +114,18 @@
     <FilesToPackage Include="$(TargetPath)" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="attest.c" />
     <ClCompile Include="config.c" />
     <ClCompile Include="driver.c" />
     <ClCompile Include="termproc.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="attest.h" />
     <ClInclude Include="config.h" />
     <ClInclude Include="termproc.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="generate_secret.py" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

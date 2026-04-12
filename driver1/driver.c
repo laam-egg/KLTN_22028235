@@ -9,6 +9,7 @@
 #include <bcrypt.h>
 #include "config.h"
 #include "termproc.h"
+//#include "attest.h"
 
 // Copied from <ntifs.h>
 typedef struct _FILE_ID_INFORMATION {
@@ -430,6 +431,7 @@ VOID HandleIOCTLGetPendingExecutable(
     size_t OutputBufferLength,
     size_t InputBufferLength
 ) {
+    UNREFERENCED_PARAMETER(device);
     UNREFERENCED_PARAMETER(InputBufferLength);
 
     SAFETY_BEGIN();
@@ -473,44 +475,24 @@ VOID HandleIOCTLGetPendingExecutable(
 
     // Copy DTO to user buffer
     RtlCopyMemory(outBuf, &pScanTask->Dto, sizeof(SCAN_TASK_DTO));
-    // Set information and complete outside switch
     WdfRequestSetInformation(Request, sizeof(SCAN_TASK_DTO));
-    WdfRequestComplete(Request, STATUS_SUCCESS);
     SUCCEED_FAST();
 
     SAFETY_END_RETURNING_VOID({
+        WAITLOCK_CLEANUP(LPending, ctx->PendingListLock);
+        WAITLOCK_CLEANUP(LScanning, ctx->ScanningListLock);
         if (FAILED_PREVIOUSLY()) {
             if (pScanTask) {
-                // move back to pending
+                // move back to PendingList
                 WAITLOCK_ACQUIRE(LPending, ctx->PendingListLock, NULL);
                 InsertHeadList(&ctx->PendingList, &pScanTask->Link);
                 WAITLOCK_RELEASE(LPending, ctx->PendingListLock);
             }
-            WdfRequestComplete(Request, status);
         }
+        WdfRequestComplete(Request, status);
         WAITLOCK_CLEANUP(LPending, ctx->PendingListLock);
         WAITLOCK_CLEANUP(LScanning, ctx->ScanningListLock);
     });
-
-    //WAITLOCK_ACQUIRE(LPending, ctx->PendingListLock, NULL);
-
-    //if (!IsListEmpty(&ctx->PendingList)) {
-    //    // Send a zeroed-out SCAN_TASK to usermode, or NULL if possible
-    //    SUCCEED_FAST();
-    //}
-
-    //PLIST_ENTRY entry = RemoveHeadList(&ctx->PendingList);
-    //PSCAN_TASK pScanTask = CONTAINING_RECORD(entry, SCAN_TASK, Link);
-    //(void)pScanTask;
-
-    //// Send this SCAN_TASK to usermode
-
-    //// TODO: Should we release this lock earlier?
-    //WAITLOCK_RELEASE(LPending, ctx->PendingListLock);
-
-    //SAFETY_END_RETURNING_VOID({
-    //    WAITLOCK_CLEANUP(LPending, ctx->PendingListLock);
-    //});
 }
 
 /**

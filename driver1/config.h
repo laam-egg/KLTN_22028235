@@ -7,6 +7,7 @@
 #ifndef _NTDDK_
     // Only include if not already included
 #include <ntddk.h>
+#include <minwindef.h>
 #endif
 
 #define FILE_INVALID_FILE_ID ((LONGLONG)-1LL) 
