@@ -1,6 +1,3 @@
-// TODO: Differentiate between usermode component
-// executable/process from the rest!
-
 #define DRIVER1_KERNEL_MODE
 
 // Include kernel headers in the correct order FIRST
@@ -9,7 +6,7 @@
 #include <bcrypt.h>
 #include "config.h"
 #include "termproc.h"
-//#include "attest.h"
+#include "attest.h"
 
 // Copied from <ntifs.h>
 typedef struct _FILE_ID_INFORMATION {
@@ -68,6 +65,9 @@ WDFDEVICE g_Device = NULL;
 #define _LOG(type, prefix, ...) KdPrintEx((DPFLTR_IHVDRIVER_ID, type, prefix __VA_ARGS__))
 #define LOG_INFO(...)   _LOG(DPFLTR_INFO_LEVEL, "@@@ driver1: INFO: ", __VA_ARGS__)
 #define LOG_ERROR(...)  _LOG(DPFLTR_ERROR_LEVEL, "@@@ driver1: ERROR: ", __VA_ARGS__)
+#define LOG_WARN(...)   _LOG(DPFLTR_WARNING_LEVEL, "@@@ driver1: WARNING: ", __VA_ARGS__)
+
+#define MAX_RETRIES 5
 
 ///////////////////////////////////
 /////// Other Declarations ////////
@@ -134,6 +134,7 @@ WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(WORK_ITEM_CONTEXT, WorkItemGetContext);
 typedef struct _SCAN_TASK {
     SCAN_TASK_DTO Dto;
     LIST_ENTRY Link;
+    INT8 Retried;
 } SCAN_TASK, * PSCAN_TASK;
 
 //////////// IOCTL HANDLERS (CONTEXT-DEPENDENT) /////////////
@@ -508,12 +509,136 @@ VOID HandleIOCTLPostScanningResult(
     size_t OutputBufferLength,
     size_t InputBufferLength
 ) {
-    // TODO
     UNREFERENCED_PARAMETER(device);
-    UNREFERENCED_PARAMETER(ctx);
-    UNREFERENCED_PARAMETER(Request);
+    //UNREFERENCED_PARAMETER(ctx);
+    //UNREFERENCED_PARAMETER(Request);
     UNREFERENCED_PARAMETER(InputBufferLength);
     UNREFERENCED_PARAMETER(OutputBufferLength);
+
+    SAFETY_BEGIN();
+    WILL_USE_LOCK(LScanning);
+    WILL_USE_LOCK(LPending);
+
+    PSCAN_VERDICT_DTO verdict = NULL;
+    PSCAN_TASK pScanTask = NULL;
+    SCAN_TASK_DTO taskCopy = { 0 };
+    size_t inBufLen = 0;
+    NTSTATUS verifyStatus = STATUS_UNSUCCESSFUL;
+
+    LOG_INFO("HandleIOCTLPostScanningResult starting");
+
+    //
+    // Step 1 — Get input buffer from usermode (SCAN_VERDICT_DTO)
+    //
+    TRY(WdfRequestRetrieveInputBuffer(
+        Request,
+        sizeof(SCAN_VERDICT_DTO),
+        (PVOID*)&verdict,
+        &inBufLen
+    ));
+
+    if (inBufLen < sizeof(SCAN_VERDICT_DTO)) {
+        LOG_ERROR("Invalid input buffer length %zu", inBufLen);
+        FAIL_FAST_WITH_STATUS(STATUS_INVALID_BUFFER_SIZE);
+    }
+
+    //
+    // Step 2 — Locate matching SCAN_TASK in ScanningList (by PID)
+    //
+    WAITLOCK_ACQUIRE(LScanning, ctx->ScanningListLock, NULL);
+
+    BOOLEAN found = FALSE;
+    for (PLIST_ENTRY entry = ctx->ScanningList.Flink;
+        entry != &ctx->ScanningList;
+        entry = entry->Flink)
+    {
+        PSCAN_TASK current = CONTAINING_RECORD(entry, SCAN_TASK, Link);
+        if (current->Dto.Pid == verdict->Pid) {
+            found = TRUE;
+            pScanTask = current;
+            break;
+        }
+    }
+
+    if (!found) {
+        LOG_ERROR("No matching SCAN_TASK for PID %p", verdict->Pid);
+        FAIL_FAST_WITH_STATUS(STATUS_NOT_FOUND);
+    }
+
+    // Make a safe local copy before verification
+    RtlCopyMemory(&taskCopy, &pScanTask->Dto, sizeof(SCAN_TASK_DTO));
+    WAITLOCK_RELEASE(LScanning, ctx->ScanningListLock);
+
+    //
+    // Step 3 — Verify attestation
+    //
+    verifyStatus = VerifyAttestation(&taskCopy, verdict);
+    if (!NT_SUCCESS(verifyStatus)) {
+        LOG_ERROR("Attestation verification failed for PID %p", verdict->Pid);
+        #ifndef TAKE_THE_RISK
+        TRY(TerminateProcessByPid(verdict->Pid, STATUS_INVALID_SIGNATURE));
+        #endif // TAKE_THE_RISK
+        SUCCEED_FAST();
+    }
+
+    //
+    // Step 4 — Handle allow/deny decision or recovery
+    //
+    if (NT_SUCCESS(verifyStatus)) {
+        if (verdict->AllowExecution) {
+            LOG_INFO("Process %p allowed to execute.", verdict->Pid);
+
+            // Remove from ScanningList, free after execution allowed
+            WAITLOCK_ACQUIRE(LScanning, ctx->ScanningListLock, NULL);
+            RemoveEntryList(&pScanTask->Link);
+            WAITLOCK_RELEASE(LScanning, ctx->ScanningListLock);
+
+            ExFreePoolWithTag(pScanTask, 'tstA');
+        }
+        else {
+            LOG_INFO("Process %p denied by AI model. Terminating...", verdict->Pid);
+            TRY(TerminateProcessByPid(verdict->Pid, STATUS_ACCESS_DENIED));
+
+            WAITLOCK_ACQUIRE(LScanning, ctx->ScanningListLock, NULL);
+            RemoveEntryList(&pScanTask->Link);
+            WAITLOCK_RELEASE(LScanning, ctx->ScanningListLock);
+
+            ExFreePoolWithTag(pScanTask, 'tstA');
+        }
+    }
+
+    LOG_INFO("HandleIOCTLPostScanningResult finished");
+    SAFETY_END_RETURNING_VOID({
+        WAITLOCK_CLEANUP(LScanning, ctx->ScanningListLock);
+        WAITLOCK_CLEANUP(LPending, ctx->PendingListLock);
+
+        if (!verifyStatus && pScanTask != NULL) {
+            if (!FAILED_PREVIOUSLY()) {
+                status = STATUS_UNSUCCESSFUL;
+            }
+            // Verification failed or other error — requeue for another scan
+            if (pScanTask->Retried > MAX_RETRIES) {
+                LOG_ERROR("Failed to scan process %p too many times, ignoring (i.e. let it run) !", pScanTask->Dto.Pid);
+                status = STATUS_INTERNAL_ERROR;
+            }
+            else {
+                LOG_WARN("Verification or communication failed, requeuing PID to 'Pending for Scan': %p", verdict->Pid);
+
+                WAITLOCK_ACQUIRE(LScanning, ctx->ScanningListLock, NULL);
+                RemoveEntryList(&pScanTask->Link);
+                WAITLOCK_RELEASE(LScanning, ctx->ScanningListLock);
+
+                WAITLOCK_ACQUIRE(LPending, ctx->PendingListLock, NULL);
+                pScanTask->Retried += 1;
+                InsertTailList(&ctx->PendingList, &pScanTask->Link);
+                WAITLOCK_RELEASE(LPending, ctx->PendingListLock);
+            }
+        }
+
+        WdfRequestComplete(Request, status);
+        WAITLOCK_CLEANUP(LScanning, ctx->ScanningListLock);
+        WAITLOCK_CLEANUP(LPending, ctx->PendingListLock);
+    });
 }
 
 

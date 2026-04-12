@@ -2,7 +2,6 @@
 #include <bcrypt.h>
 
 // Generated using the script driver1/generate_secret.py
-
 static UCHAR g_AttestationSecret[128] = {
     0x2F, 0xDF, 0xED, 0x27, 0x5B, 0x58, 0x4E, 0xDF,
     0x0B, 0xFE, 0x83, 0x9B, 0xEF, 0x11, 0x4C, 0xD2,
@@ -36,9 +35,6 @@ NTSTATUS VerifyAttestation(
     UCHAR hashObject[64];     // internal buffer for state
     UCHAR computedHash[32];   // SHA256 digest
     UCHAR attestationBuf[sizeof(pScanVerdictDto->Attestation)];
-
-    ULONG cbData = 0;
-    (void)cbData;
 
     // Copy attestation, then zero it out before hashing
     RtlCopyMemory(attestationBuf, pScanVerdictDto->Attestation, sizeof(attestationBuf));
