@@ -8,6 +8,7 @@
 #include <wdf.h>
 #include <bcrypt.h>
 #include "config.h"
+#include "termproc.h"
 
 // Copied from <ntifs.h>
 typedef struct _FILE_ID_INFORMATION {
@@ -316,7 +317,7 @@ _IRQL_requires_max_(PASSIVE_LEVEL)
 VOID EvtAddScanTaskToPendingList(WDFWORKITEM WorkItem)
 {
     SAFETY_BEGIN();
-    WILL_USE_LOCK(LPENDING);
+    WILL_USE_LOCK(LPending);
     
     LOG_INFO("EvtAddScanTaskToPendingList starting");
 
@@ -356,9 +357,9 @@ VOID EvtAddScanTaskToPendingList(WDFWORKITEM WorkItem)
     pScanTask->Dto.VolumeSerialNumber = wiCtx->VolumeSerialNumber;
 
     LOG_INFO("Acquiring lock to send attest entry into queue");
-    WAITLOCK_ACQUIRE(LPENDING, ctx->PendingListLock, NULL);
+    WAITLOCK_ACQUIRE(LPending, ctx->PendingListLock, NULL);
     NEVER_FAIL(InsertTailList(&ctx->PendingList, &pScanTask->Link));
-    WAITLOCK_RELEASE(LPENDING, ctx->PendingListLock);
+    WAITLOCK_RELEASE(LPending, ctx->PendingListLock);
 
     // At this point, user-mode component can query scan task via IOCTL
     LOG_INFO("Nonce generated and pending entry inserted for PID %p", pScanTask->Dto.Pid);
@@ -370,7 +371,7 @@ VOID EvtAddScanTaskToPendingList(WDFWORKITEM WorkItem)
                 ExFreePoolWithTag(pScanTask, 'tstA');
             }
         }
-        WAITLOCK_CLEANUP(LPENDING, ctx->PendingListLock);
+        WAITLOCK_CLEANUP(LPending, ctx->PendingListLock);
         WdfObjectDelete(WorkItem);
     });
 }
@@ -429,33 +430,87 @@ VOID HandleIOCTLGetPendingExecutable(
     size_t OutputBufferLength,
     size_t InputBufferLength
 ) {
-    UNREFERENCED_PARAMETER(device);
-    UNREFERENCED_PARAMETER(Request);
     UNREFERENCED_PARAMETER(InputBufferLength);
-    UNREFERENCED_PARAMETER(OutputBufferLength);
 
     SAFETY_BEGIN();
     WILL_USE_LOCK(LPending);
+    WILL_USE_LOCK(LScanning);
 
+    PSCAN_TASK pScanTask = NULL;
+    PLIST_ENTRY entry = NULL;
+    PVOID outBuf = NULL;
+    size_t outLen = 0;
+
+    if (OutputBufferLength < sizeof(SCAN_TASK_DTO)) {
+        FAIL_FAST_WITH_STATUS(STATUS_BUFFER_TOO_SMALL);
+    }
+    TRY(WdfRequestRetrieveOutputBuffer(Request, sizeof(SCAN_TASK_DTO), &outBuf, &outLen));
+    if (outBuf == NULL) {
+        FAIL_FAST_WITH_STATUS(STATUS_INVALID_ADDRESS);
+    }
+    if (outLen < sizeof(SCAN_TASK_DTO)) {
+        FAIL_FAST_WITH_STATUS(STATUS_BUFFER_TOO_SMALL);
+    }
+    RtlZeroMemory(outBuf, sizeof(SCAN_TASK_DTO));
+
+    // Acquire PendingList lock and pop head
     WAITLOCK_ACQUIRE(LPending, ctx->PendingListLock, NULL);
-
-    if (!IsListEmpty(&ctx->PendingList)) {
-        // Send a zeroed-out SCAN_TASK to usermode, or NULL if possible
+    if (IsListEmpty(&ctx->PendingList)) {
+        // Nothing to return - leave the output buffer zeroed (done above)
         SUCCEED_FAST();
     }
 
-    PLIST_ENTRY entry = RemoveHeadList(&ctx->PendingList);
-    PSCAN_TASK pScanTask = CONTAINING_RECORD(entry, SCAN_TASK, Link);
-    (void)pScanTask;
-
-    // Send this SCAN_TASK to usermode
-
-    // TODO: Should we release this lock earlier?
+    entry = RemoveHeadList(&ctx->PendingList);
     WAITLOCK_RELEASE(LPending, ctx->PendingListLock);
 
+    pScanTask = CONTAINING_RECORD(entry, SCAN_TASK, Link);
+    ASSERT_NOT_NULL(pScanTask);
+
+    // Move the task to ScanningList under ScanningListLock
+    WAITLOCK_ACQUIRE(LScanning, ctx->ScanningListLock, NULL);
+    InsertTailList(&ctx->ScanningList, &pScanTask->Link);
+    WAITLOCK_RELEASE(LScanning, ctx->ScanningListLock);
+
+    // Copy DTO to user buffer
+    RtlCopyMemory(outBuf, &pScanTask->Dto, sizeof(SCAN_TASK_DTO));
+    // Set information and complete outside switch
+    WdfRequestSetInformation(Request, sizeof(SCAN_TASK_DTO));
+    WdfRequestComplete(Request, STATUS_SUCCESS);
+    SUCCEED_FAST();
+
     SAFETY_END_RETURNING_VOID({
+        if (FAILED_PREVIOUSLY()) {
+            if (pScanTask) {
+                // move back to pending
+                WAITLOCK_ACQUIRE(LPending, ctx->PendingListLock, NULL);
+                InsertHeadList(&ctx->PendingList, &pScanTask->Link);
+                WAITLOCK_RELEASE(LPending, ctx->PendingListLock);
+            }
+            WdfRequestComplete(Request, status);
+        }
         WAITLOCK_CLEANUP(LPending, ctx->PendingListLock);
+        WAITLOCK_CLEANUP(LScanning, ctx->ScanningListLock);
     });
+
+    //WAITLOCK_ACQUIRE(LPending, ctx->PendingListLock, NULL);
+
+    //if (!IsListEmpty(&ctx->PendingList)) {
+    //    // Send a zeroed-out SCAN_TASK to usermode, or NULL if possible
+    //    SUCCEED_FAST();
+    //}
+
+    //PLIST_ENTRY entry = RemoveHeadList(&ctx->PendingList);
+    //PSCAN_TASK pScanTask = CONTAINING_RECORD(entry, SCAN_TASK, Link);
+    //(void)pScanTask;
+
+    //// Send this SCAN_TASK to usermode
+
+    //// TODO: Should we release this lock earlier?
+    //WAITLOCK_RELEASE(LPending, ctx->PendingListLock);
+
+    //SAFETY_END_RETURNING_VOID({
+    //    WAITLOCK_CLEANUP(LPending, ctx->PendingListLock);
+    //});
 }
 
 /**
@@ -540,7 +595,7 @@ VOID DriverUnload(WDFDRIVER driver)
 
 
 // TODO: Review this
-
+_IRQL_requires_max_(PASSIVE_LEVEL)
 NTSTATUS GetFileIdFromPath(PCUNICODE_STRING FilePath, PFILE_ID_128 FileId, PULONG VolumeSerial) {
     NTSTATUS status;
     HANDLE fileHandle = NULL;
@@ -619,3 +674,5 @@ NTSTATUS GetFileIdFromPath(PCUNICODE_STRING FilePath, PFILE_ID_128 FileId, PULON
     ZwClose(fileHandle);
     return status;
 }
+
+// TODO: Review this

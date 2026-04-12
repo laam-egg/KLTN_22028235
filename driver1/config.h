@@ -40,6 +40,9 @@ extern GUID const DRIVER1_DEVICE_GUID;
 #pragma pack(push, 1)
 
 typedef struct _SCAN_TASK_DTO {
+    UINT32 Version;
+    UINT32 Reserved;
+
     HANDLE Pid;
     BYTE Nonce[32];
     LARGE_INTEGER Timestamp;
@@ -51,6 +54,9 @@ typedef struct _SCAN_TASK_DTO {
 } SCAN_TASK_DTO, * PSCAN_TASK_DTO;
 
 typedef struct _SCAN_VERDICT_DTO {
+    UINT32 Version;
+    UINT32 Reserved;
+
     HANDLE Pid;
     BOOLEAN AllowExecution;
 
