@@ -61,6 +61,10 @@ typedef struct _SCAN_VERDICT_DTO {
     BOOLEAN AllowExecution;
     BOOLEAN Reserved1;
     UINT16 Reserved2;
+    
+    // Unfortunately we can't use DOUBLE in kernel drivers
+#define SIZEOF_DOUBLE 8
+    BYTE PredScore[SIZEOF_DOUBLE];
 
     HANDLE Pid;
 
@@ -75,6 +79,8 @@ typedef struct _DECISION_DTO {
     UINT16 Reserved2;
     ULONG VolumeSerialNumber;
     FILE_ID_128 FileId;
+
+    BYTE PredScore[SIZEOF_DOUBLE];
 
     LARGE_INTEGER Timestamp;
 } DECISION_DTO, *PDECISION_DTO;

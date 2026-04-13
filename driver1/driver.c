@@ -927,6 +927,7 @@ VOID HandleIOCTLPostScanningResult(
                 ASSERT_NOT_NULL(pDecision);
                 NEVER_FAIL(RtlZeroMemory(pDecision, sizeof(DECISION)));
                 pDecision->Dto.AllowExecution = verdict->AllowExecution;
+                RtlCopyMemory(pDecision->Dto.PredScore, verdict->PredScore, SIZEOF_DOUBLE);
                 pDecision->Dto.FileId = pScanTask->Dto.FileId;
                 pDecision->Dto.VolumeSerialNumber = pScanTask->Dto.VolumeSerialNumber;
                 pDecision->Dto.IsValid = TRUE;
