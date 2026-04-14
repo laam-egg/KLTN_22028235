@@ -286,12 +286,12 @@ NTSTATUS EvtDeviceAdd(WDFDRIVER Driver, PWDFDEVICE_INIT DeviceInit)
     WDF_IO_QUEUE_CONFIG queueConfig;
     WDFQUEUE queue;
     PDEVICE_CONTEXT devCtx;
-    DECLARE_CONST_UNICODE_STRING(sddl, L"D:P(A;;GA;;;SY)(A;;GA;;;BA)"); // SYSTEM & Admins only
+    //DECLARE_CONST_UNICODE_STRING(sddl, L"D:P(A;;GA;;;SY)(A;;GA;;;BA)"); // SYSTEM & Admins only
 
     LOG_INFO("Creating device");
     //WDF_OBJECT_ATTRIBUTES_INIT(&deviceAttributes);
     WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&deviceAttributes, DEVICE_CONTEXT);
-    WdfDeviceInitAssignSDDLString(DeviceInit, &sddl);
+    //WdfDeviceInitAssignSDDLString(DeviceInit, &sddl);
     WdfDeviceInitSetDeviceType(DeviceInit, FILE_DEVICE_UNKNOWN);
     TRY(WdfDeviceCreate(&DeviceInit, &deviceAttributes, &device));
     g_Device = device;
