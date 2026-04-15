@@ -68,7 +68,7 @@ TRUSTED_PARTNER g_UI = { 0 }; // currently the UI component is not yet required 
 #define NO_CLEANUP nop();
 #define FAILED_PREVIOUSLY() (!NT_SUCCESS(status))
 
-#define TRY(functionCall) { status = functionCall; if (!NT_SUCCESS(status)) goto EXIT; } nop()
+#define TRY(functionCall) { status = functionCall; if (!NT_SUCCESS(status)) { LOG_ERROR("At file %s, line %d: status = %lu", __FILE__, __LINE__, status); goto EXIT; } } nop()
 #define TRY_EXCEPT(functionCall, exceptBlock) { status = functionCall; if (!NT_SUCCESS(status)) { exceptBlock goto EXIT; } } nop()
 #define ASSERT_NOT_NULL(value) if (value == NULL) FAIL_FAST()
 
@@ -87,7 +87,7 @@ TRUSTED_PARTNER g_UI = { 0 }; // currently the UI component is not yet required 
 #define FAIL_FAST() FAIL_FAST_WITH_STATUS(STATUS_FAIL_FAST_EXCEPTION)
 #define FAIL_FAST_WITH_STATUS(x) { status = x; goto EXIT; } nop()
 
-#define _LOG(type, prefix, ...) KdPrintEx((DPFLTR_IHVDRIVER_ID, type, prefix __VA_ARGS__))
+#define _LOG(type, prefix, ...) { KdPrintEx((DPFLTR_IHVDRIVER_ID, type, prefix __VA_ARGS__)); KdPrintEx((DPFLTR_IHVDRIVER_ID, type, "\n")); } nop()
 #define LOG_INFO(...)   _LOG(DPFLTR_INFO_LEVEL, "@@@ driver1: INFO: ", __VA_ARGS__)
 #define LOG_ERROR(...)  _LOG(DPFLTR_ERROR_LEVEL, "@@@ driver1: ERROR: ", __VA_ARGS__)
 #define LOG_WARN(...)   _LOG(DPFLTR_WARNING_LEVEL, "@@@ driver1: WARNING: ", __VA_ARGS__)
@@ -245,6 +245,13 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath)
 {
     SAFETY_BEGIN();
     LOG_INFO("DriverEntry starting");
+
+    LOG_INFO("Resetting trusted partners");
+    KeInitializeSpinLock(&g_Model.Lock);
+    g_Model.Pid = NULL;
+    KeInitializeSpinLock(&g_UI.Lock);
+    g_UI.Pid = NULL;
+
     WDF_DRIVER_CONFIG config;
 
     LOG_INFO("Initializing driver");
@@ -275,12 +282,6 @@ NTSTATUS EvtDeviceAdd(WDFDRIVER Driver, PWDFDEVICE_INIT DeviceInit)
 
     SAFETY_BEGIN();
 
-    LOG_INFO("Resetting trusted partners");
-    KeInitializeSpinLock(&g_Model.Lock);
-    g_Model.Pid = NULL;
-    KeInitializeSpinLock(&g_UI.Lock);
-    g_UI.Pid = NULL;
-
     WDF_OBJECT_ATTRIBUTES deviceAttributes;
     WDFDEVICE device;
     WDF_IO_QUEUE_CONFIG queueConfig;
@@ -299,11 +300,26 @@ NTSTATUS EvtDeviceAdd(WDFDRIVER Driver, PWDFDEVICE_INIT DeviceInit)
     LOG_INFO("Creating device context");
     devCtx = DeviceGetContext(device);
     InitializeListHead(&devCtx->PendingList);
-    TRY(WdfWaitLockCreate(WDF_NO_OBJECT_ATTRIBUTES, &devCtx->PendingListLock));
+    {
+        WDF_OBJECT_ATTRIBUTES lockAttr;
+        WDF_OBJECT_ATTRIBUTES_INIT(&lockAttr);
+        lockAttr.ParentObject = device;
+        TRY(WdfWaitLockCreate(&lockAttr, &devCtx->PendingListLock));
+    }
     InitializeListHead(&devCtx->ScanningList);
-    TRY(WdfWaitLockCreate(WDF_NO_OBJECT_ATTRIBUTES, &devCtx->ScanningListLock));
+    {
+        WDF_OBJECT_ATTRIBUTES lockAttr;
+        WDF_OBJECT_ATTRIBUTES_INIT(&lockAttr);
+        lockAttr.ParentObject = device;
+        TRY(WdfWaitLockCreate(&lockAttr, &devCtx->ScanningListLock));
+    }
     InitializeListHead(&devCtx->DecisionList);
-    TRY(WdfWaitLockCreate(WDF_NO_OBJECT_ATTRIBUTES, &devCtx->DecisionListLock));
+    {
+        WDF_OBJECT_ATTRIBUTES lockAttr;
+        WDF_OBJECT_ATTRIBUTES_INIT(&lockAttr);
+        lockAttr.ParentObject = device;
+        TRY(WdfWaitLockCreate(&lockAttr, &devCtx->DecisionListLock));
+    }
 
     LOG_INFO("Assigning GUID to device");
     TRY(WdfDeviceCreateDeviceInterface(device, &DRIVER1_DEVICE_GUID, NULL));
@@ -688,8 +704,8 @@ VOID HandleIOCTLRegisterScanner(
     size_t OutputBufferLength,
     size_t InputBufferLength
 ) {
-    // Push a fake scan task to PendingList, all zeroed out,
-    // for handshaking.
+    // Push a fake scan task to PendingList, all zeroed out
+    // (except the nonce) for handshaking.
 
     UNREFERENCED_PARAMETER(device);
     UNREFERENCED_PARAMETER(OutputBufferLength);
@@ -701,6 +717,7 @@ VOID HandleIOCTLRegisterScanner(
     HANDLE callerPid = GET_CALLER_ID(Request);
 
     PSCAN_TASK pScanTask = NULL;
+    BYTE nonce[32];
 
     #pragma warning(disable: 4996)
     pScanTask = (PSCAN_TASK)ExAllocatePoolWithTag(NonPagedPoolNx, sizeof(SCAN_TASK), 'tstA');
@@ -708,6 +725,8 @@ VOID HandleIOCTLRegisterScanner(
 
     NEVER_FAIL(RtlZeroMemory(pScanTask, sizeof(SCAN_TASK)));
     pScanTask->CallerPid = callerPid;
+    TRY(BCryptGenRandom(NULL, nonce, sizeof(nonce), BCRYPT_USE_SYSTEM_PREFERRED_RNG));
+    NEVER_FAIL(RtlCopyMemory(pScanTask->Dto.Nonce, nonce, sizeof(nonce)));
 
     LOG_INFO("Acquiring lock to send attest entry into queue");
     WAITLOCK_ACQUIRE(LPending, ctx->PendingListLock, NULL);
@@ -893,10 +912,12 @@ VOID HandleIOCTLPostScanningResult(
     //
     verifyStatus = VerifyAttestation(&taskCopy, verdict);
     if (!NT_SUCCESS(verifyStatus)) {
-        LOG_ERROR("Attestation verification failed for PID %p", verdict->Pid);
-        #ifndef TAKE_THE_RISK
-        TRY(TerminateProcessByPid(verdict->Pid, STATUS_INVALID_SIGNATURE));
-        #endif // TAKE_THE_RISK
+        LOG_ERROR("Attestation verification failed for detected PID %p", verdict->Pid);
+        if (verdict->Pid) {
+            LOG_ERROR("Trying to kill process with PID %p", verdict->Pid);
+            TRY(TerminateProcessByPid(verdict->Pid, STATUS_INVALID_SIGNATURE));
+            LOG_ERROR("Killed process with PID %p", verdict->Pid);
+        }
         SUCCEED_FAST();
     }
 
@@ -957,6 +978,12 @@ VOID HandleIOCTLPostScanningResult(
     }
 
     LOG_INFO("HandleIOCTLPostScanningResult finished");
+
+    //////////////////////////////////////////////////////////////
+    // TODO: Review this cleanup code - it is causing bug checks
+    // And it shouldn't be this long.
+    //////////////////////////////////////////////////////////////
+
     SAFETY_END_RETURNING_VOID({
         WAITLOCK_CLEANUP(LScanning, ctx->ScanningListLock);
         WAITLOCK_CLEANUP(LPending, ctx->PendingListLock);
@@ -969,7 +996,8 @@ VOID HandleIOCTLPostScanningResult(
             }
         }
 
-        if (!verifyStatus && pScanTask != NULL) {
+        if (!NT_SUCCESS(verifyStatus) && pScanTask != NULL) {
+            // Not verified, but scan task popped off
             if (!FAILED_PREVIOUSLY()) {
                 status = STATUS_UNSUCCESSFUL;
             }
@@ -1089,6 +1117,8 @@ VOID DriverUnload(WDFDRIVER driver)
     WILL_USE_LOCK(LScanning);
     WILL_USE_LOCK(LDecision);
 
+    PsSetCreateProcessNotifyRoutineEx(RoutineProcessNotify, /*Remove=*/TRUE);
+
     PDEVICE_CONTEXT ctx = NULL;
 
     if (g_Device) {
@@ -1125,7 +1155,6 @@ VOID DriverUnload(WDFDRIVER driver)
             WAITLOCK_RELEASE(LDecision, ctx->DecisionListLock);
         }
     }
-    PsSetCreateProcessNotifyRoutineEx(RoutineProcessNotify, TRUE);
 
     SAFETY_END_RETURNING_VOID({
         WAITLOCK_CLEANUP(LPending, ctx->PendingListLock);

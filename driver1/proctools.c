@@ -11,16 +11,27 @@
 #define TRY(status) { if (!NT_SUCCESS(status)) goto cleanup; } NOP()
 #define FAIL_FAST_WITH_STATUS(x) { status = x; goto cleanup; } NOP()
 
+#define _LOG(type, prefix, ...) { KdPrintEx((DPFLTR_IHVDRIVER_ID, type, prefix __VA_ARGS__)); KdPrintEx((DPFLTR_IHVDRIVER_ID, type, "\n")); } NOP()
+#define LOG_INFO(...)   _LOG(DPFLTR_INFO_LEVEL, "@@@ driver1: INFO: ", __VA_ARGS__)
+#define LOG_ERROR(...)  _LOG(DPFLTR_ERROR_LEVEL, "@@@ driver1: ERROR: ", __VA_ARGS__)
+#define LOG_WARN(...)   _LOG(DPFLTR_WARNING_LEVEL, "@@@ driver1: WARNING: ", __VA_ARGS__)
+
 _IRQL_requires_max_(PASSIVE_LEVEL)
 NTSTATUS TerminateProcessByPid(HANDLE Pid, NTSTATUS ExitStatus)
 {
     NTSTATUS status;
     PEPROCESS process = NULL;
     HANDLE procHandle = NULL;
+    BOOLEAN processReferenced = FALSE;
 
     status = PsLookupProcessByProcessId(Pid, &process);
-    if (!NT_SUCCESS(status)) {
-        return status;
+    TRY(status);
+    processReferenced = TRUE;
+
+    // Check if the process is already exiting/terminated
+    if (PsGetProcessExitStatus(process) != STATUS_PENDING) {
+        LOG_WARN("Process (PID: %p) is already terminating; treating as success.", Pid);
+        FAIL_FAST_WITH_STATUS(STATUS_PROCESS_IS_TERMINATING);
     }
 
     // Open a kernel handle to the process object with PROCESS_TERMINATE
@@ -29,21 +40,36 @@ NTSTATUS TerminateProcessByPid(HANDLE Pid, NTSTATUS ExitStatus)
         OBJ_KERNEL_HANDLE,
         NULL,
         PROCESS_TERMINATE,
-        *PsProcessType, // compiler may accept PsProcessType
+        *PsProcessType,
         KernelMode,
         &procHandle
     );
 
-    // dereference the EPROCESS
+    // Dereference the EPROCESS (always done after PsLookupProcessByProcessId)
     ObDereferenceObject(process);
+    processReferenced = FALSE;
 
-    if (!NT_SUCCESS(status)) {
-        return status;
+    TRY(status);
+
+    // Terminate the process
+    status = ZwTerminateProcess(procHandle, ExitStatus);
+    TRY(status);
+
+cleanup:
+    if (procHandle != NULL) {
+        ZwClose(procHandle);
     }
 
-    // Terminate. If ZwTerminateProcess expects a handle to process object, pass handle
-    status = ZwTerminateProcess(procHandle, ExitStatus);
-    ZwClose(procHandle);
+    // Handle case where we jumped to cleanup before dereferencing
+    if (processReferenced && process != NULL) {
+        ObDereferenceObject(process);
+    }
+
+    if (status == STATUS_PROCESS_IS_TERMINATING) {
+        LOG_INFO("STATUS_PROCESS_IS_TERMINATING is being treated as STATUS_SUCCESS.");
+        status = STATUS_SUCCESS;
+    }
+
     return status;
 }
 

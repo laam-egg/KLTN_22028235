@@ -32,7 +32,7 @@ NTSTATUS VerifyAttestation(
     BCRYPT_ALG_HANDLE hAlg = NULL;
     BCRYPT_HASH_HANDLE hHash = NULL;
 
-    UCHAR hashObject[64];     // internal buffer for state
+    UCHAR hashObject[1024];     // internal buffer for state
     UCHAR computedHash[32];   // SHA256 digest
     UCHAR attestationBuf[sizeof(pScanVerdictDto->Attestation)];
 

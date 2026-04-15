@@ -8,7 +8,7 @@ Class       = System ; TODO: specify appropriate Class
 ClassGuid   = {4d36e97d-e325-11ce-bfc1-08002be10318} ; TODO: specify appropriate ClassGuid
 Provider    = %ManufacturerName%
 CatalogFile = driver1.cat
-DriverVer   = 09/25/2025,0.0.0.1; TODO: set DriverVer in stampinf property pages
+DriverVer   = 10/10/2025,0.0.0.2; TODO: set DriverVer in stampinf property pages
 PnpLockdown = 1
 
 [DestinationDirs]
@@ -44,7 +44,7 @@ AddService = driver1,%SPSVCINST_ASSOCSERVICE%, driver1_Service_Inst
 [driver1_Service_Inst]
 DisplayName    = %driver1.SVCDESC%
 ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
-StartType      = 3               ; SERVICE_DEMAND_START
+StartType      = 3               ; SERVICE_DEMAND_START ; or 1 for SERVICE_SYSTEM_START (starts during boot) ; or 2 for SERVICE_AUTO_START (starts after boot)
 ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
 ServiceBinary  = %13%\driver1.sys
 
