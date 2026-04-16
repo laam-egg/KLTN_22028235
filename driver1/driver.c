@@ -958,6 +958,7 @@ VOID HandleIOCTLPostScanningResult(
             WAITLOCK_ACQUIRE(LDecision, ctx->DecisionListLock, NULL);
             NEVER_FAIL(InsertTailList(&ctx->DecisionList, &pDecision->Link));
             WAITLOCK_RELEASE(LDecision, ctx->DecisionListLock);
+            pDecision = NULL;
 
             // Then, execute the decision.
 
