@@ -22,7 +22,6 @@
 #include <bcrypt.h>
 #include "config.h"
 #include "proctools.h"
-#include "attest.h"
 #include "drivertools.h"
 
 // Copied from <ntifs.h>
@@ -61,19 +60,23 @@ TRUSTED_PARTNER g_Service = { 0 };
  */
 
 #define SAFETY_BEGIN() NTSTATUS status = STATUS_SUCCESS; (void)status;
-#define WILL_USE_LOCK(Name) BOOLEAN lock##Name##Held = FALSE
 #define SAFETY_END(cleanupCode) EXIT: cleanupCode return status;
 #define SAFETY_END_RETURNING_VOID(cleanupCode) goto EXIT; EXIT: cleanupCode return;
 #define NO_CLEANUP nop();
 #define FAILED_PREVIOUSLY() (!NT_SUCCESS(status))
+#define FAILED_PREVIOUSLY_WITH(code) (status == (code))
 
 #define TRY(functionCall) { status = functionCall; if (!NT_SUCCESS(status)) { LOG_ERROR("At file %s, line %d: status = %lu", __FILE__, __LINE__, status); goto EXIT; } } nop()
 #define TRY_EXCEPT(functionCall, exceptBlock) { status = functionCall; if (!NT_SUCCESS(status)) { exceptBlock goto EXIT; } } nop()
 #define ASSERT_NOT_NULL(value) if (value == NULL) FAIL_FAST()
 
+#define WILL_USE_LOCK(Name) BOOLEAN lock##Name##Held = FALSE
 #define WAITLOCK_ACQUIRE(Name, lockHandle, timeout) { TRY(WdfWaitLockAcquire(lockHandle, timeout)); lock##Name##Held = TRUE; } nop()
 #define WAITLOCK_RELEASE(Name, lockHandle)          { NEVER_FAIL(WdfWaitLockRelease(lockHandle)); lock##Name##Held = FALSE; } nop()
 #define WAITLOCK_CLEANUP(Name, lockHandle)          if (lock##Name##Held) { WAITLOCK_RELEASE(Name, lockHandle); } nop()
+#define SPINLOCK_ACQUIRE(Name, lockHandle)      { NEVER_FAIL(WdfSpinLockAcquire(lockHandle)); lock##Name##Held = TRUE; } nop()
+#define SPINLOCK_RELEASE(Name, lockHandle)      { NEVER_FAIL(WdfSpinLockRelease(lockHandle)); lock##Name##Held = FALSE; } nop()
+#define SPINLOCK_CLEANUP(Name, lockHandle)      if (lock##Name##Held) { SPINLOCK_RELEASE(Name, lockHandle); } nop()
 
 /**
  * Either the call indeed never fails, or
@@ -97,7 +100,7 @@ inline HANDLE GET_CALLER_ID(WDFREQUEST Request) {
 }
 
 #define MAX_RETRIES 5
-#define TAG_DECISION 'dec '
+#define TAG_BLOCK_OPERATION 'blko'
 
 #define CLEANUP_ALL_SCAN_TASKS 1
 
@@ -144,6 +147,8 @@ _IRQL_requires_same_
 _IRQL_requires_max_(PASSIVE_LEVEL)
 static VOID EnqueueCleanupTaskWorkItem(WDFDEVICE Device, INT CleanupTask, PVOID Arg);
 
+
+
 _IRQL_requires_same_
 _IRQL_requires_max_(PASSIVE_LEVEL)
 NTSTATUS GetFileIdFromPath(PCUNICODE_STRING FilePath, PFILE_ID_128 FileId, PULONG VolumeSerial);
@@ -161,34 +166,39 @@ typedef struct _DEVICE_CONTEXT {
     LIST_ENTRY PendingList;
 
     /**
-     * Lock for PendingList. Use in PASSIVE_LEVEL only.
+     * Lock for PendingList. It's a SPIN LOCK.
      */
-    WDFWAITLOCK PendingListLock;
+    WDFSPINLOCK PendingListSpinLock;
 
     /**
-     * List of executables that are already being scanned.
-     * In case the usermode component FAILS to attest/scan,
-     * the corresponding entry in this list is moved back to
-     * PendingList.
+     * List of GetNextScanTask IOCTL requests.
+     * Since we are doing async scanning,
+     * whenever the Service yields that IOCTL,
+     * we save the WDFREQUEST into this queue.
+     * And when the PendingList is filled,
+     * we pops off the head of this queue to get
+     * the next WDFREQUEST to fulfill.
+     * 
+     * This is akin to HTTP long-polling, while
+     * the previous strategy is akin to HTTP
+     * short-polling, which wastes CPU time
+     * when the Service would have to poll
+     * the driver at fixed interval to get
+     * the next PE file to scan, or none at all.
      */
-    LIST_ENTRY ScanningList;
-
-    /**
-     * Lock for ScanningList. Use in PASSIVE_LEVEL only.
-     */
-    WDFWAITLOCK ScanningListLock;
+    WDFQUEUE ScanRequestQueue;
 
     /**
      * List of past decisions made by this driver i.e. allow/deny
      * execution, of which files, when... Mean to be read via
-     * IOCTL_GET_NEXT_DECISION.
+     * IOCTL_GET_NEXT_BLOCK_OPERATION.
      */
-    LIST_ENTRY DecisionList;
+    LIST_ENTRY BlockOperationList;
 
     /**
-     * Lock for DecisionList. Use in PASSIVE_LEVEL only.
+     * Lock for BlockOperationList. Use in PASSIVE_LEVEL only.
      */
-    WDFWAITLOCK DecisionListLock;
+    WDFWAITLOCK BlockOperationListLock;
 } DEVICE_CONTEXT, *PDEVICE_CONTEXT;
 
 WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(DEVICE_CONTEXT, DeviceGetContext);
@@ -211,21 +221,26 @@ typedef struct _CLEANUP_ITEM_CONTEXT {
 
 WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(CLEANUP_ITEM_CONTEXT, CleanupItemGetContext);
 
-////// SCAN TASK (AN ELEMENT IN PendingList or ScanningList OF DEVICE CONTEXT) //////////
+////// SCAN REQUEST (AN ELEMENT IN ScanRequestQueue OF DEVICE CONTEXT) //////////
+typedef struct _SCAN_REQUEST {
+    WDFREQUEST Request;
+} SCAN_REQUEST, *PSCAN_REQUEST;
+
+////// SCAN TASK (AN ELEMENT IN PendingList OF DEVICE CONTEXT) //////////
 
 typedef struct _SCAN_TASK {
     SCAN_TASK_DTO Dto;
     LIST_ENTRY Link;
     HANDLE CallerPid;
     INT8 Retried;
-} SCAN_TASK, * PSCAN_TASK;
+} SCAN_TASK, *PSCAN_TASK;
 
-////// DECISION (AN ELEMENT IN DecisionList OF DEVICE CONTEXT) //////////
+////// BLOCK OPERATION (AN ELEMENT IN BlockOperationList OF DEVICE CONTEXT) //////////
 
-typedef struct _DECISION {
-    DECISION_DTO Dto;
+typedef struct _BLOCK_OPERATION {
+    BLOCK_OPERATION_DTO Dto;
     LIST_ENTRY Link;
-} DECISION, *PDECISION;
+} BLOCK_OPERATION, *PBLOCK_OPERATION;
 
 //////////// IOCTL HANDLERS (CONTEXT-DEPENDENT) /////////////
 
@@ -261,13 +276,31 @@ VOID HandleIOCTLPostScanningResult(
 
 _IRQL_requires_same_
 _IRQL_requires_max_(PASSIVE_LEVEL)
-VOID HandleIOCTLGetNextDecision(
+VOID HandleIOCTLGetNextBlockOperation(
     WDFDEVICE device,
     PDEVICE_CONTEXT ctx,
     WDFREQUEST Request,
     size_t OutputBufferLength,
     size_t InputBufferLength
 );
+
+
+
+
+
+
+_IRQL_requires_max_(DISPATCH_LEVEL)
+VOID CompleteScanRequest(WDFREQUEST Request, PSCAN_TASK pScanTask);
+
+_IRQL_requires_max_(DISPATCH_LEVEL)
+VOID EmitterTryingToCompleteScanRequest(PSCAN_TASK pScanTask);
+
+_IRQL_requires_max_(DISPATCH_LEVEL)
+VOID ConsumerTryingToCompleteScanRequest(WDFREQUEST Request);
+
+
+
+
 
 // ============================================================
 // DriverEntry
@@ -327,26 +360,33 @@ NTSTATUS EvtDeviceAdd(WDFDRIVER Driver, PWDFDEVICE_INIT DeviceInit)
 
     LOG_INFO("Creating device context");
     devCtx = DeviceGetContext(device);
+    {
+        WDF_IO_QUEUE_CONFIG scanRequestQueueConfig;
+        WDF_IO_QUEUE_CONFIG_INIT(
+            &scanRequestQueueConfig,
+            WdfIoQueueDispatchManual
+        );
+        scanRequestQueueConfig.PowerManaged = WdfFalse;
+        TRY(WdfIoQueueCreate(
+            device,
+            &scanRequestQueueConfig,
+            WDF_NO_OBJECT_ATTRIBUTES,
+            &devCtx->ScanRequestQueue
+        ));
+    }
     InitializeListHead(&devCtx->PendingList);
     {
         WDF_OBJECT_ATTRIBUTES lockAttr;
         WDF_OBJECT_ATTRIBUTES_INIT(&lockAttr);
         lockAttr.ParentObject = device;
-        TRY(WdfWaitLockCreate(&lockAttr, &devCtx->PendingListLock));
+        TRY(WdfSpinLockCreate(&lockAttr, &devCtx->PendingListSpinLock));
     }
-    InitializeListHead(&devCtx->ScanningList);
+    InitializeListHead(&devCtx->BlockOperationList);
     {
         WDF_OBJECT_ATTRIBUTES lockAttr;
         WDF_OBJECT_ATTRIBUTES_INIT(&lockAttr);
         lockAttr.ParentObject = device;
-        TRY(WdfWaitLockCreate(&lockAttr, &devCtx->ScanningListLock));
-    }
-    InitializeListHead(&devCtx->DecisionList);
-    {
-        WDF_OBJECT_ATTRIBUTES lockAttr;
-        WDF_OBJECT_ATTRIBUTES_INIT(&lockAttr);
-        lockAttr.ParentObject = device;
-        TRY(WdfWaitLockCreate(&lockAttr, &devCtx->DecisionListLock));
+        TRY(WdfWaitLockCreate(&lockAttr, &devCtx->BlockOperationListLock));
     }
 
     LOG_INFO("Assigning GUID to device");
@@ -384,6 +424,7 @@ VOID RoutineProcessNotify(PEPROCESS Process, HANDLE ProcessId, PPS_CREATE_NOTIFY
     LOG_INFO("RoutingProcessNotify starting");
     LOG_INFO("Process ID: %p", ProcessId);
 
+    BOOL serviceJustExited = FALSE;
     if (CreateInfo == NULL) {
         // Process terminating - if that is a trusted partner,
         // deregister it
@@ -398,8 +439,9 @@ VOID RoutineProcessNotify(PEPROCESS Process, HANDLE ProcessId, PPS_CREATE_NOTIFY
             KeReleaseSpinLock(&g_Service.Lock, oldIrql);
             if (matched) {
                 LOG_INFO("Trusted usermode process %p (Service) exited, untrust this PID", ProcessId);
-                LOG_INFO("Removing all leftover scan tasks for sanity.");
+                LOG_INFO("Removing all leftover queued items for sanity.");
                 NEVER_FAIL(EnqueueCleanupTaskWorkItem(g_Device, CLEANUP_ALL_SCAN_TASKS, NULL));
+                serviceJustExited = TRUE;
                 // Claude:
                 // Problem: After a process terminates and you call EnqueueCleanupTaskWorkItem, the cleanup happens asynchronously.
                 // A new instance of the Service could register before cleanup completes, leading to state corruption.
@@ -414,12 +456,18 @@ VOID RoutineProcessNotify(PEPROCESS Process, HANDLE ProcessId, PPS_CREATE_NOTIFY
     {
         // Check if the Service is there. If not, well, do not do anything
         // to prevent malware (simplicity for now), also remove all scan tasks!
-        BOOL isModelPresent = FALSE;
-        KIRQL oldIrql = 0;
-        KeAcquireSpinLock(&g_Service.Lock, &oldIrql);
-        isModelPresent = (g_Service.Pid != NULL);
-        KeReleaseSpinLock(&g_Service.Lock, oldIrql);
-        if (!isModelPresent) {
+        BOOL isServicePresent = FALSE;
+        if (serviceJustExited) {
+            isServicePresent = FALSE;
+        }
+        else {
+            KIRQL oldIrql = 0;
+            KeAcquireSpinLock(&g_Service.Lock, &oldIrql);
+            isServicePresent = (g_Service.Pid != NULL);
+            KeReleaseSpinLock(&g_Service.Lock, oldIrql);
+        }
+
+        if (!isServicePresent) {
             LOG_INFO("Service is not present, so skipped scanning process with PID = %p", ProcessId);
             SUCCEED_FAST();
         }
@@ -464,7 +512,7 @@ static VOID EnqueueCleanupTaskWorkItem(WDFDEVICE Device, INT CleanupTask, PVOID 
 VOID EvtConductCleanupTask(WDFWORKITEM WorkItem) {
     SAFETY_BEGIN();
     WILL_USE_LOCK(LPending);
-    WILL_USE_LOCK(LScanning);
+    WILL_USE_LOCK(LBlockOperations);
 
     WDFDEVICE device = NULL;
     PDEVICE_CONTEXT ctx = NULL;
@@ -489,25 +537,25 @@ VOID EvtConductCleanupTask(WDFWORKITEM WorkItem) {
         }
 
         if (!isServicePresent) {
-            WAITLOCK_ACQUIRE(LPending, ctx->PendingListLock, NULL);
+            SPINLOCK_ACQUIRE(LPending, ctx->PendingListSpinLock);
             while (!IsListEmpty(&ctx->PendingList)) {
                 PLIST_ENTRY entry = RemoveHeadList(&ctx->PendingList);
-                ASSERT_NOT_NULL(entry);
+                if (!entry) continue;
                 PSCAN_TASK pScanTask = CONTAINING_RECORD(entry, SCAN_TASK, Link);
-                ASSERT_NOT_NULL(pScanTask);
+                if (!pScanTask) continue;
                 ExFreePoolWithTag(pScanTask, 'tstA');
             }
-            WAITLOCK_RELEASE(LPending, ctx->PendingListLock);
+            SPINLOCK_RELEASE(LPending, ctx->PendingListSpinLock);
 
-            WAITLOCK_ACQUIRE(LScanning, ctx->ScanningListLock, NULL);
-            while (!IsListEmpty(&ctx->ScanningList)) {
-                PLIST_ENTRY entry = RemoveHeadList(&ctx->ScanningList);
-                ASSERT_NOT_NULL(entry);
-                PSCAN_TASK pScanTask = CONTAINING_RECORD(entry, SCAN_TASK, Link);
-                ASSERT_NOT_NULL(pScanTask);
-                ExFreePoolWithTag(pScanTask, 'tstA');
+            WAITLOCK_ACQUIRE(LBlockOperations, ctx->BlockOperationListLock, NULL);
+            while (!IsListEmpty(&ctx->BlockOperationList)) {
+                PLIST_ENTRY entry = RemoveHeadList(&ctx->BlockOperationList);
+                if (!entry) continue;
+                PBLOCK_OPERATION pBlockOperation = CONTAINING_RECORD(entry, BLOCK_OPERATION, Link);
+                if (!pBlockOperation) continue;
+                ExFreePoolWithTag(pBlockOperation, 'tstA');
             }
-            WAITLOCK_RELEASE(LScanning, ctx->ScanningListLock);
+            WAITLOCK_RELEASE(LBlockOperations, ctx->BlockOperationListLock);
         }
     }
     else {
@@ -516,8 +564,8 @@ VOID EvtConductCleanupTask(WDFWORKITEM WorkItem) {
     }
 
     SAFETY_END_RETURNING_VOID({
-        WAITLOCK_CLEANUP(LPending, ctx->PendingListLock);
-        WAITLOCK_CLEANUP(LScanning, ctx->ScanningListLock);
+        SPINLOCK_CLEANUP(LPending, ctx->PendingListSpinLock);
+        WAITLOCK_CLEANUP(LBlockOperations, ctx->BlockOperationListLock);
         WdfObjectDelete(WorkItem);
     });
 }
@@ -585,29 +633,13 @@ static VOID EnqueueScanTaskAddWorkItem(WDFDEVICE Device, HANDLE ProcessId, PCUNI
 VOID EvtAddScanTaskToPendingList(WDFWORKITEM WorkItem)
 {
     SAFETY_BEGIN();
-    WILL_USE_LOCK(LPending);
 
     LOG_INFO("EvtAddScanTaskToPendingList starting");
 
     PSCAN_TASK pScanTask = NULL;
-    BYTE nonce[32];
     WDFDEVICE device = NULL;
     PDEVICE_CONTEXT ctx = NULL;
     PWORK_ITEM_CONTEXT wiCtx = NULL;
-
-    // Only add if the Service model is NOT registered
-    {
-        BOOL isAIModelPresent = FALSE;
-
-        KIRQL oldIrql = 0;
-        KeAcquireSpinLock(&g_Service.Lock, &oldIrql);
-        isAIModelPresent = g_Service.Pid != NULL;
-        KeReleaseSpinLock(&g_Service.Lock, oldIrql);
-
-        if (!isAIModelPresent) {
-            SUCCEED_FAST();
-        }
-    }
 
     LOG_INFO("Getting the WDFDEVICE that owns this work item");
     device = NEVER_FAIL(WdfWorkItemGetParentObject(WorkItem));
@@ -622,29 +654,21 @@ VOID EvtAddScanTaskToPendingList(WDFWORKITEM WorkItem)
         FAIL_FAST();
     }
 
-    LOG_INFO("Generating nonce for usermode component attestation");
-    TRY(BCryptGenRandom(NULL, nonce, sizeof(nonce), BCRYPT_USE_SYSTEM_PREFERRED_RNG));
-
-    LOG_INFO("Allocating attestation entry in non-paged pool");
+    LOG_INFO("Allocating SCAN_TASK in non-paged pool");
     #pragma warning(disable: 4996)
     pScanTask = (PSCAN_TASK)ExAllocatePoolWithTag(NonPagedPoolNx, sizeof(SCAN_TASK), 'tstA');
     ASSERT_NOT_NULL(pScanTask);
 
-    LOG_INFO("Initializing attestation entry");
+    LOG_INFO("Initializing SCAN_TASK");
     NEVER_FAIL(RtlZeroMemory(pScanTask, sizeof(SCAN_TASK)));
-    NEVER_FAIL(RtlCopyMemory(pScanTask->Dto.Nonce, nonce, sizeof(nonce)));
     pScanTask->Dto.Pid = wiCtx->ProcessId;
     NEVER_FAIL(KeQuerySystemTime(&pScanTask->Dto.Timestamp));
     pScanTask->Dto.FileId = wiCtx->FileId;
     pScanTask->Dto.VolumeSerialNumber = wiCtx->VolumeSerialNumber;
 
-    LOG_INFO("Acquiring lock to send attest entry into queue");
-    WAITLOCK_ACQUIRE(LPending, ctx->PendingListLock, NULL);
-    NEVER_FAIL(InsertTailList(&ctx->PendingList, &pScanTask->Link));
-    WAITLOCK_RELEASE(LPending, ctx->PendingListLock);
-
+    LOG_INFO("Try to deliver the SCAN_TASK");
+    EmitterTryingToCompleteScanRequest(pScanTask);
     // At this point, user-mode component can query scan task via IOCTL
-    LOG_INFO("Nonce generated and pending entry inserted for PID %p", pScanTask->Dto.Pid);
     LOG_INFO("EvtAddScanTaskToPendingList finished successfully");
 
     SAFETY_END_RETURNING_VOID({
@@ -653,7 +677,6 @@ VOID EvtAddScanTaskToPendingList(WDFWORKITEM WorkItem)
                 ExFreePoolWithTag(pScanTask, 'tstA');
             }
         }
-        WAITLOCK_CLEANUP(LPending, ctx->PendingListLock);
         WdfObjectDelete(WorkItem);
     });
 }
@@ -698,8 +721,8 @@ VOID EvtIoDeviceControl(
         HandleIOCTLPostScanningResult(device, ctx, Request, OutputBufferLength, InputBufferLength);
         break;
 
-    case IOCTL_GET_NEXT_DECISION:
-        HandleIOCTLGetNextDecision(device, ctx, Request, OutputBufferLength, InputBufferLength);
+    case IOCTL_GET_NEXT_BLOCK_OPERATION:
+        HandleIOCTLGetNextBlockOperation(device, ctx, Request, OutputBufferLength, InputBufferLength);
         break;
 
     default:
@@ -728,40 +751,20 @@ VOID HandleIOCTLRegisterScanner(
     // (except the nonce) for handshaking.
 
     UNREFERENCED_PARAMETER(device);
+    UNREFERENCED_PARAMETER(ctx);
     UNREFERENCED_PARAMETER(OutputBufferLength);
     UNREFERENCED_PARAMETER(InputBufferLength);
 
     SAFETY_BEGIN();
-    WILL_USE_LOCK(LPending);
 
     HANDLE callerPid = GET_CALLER_ID(Request);
 
-    PSCAN_TASK pScanTask = NULL;
-    BYTE nonce[32];
-
-    #pragma warning(disable: 4996)
-    pScanTask = (PSCAN_TASK)ExAllocatePoolWithTag(NonPagedPoolNx, sizeof(SCAN_TASK), 'tstA');
-    ASSERT_NOT_NULL(pScanTask);
-
-    NEVER_FAIL(RtlZeroMemory(pScanTask, sizeof(SCAN_TASK)));
-    pScanTask->CallerPid = callerPid;
-    TRY(BCryptGenRandom(NULL, nonce, sizeof(nonce), BCRYPT_USE_SYSTEM_PREFERRED_RNG));
-    NEVER_FAIL(RtlCopyMemory(pScanTask->Dto.Nonce, nonce, sizeof(nonce)));
-
-    LOG_INFO("Acquiring lock to send attest entry into queue");
-    WAITLOCK_ACQUIRE(LPending, ctx->PendingListLock, NULL);
-    NEVER_FAIL(InsertTailList(&ctx->PendingList, &pScanTask->Link));
-    WAITLOCK_RELEASE(LPending, ctx->PendingListLock);
-
-    // At this point, user-mode component can query scan task via IOCTL
+    KIRQL oldIrql = 0;
+    KeAcquireSpinLock(&g_Service.Lock, &oldIrql);
+    g_Service.Pid = callerPid;
+    KeReleaseSpinLock(&g_Service.Lock, oldIrql);
 
     SAFETY_END_RETURNING_VOID({
-        if (FAILED_PREVIOUSLY()) {
-            if (pScanTask != NULL) {
-                ExFreePoolWithTag(pScanTask, 'tstA');
-            }
-        }
-        WAITLOCK_CLEANUP(LPending, ctx->PendingListLock);
         WdfRequestComplete(Request, status);
     });
 }
@@ -771,6 +774,9 @@ VOID HandleIOCTLRegisterScanner(
  * scan task in PendingList.
  * 
  * Also moves this task to ScanningList.
+ * 
+ * Operates in async mode - when there is no
+ * scan task, suspend the request till there is one.
  */
 _IRQL_requires_same_
 _IRQL_requires_max_(PASSIVE_LEVEL)
@@ -782,20 +788,54 @@ VOID HandleIOCTLGetPendingExecutable(
     size_t InputBufferLength
 ) {
     UNREFERENCED_PARAMETER(device);
+    UNREFERENCED_PARAMETER(ctx);
     UNREFERENCED_PARAMETER(InputBufferLength);
+    UNREFERENCED_PARAMETER(OutputBufferLength);
+
+    ConsumerTryingToCompleteScanRequest(Request);
+}
+
+/**
+ * Tries to complete a scan request.
+ * 
+ * The scan task pointer MUST be
+ * dynamically allocated with ExAllocatePoolWithTag,
+ * with pool type NonPagedPoolNx
+ * and the tag being 'tstA'.
+ * 
+ * This is called both by the event
+ * emitter(s) (e.g. process creation
+ * callback) and the consumer(s)
+ * (e.g. HandleIOCTLGetPendingExecutable)
+ * so that either side does not
+ * lock each other out in a race
+ * like this (cre ChatGPT):
+ * 
+ * CPU 0 (process callback)        CPU 1 (EvtIoDeviceControl)
+ * ---------------------------------------------------------
+ * Check: no request waiting
+ *                                Check: no event queued
+ * Queue event
+ *                                Queue request
+ * 
+ * Result: both are queued, nobody completes anything
+ */
+_IRQL_requires_max_(DISPATCH_LEVEL)
+VOID CompleteScanRequest(WDFREQUEST Request, PSCAN_TASK pScanTask) {
+    WDFQUEUE queue = WdfRequestGetIoQueue(Request);
+    WDFDEVICE device = WdfIoQueueGetDevice(queue);
+    PDEVICE_CONTEXT ctx = DeviceGetContext(device);
+    if (!ctx) {
+        WdfRequestComplete(Request, STATUS_INVALID_DEVICE_STATE);
+        return;
+    }
 
     SAFETY_BEGIN();
-    WILL_USE_LOCK(LPending);
-    WILL_USE_LOCK(LScanning);
+    ASSERT_NOT_NULL(pScanTask);
 
-    PSCAN_TASK pScanTask = NULL;
-    PLIST_ENTRY entry = NULL;
     PVOID outBuf = NULL;
     size_t outLen = 0;
 
-    if (OutputBufferLength < sizeof(SCAN_TASK_DTO)) {
-        FAIL_FAST_WITH_STATUS(STATUS_BUFFER_TOO_SMALL);
-    }
     TRY(WdfRequestRetrieveOutputBuffer(Request, sizeof(SCAN_TASK_DTO), &outBuf, &outLen));
     if (outBuf == NULL) {
         FAIL_FAST_WITH_STATUS(STATUS_INVALID_ADDRESS);
@@ -805,45 +845,90 @@ VOID HandleIOCTLGetPendingExecutable(
     }
     RtlZeroMemory(outBuf, sizeof(SCAN_TASK_DTO));
 
-    // Acquire PendingList lock and pop head
-    WAITLOCK_ACQUIRE(LPending, ctx->PendingListLock, NULL);
-    if (IsListEmpty(&ctx->PendingList)) {
-        // Nothing to return - leave the output buffer zeroed (done above)
-        SUCCEED_FAST();
-    }
-
-    entry = RemoveHeadList(&ctx->PendingList);
-    WAITLOCK_RELEASE(LPending, ctx->PendingListLock);
-
-    pScanTask = CONTAINING_RECORD(entry, SCAN_TASK, Link);
-    ASSERT_NOT_NULL(pScanTask);
-
-    // Move the task to ScanningList under ScanningListLock
-    WAITLOCK_ACQUIRE(LScanning, ctx->ScanningListLock, NULL);
-    InsertTailList(&ctx->ScanningList, &pScanTask->Link);
-    WAITLOCK_RELEASE(LScanning, ctx->ScanningListLock);
-
     // Copy DTO to user buffer
     RtlCopyMemory(outBuf, &pScanTask->Dto, sizeof(SCAN_TASK_DTO));
+    ExFreePoolWithTag(pScanTask, 'tstA');
     WdfRequestSetInformation(Request, sizeof(SCAN_TASK_DTO));
     SUCCEED_FAST();
 
     SAFETY_END_RETURNING_VOID({
-        WAITLOCK_CLEANUP(LPending, ctx->PendingListLock);
-        WAITLOCK_CLEANUP(LScanning, ctx->ScanningListLock);
-        if (FAILED_PREVIOUSLY()) {
-            if (pScanTask) {
-                // move back to PendingList
-                WAITLOCK_ACQUIRE(LPending, ctx->PendingListLock, NULL);
-                InsertHeadList(&ctx->PendingList, &pScanTask->Link);
-                WAITLOCK_RELEASE(LPending, ctx->PendingListLock);
-            }
-        }
         WdfRequestComplete(Request, status);
-        WAITLOCK_CLEANUP(LPending, ctx->PendingListLock);
-        WAITLOCK_CLEANUP(LScanning, ctx->ScanningListLock);
     });
 }
+
+/**
+ * The version of CompleteScanRequest
+ * for the event emitters, which only have
+ * the event (scan task) at hand.
+ */
+_IRQL_requires_max_(DISPATCH_LEVEL)
+VOID EmitterTryingToCompleteScanRequest(PSCAN_TASK pScanTask) {
+    WDFDEVICE Device = g_Device;
+    PDEVICE_CONTEXT ctx = DeviceGetContext(Device);
+    if (!ctx) {
+        LOG_ERROR("Context is NULL ???");
+        return;
+    }
+
+    WDFREQUEST Request;
+    // Try to get a waiting request
+    if (
+        !NT_SUCCESS(
+            WdfIoQueueRetrieveNextRequest(
+                ctx->ScanRequestQueue,
+                &Request
+            )
+        )
+    ) {
+        // No request? Queue it!
+        WdfSpinLockAcquire(ctx->PendingListSpinLock);
+        InsertTailList(&ctx->PendingList, &pScanTask->Link);
+        WdfSpinLockRelease(ctx->PendingListSpinLock);
+        return;
+    }
+
+    CompleteScanRequest(Request, pScanTask);
+}
+
+/**
+ * The version of CompleteScanRequest
+ * for the event consumers, which only have
+ * the WDFREQUEST Request object at hand.
+ */
+_IRQL_requires_max_(DISPATCH_LEVEL)
+VOID ConsumerTryingToCompleteScanRequest(WDFREQUEST Request) {
+    WDFDEVICE Device = g_Device;
+
+    WILL_USE_LOCK(LPending);
+
+    SAFETY_BEGIN();
+    PDEVICE_CONTEXT ctx = DeviceGetContext(Device);
+    ASSERT_NOT_NULL(ctx);
+
+    // Try to get a pending scan task
+    SPINLOCK_ACQUIRE(LPending, ctx->PendingListSpinLock);
+    if (IsListEmpty(&ctx->PendingList)) {
+        SPINLOCK_RELEASE(LPending, ctx->PendingListSpinLock);
+        WdfRequestForwardToIoQueue(Request, ctx->ScanRequestQueue);
+        SUCCEED_FAST();
+    }
+    else {
+        PLIST_ENTRY entry = RemoveHeadList(&ctx->PendingList);
+        SPINLOCK_RELEASE(LPending, ctx->PendingListSpinLock);
+        ASSERT_NOT_NULL(entry);
+        PSCAN_TASK pScanTask = CONTAINING_RECORD(entry, SCAN_TASK, Link);
+        ASSERT_NOT_NULL(pScanTask);
+        CompleteScanRequest(Request, pScanTask);
+    }
+
+    SAFETY_END_RETURNING_VOID({
+        if (ctx) {
+            SPINLOCK_CLEANUP(LPending, ctx->PendingListSpinLock);
+        }
+    });
+}
+
+
 
 /**
  * Gets the scanning result from usermode
@@ -866,18 +951,12 @@ VOID HandleIOCTLPostScanningResult(
     UNREFERENCED_PARAMETER(OutputBufferLength);
 
     SAFETY_BEGIN();
-    WILL_USE_LOCK(LScanning);
     WILL_USE_LOCK(LPending);
-    WILL_USE_LOCK(LDecision);
-
-    HANDLE callerPid = GET_CALLER_ID(Request);
+    WILL_USE_LOCK(LBlockOperations);
 
     PSCAN_VERDICT_DTO verdict = NULL;
-    PSCAN_TASK pScanTask = NULL;
-    SCAN_TASK_DTO taskCopy = { 0 };
     size_t inBufLen = 0;
-    NTSTATUS verifyStatus = STATUS_UNSUCCESSFUL;
-    PDECISION pDecision = NULL;
+    PBLOCK_OPERATION pBlockOperation = NULL;
 
     LOG_INFO("HandleIOCTLPostScanningResult starting");
 
@@ -895,158 +974,68 @@ VOID HandleIOCTLPostScanningResult(
         LOG_ERROR("Invalid input buffer length %zu", inBufLen);
         FAIL_FAST_WITH_STATUS(STATUS_INVALID_BUFFER_SIZE);
     }
+    ASSERT_NOT_NULL(verdict);
 
     //
-    // Step 2 — Locate matching SCAN_TASK in ScanningList (by PID)
+    // Step 2 — Handle allow/deny decision or recovery
     //
-    WAITLOCK_ACQUIRE(LScanning, ctx->ScanningListLock, NULL);
+    // TODO: We may need to also check callerPid == g_Service.Pid
 
-    BOOLEAN found = FALSE;
-    for (PLIST_ENTRY entry = ctx->ScanningList.Flink;
-        entry != &ctx->ScanningList;
-        entry = entry->Flink)
-    {
-        PSCAN_TASK current = CONTAINING_RECORD(entry, SCAN_TASK, Link);
-        if (current->Dto.Pid == verdict->Pid) {
-            if (verdict->Pid == 0 /*for handshake*/ && current->CallerPid != callerPid /*but inconsistent callerPid*/) {
-                /*then this scan task does not match/qualify*/
-                continue;
-            }
-            else {
-                found = TRUE;
-                pScanTask = current;
-                break;
-            }
-        }
+    // Execute the decision:
+    if (verdict->AllowExecution) {
+        LOG_INFO("Process %p allowed to execute.", verdict->Pid);
     }
-
-    if (!found) {
-        LOG_ERROR("No matching SCAN_TASK for PID %p", verdict->Pid);
-        FAIL_FAST_WITH_STATUS(STATUS_NOT_FOUND);
-    }
-
-    // Make a safe local copy before verification
-    RtlCopyMemory(&taskCopy, &pScanTask->Dto, sizeof(SCAN_TASK_DTO));
-    WAITLOCK_RELEASE(LScanning, ctx->ScanningListLock);
-
-    //
-    // Step 3 — Verify attestation
-    //
-    verifyStatus = VerifyAttestation(&taskCopy, verdict);
-    if (!NT_SUCCESS(verifyStatus)) {
-        LOG_ERROR("Attestation verification failed for detected PID %p", verdict->Pid);
-        if (verdict->Pid) {
-            LOG_ERROR("Trying to kill process with PID %p", verdict->Pid);
-            TRY(TerminateProcessByPid(verdict->Pid, STATUS_INVALID_SIGNATURE));
-            LOG_ERROR("Killed process with PID %p", verdict->Pid);
-        }
-        SUCCEED_FAST();
-    }
-
-    //
-    // Step 4 — Handle allow/deny decision or recovery
-    //
-    if (NT_SUCCESS(verifyStatus)) {
-        if (!verdict->Pid) {
-            // Fake decision for handshake - now that the caller
-            // attested correctly => it's the legitimate Service.
-            // Register it as a trusted partner.
-            KIRQL oldIrql = 0;
-            KeAcquireSpinLock(&g_Service.Lock, &oldIrql);
-            g_Service.Pid = callerPid;
-            KeReleaseSpinLock(&g_Service.Lock, oldIrql);
+    else {
+        NTSTATUS terminationStatus = TerminateProcessByPid(verdict->Pid, STATUS_ACCESS_DENIED);
+        if (NT_SUCCESS(terminationStatus)) {
+            LOG_INFO("Process %p denied by the Service and terminated by the Driver.", verdict->Pid);
         }
         else {
-            // Normal decision: allow or block execution.
-            // TODO: We may need to also check callerPid == g_Service.Pid
-            // but first...
+            LOG_INFO("Process %p denied by the Service but could NOT be terminated by the Driver. The incident has been reported.", verdict->Pid);
+        }
 
-            //
-            // Step 5 - Persist the decision
-            //
-            {
-                #pragma warning(disable: 4996)
-                pDecision = (PDECISION)ExAllocatePoolWithTag(NonPagedPoolNx, sizeof(DECISION), TAG_DECISION);
-                ASSERT_NOT_NULL(pDecision);
-                NEVER_FAIL(RtlZeroMemory(pDecision, sizeof(DECISION)));
-                pDecision->Dto.AllowExecution = verdict->AllowExecution;
-                RtlCopyMemory(pDecision->Dto.PredScore, verdict->PredScore, SIZEOF_DOUBLE);
-                pDecision->Dto.FileId = pScanTask->Dto.FileId;
-                pDecision->Dto.VolumeSerialNumber = pScanTask->Dto.VolumeSerialNumber;
-                pDecision->Dto.IsValid = TRUE;
-                pDecision->Dto.Version = 1;
-                NEVER_FAIL(KeQuerySystemTime(&pDecision->Dto.Timestamp));
-            }
-            WAITLOCK_ACQUIRE(LDecision, ctx->DecisionListLock, NULL);
-            NEVER_FAIL(InsertTailList(&ctx->DecisionList, &pDecision->Link));
-            WAITLOCK_RELEASE(LDecision, ctx->DecisionListLock);
-            pDecision = NULL;
+        //
+        // Step 3 — Report Block Operation
+        //
+        {
+            #pragma warning(disable: 4996)
+            pBlockOperation = (PBLOCK_OPERATION)ExAllocatePoolWithTag(
+                NonPagedPoolNx,
+                sizeof(BLOCK_OPERATION),
+                TAG_BLOCK_OPERATION
+            );
+            ASSERT_NOT_NULL(pBlockOperation);
 
-            // Then, execute the decision.
+            NEVER_FAIL(RtlZeroMemory(pBlockOperation, sizeof(BLOCK_OPERATION)));
+            pBlockOperation->Dto.AllowExecution = verdict->AllowExecution;
+            NEVER_FAIL(RtlCopyMemory(pBlockOperation->Dto.PredScore, verdict->PredScore, SIZEOF_DOUBLE));
+            pBlockOperation->Dto.FileId = verdict->FileId;
+            pBlockOperation->Dto.VolumeSerialNumber = verdict->VolumeSerialNumber;
+            pBlockOperation->Dto.IsMitigated = NT_SUCCESS(terminationStatus);
+            pBlockOperation->Dto.Version = 1;
+            NEVER_FAIL(KeQuerySystemTime(&pBlockOperation->Dto.Timestamp));
 
-            if (verdict->AllowExecution) {
-                LOG_INFO("Process %p allowed to execute.", verdict->Pid);
-            }
-            else {
-                LOG_INFO("Process %p denied by the Service. Terminating...", verdict->Pid);
-                TRY(TerminateProcessByPid(verdict->Pid, STATUS_ACCESS_DENIED));
-            }
-            WAITLOCK_ACQUIRE(LScanning, ctx->ScanningListLock, NULL);
-            RemoveEntryList(&pScanTask->Link);
-            WAITLOCK_RELEASE(LScanning, ctx->ScanningListLock);
-            ExFreePoolWithTag(pScanTask, 'tstA');
-            pScanTask = NULL;
-
+            WAITLOCK_ACQUIRE(LBlockOperations, ctx->BlockOperationListLock, NULL);
+            NEVER_FAIL(InsertTailList(&ctx->BlockOperationList, &pBlockOperation->Link));
+            WAITLOCK_RELEASE(LBlockOperations, ctx->BlockOperationListLock);
+            pBlockOperation = NULL;
         }
     }
 
     LOG_INFO("HandleIOCTLPostScanningResult finished");
 
-    //////////////////////////////////////////////////////////////
-    // TODO: Review this cleanup code - it is causing bug checks
-    // And it shouldn't be this long.
-    //////////////////////////////////////////////////////////////
-
     SAFETY_END_RETURNING_VOID({
-        WAITLOCK_CLEANUP(LScanning, ctx->ScanningListLock);
-        WAITLOCK_CLEANUP(LPending, ctx->PendingListLock);
-        WAITLOCK_CLEANUP(LDecision, ctx->DecisionListLock);
+        SPINLOCK_CLEANUP(LPending, ctx->PendingListSpinLock);
+        WAITLOCK_CLEANUP(LBlockOperations, ctx->BlockOperationListLock);
 
         if (FAILED_PREVIOUSLY()) {
-            if (pDecision != NULL) {
-                ExFreePoolWithTag(pDecision, TAG_DECISION);
-                pDecision = NULL;
-            }
-        }
-
-        if (!NT_SUCCESS(verifyStatus) && pScanTask != NULL) {
-            // Not verified, but scan task popped off
-            if (!FAILED_PREVIOUSLY()) {
-                status = STATUS_UNSUCCESSFUL;
-            }
-            // Verification failed or other error — requeue for another scan
-            if (pScanTask->Retried >= MAX_RETRIES) {
-                LOG_ERROR("Failed to scan process %p too many times, ignoring (i.e. let it run) !", pScanTask->Dto.Pid);
-                status = STATUS_INTERNAL_ERROR;
-            }
-            else {
-                LOG_WARN("Verification or communication failed, requeuing PID to 'Pending for Scan': %p", verdict->Pid);
-
-                WAITLOCK_ACQUIRE(LScanning, ctx->ScanningListLock, NULL);
-                RemoveEntryList(&pScanTask->Link);
-                WAITLOCK_RELEASE(LScanning, ctx->ScanningListLock);
-
-                WAITLOCK_ACQUIRE(LPending, ctx->PendingListLock, NULL);
-                pScanTask->Retried += 1;
-                InsertTailList(&ctx->PendingList, &pScanTask->Link);
-                WAITLOCK_RELEASE(LPending, ctx->PendingListLock);
+            if (pBlockOperation != NULL) {
+                ExFreePoolWithTag(pBlockOperation, TAG_BLOCK_OPERATION);
+                pBlockOperation = NULL;
             }
         }
 
         WdfRequestComplete(Request, status);
-        WAITLOCK_CLEANUP(LScanning, ctx->ScanningListLock);
-        WAITLOCK_CLEANUP(LPending, ctx->PendingListLock);
-        WAITLOCK_CLEANUP(LDecision, ctx->DecisionListLock);
     });
 }
 
@@ -1057,7 +1046,7 @@ VOID HandleIOCTLPostScanningResult(
  */
 _IRQL_requires_same_
 _IRQL_requires_max_(PASSIVE_LEVEL)
-VOID HandleIOCTLGetNextDecision(
+VOID HandleIOCTLGetNextBlockOperation(
     WDFDEVICE device,
     PDEVICE_CONTEXT ctx,
     WDFREQUEST Request,
@@ -1068,58 +1057,54 @@ VOID HandleIOCTLGetNextDecision(
     UNREFERENCED_PARAMETER(InputBufferLength);
 
     SAFETY_BEGIN();
-    WILL_USE_LOCK(LDecision);
+    WILL_USE_LOCK(LBlockOperations);
 
-    PDECISION pDecision = NULL;
+    PBLOCK_OPERATION pBlockOperation = NULL;
     PLIST_ENTRY entry = NULL;
     PVOID outBuf = NULL;
     size_t outLen = 0;
 
-    if (OutputBufferLength < sizeof(DECISION_DTO)) {
+    if (OutputBufferLength < sizeof(BLOCK_OPERATION_DTO)) {
         FAIL_FAST_WITH_STATUS(STATUS_BUFFER_TOO_SMALL);
     }
-    TRY(WdfRequestRetrieveOutputBuffer(Request, sizeof(DECISION_DTO), &outBuf, &outLen));
+    TRY(WdfRequestRetrieveOutputBuffer(Request, sizeof(BLOCK_OPERATION_DTO), &outBuf, &outLen));
     if (outBuf == NULL) {
         FAIL_FAST_WITH_STATUS(STATUS_INVALID_ADDRESS);
     }
-    if (outLen < sizeof(DECISION_DTO)) {
+    if (outLen < sizeof(BLOCK_OPERATION_DTO)) {
         FAIL_FAST_WITH_STATUS(STATUS_BUFFER_TOO_SMALL);
     }
-    RtlZeroMemory(outBuf, sizeof(DECISION_DTO));
+    RtlZeroMemory(outBuf, sizeof(BLOCK_OPERATION_DTO));
 
-    // Acquire DecisionList lock and pop head
-    WAITLOCK_ACQUIRE(LDecision, ctx->DecisionListLock, NULL);
-    if (IsListEmpty(&ctx->DecisionList)) {
+    WAITLOCK_ACQUIRE(LBlockOperations, ctx->BlockOperationListLock, NULL);
+    if (IsListEmpty(&ctx->BlockOperationList)) {
         // Nothing to return - leave the output buffer zeroed (done above)
         SUCCEED_FAST();
     }
-    entry = RemoveHeadList(&ctx->DecisionList);
-    WAITLOCK_RELEASE(LDecision, ctx->DecisionListLock);
+    entry = RemoveHeadList(&ctx->BlockOperationList);
+    WAITLOCK_RELEASE(LBlockOperations, ctx->BlockOperationListLock);
 
-    pDecision = CONTAINING_RECORD(entry, DECISION, Link);
-    ASSERT_NOT_NULL(pDecision);
+    pBlockOperation = CONTAINING_RECORD(entry, BLOCK_OPERATION, Link);
+    ASSERT_NOT_NULL(pBlockOperation);
 
     // Copy DTO to user buffer
-    RtlCopyMemory(outBuf, &pDecision->Dto, sizeof(DECISION_DTO));
-    WdfRequestSetInformation(Request, sizeof(DECISION_DTO));
+    RtlCopyMemory(outBuf, &pBlockOperation->Dto, sizeof(BLOCK_OPERATION_DTO));
+    WdfRequestSetInformation(Request, sizeof(BLOCK_OPERATION_DTO));
 
-    ExFreePoolWithTag(pDecision, TAG_DECISION);
-    pDecision = NULL;
+    ExFreePoolWithTag(pBlockOperation, TAG_BLOCK_OPERATION);
+    pBlockOperation = NULL;
 
     SUCCEED_FAST();
 
     SAFETY_END_RETURNING_VOID({
-        WAITLOCK_CLEANUP(LDecision, ctx->DecisionListLock);
+        WAITLOCK_CLEANUP(LBlockOperations, ctx->BlockOperationListLock);
 
-        if (pDecision) {
-            // TODO: Now we accept that the decision might be lost here.
-            // No requeue.
-            ExFreePoolWithTag(pDecision, TAG_DECISION);
-            pDecision = NULL;
+        if (pBlockOperation) {
+            ExFreePoolWithTag(pBlockOperation, TAG_BLOCK_OPERATION);
+            pBlockOperation = NULL;
         }
 
         WdfRequestComplete(Request, status);
-        WAITLOCK_CLEANUP(LDecision, ctx->DecisionListLock);
     });
 }
 
@@ -1140,8 +1125,7 @@ VOID DriverUnload(_In_ WDFDRIVER driver)
     UNREFERENCED_PARAMETER(driver);
     SAFETY_BEGIN();
     WILL_USE_LOCK(LPending);
-    WILL_USE_LOCK(LScanning);
-    WILL_USE_LOCK(LDecision);
+    WILL_USE_LOCK(LBlockOperations);
 
     PsSetCreateProcessNotifyRoutineEx(RoutineProcessNotify, /*Remove=*/TRUE);
 
@@ -1150,7 +1134,7 @@ VOID DriverUnload(_In_ WDFDRIVER driver)
     if (g_Device) {
         ctx = DeviceGetContext(g_Device);
         if (ctx) {
-            WAITLOCK_ACQUIRE(LPending, ctx->PendingListLock, NULL);
+            SPINLOCK_ACQUIRE(LPending, ctx->PendingListSpinLock);
             while (!IsListEmpty(&ctx->PendingList)) {
                 PLIST_ENTRY entry = RemoveHeadList(&ctx->PendingList);
                 ASSERT_NOT_NULL(entry);
@@ -1158,34 +1142,23 @@ VOID DriverUnload(_In_ WDFDRIVER driver)
                 ASSERT_NOT_NULL(pScanTask);
                 ExFreePoolWithTag(pScanTask, 'tstA');
             }
-            WAITLOCK_RELEASE(LPending, ctx->PendingListLock);
+            SPINLOCK_RELEASE(LPending, ctx->PendingListSpinLock);
 
-            WAITLOCK_ACQUIRE(LScanning, ctx->ScanningListLock, NULL);
-            while (!IsListEmpty(&ctx->ScanningList)) {
-                PLIST_ENTRY entry = RemoveHeadList(&ctx->ScanningList);
+            WAITLOCK_ACQUIRE(LBlockOperations, ctx->BlockOperationListLock, NULL);
+            while (!IsListEmpty(&ctx->BlockOperationList)) {
+                PLIST_ENTRY entry = RemoveHeadList(&ctx->BlockOperationList);
                 ASSERT_NOT_NULL(entry);
-                PSCAN_TASK pScanTask = CONTAINING_RECORD(entry, SCAN_TASK, Link);
-                ASSERT_NOT_NULL(pScanTask);
-                ExFreePoolWithTag(pScanTask, 'tstA');
+                PBLOCK_OPERATION pBlockOperation = CONTAINING_RECORD(entry, BLOCK_OPERATION, Link);
+                ASSERT_NOT_NULL(pBlockOperation);
+                ExFreePoolWithTag(pBlockOperation, TAG_BLOCK_OPERATION);
             }
-            WAITLOCK_RELEASE(LScanning, ctx->ScanningListLock);
-
-            WAITLOCK_ACQUIRE(LDecision, ctx->DecisionListLock, NULL);
-            while (!IsListEmpty(&ctx->DecisionList)) {
-                PLIST_ENTRY entry = RemoveHeadList(&ctx->DecisionList);
-                ASSERT_NOT_NULL(entry);
-                PDECISION pDecision = CONTAINING_RECORD(entry, DECISION, Link);
-                ASSERT_NOT_NULL(pDecision);
-                ExFreePoolWithTag(pDecision, TAG_DECISION);
-            }
-            WAITLOCK_RELEASE(LDecision, ctx->DecisionListLock);
+            WAITLOCK_RELEASE(LBlockOperations, ctx->BlockOperationListLock);
         }
     }
 
     SAFETY_END_RETURNING_VOID({
-        WAITLOCK_CLEANUP(LPending, ctx->PendingListLock);
-        WAITLOCK_CLEANUP(LScanning, ctx->ScanningListLock);
-        WAITLOCK_CLEANUP(LDecision, ctx->DecisionListLock);
+        SPINLOCK_CLEANUP(LPending, ctx->PendingListSpinLock);
+        WAITLOCK_CLEANUP(LBlockOperations, ctx->BlockOperationListLock);
     });
 
     // No need to deinitialize spin locks.
