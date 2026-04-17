@@ -336,7 +336,6 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath)
 // ============================================================
 NTSTATUS EvtDeviceAdd(WDFDRIVER Driver, PWDFDEVICE_INIT DeviceInit)
 {
-    PAGED_CODE() // TODO: Add this for other PASSIVE_LEVEL routines too?
     UNREFERENCED_PARAMETER(Driver);
 
     LOG_INFO("EvtDeviceAdd starting");
@@ -870,7 +869,7 @@ VOID EmitterTryingToCompleteScanRequest(PSCAN_TASK pScanTask) {
         return;
     }
 
-    WDFREQUEST Request;
+    WDFREQUEST Request = NULL;
     // Try to get a waiting request
     if (
         !NT_SUCCESS(
