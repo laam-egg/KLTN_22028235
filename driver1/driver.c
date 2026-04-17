@@ -48,8 +48,7 @@ typedef struct _TRUSTED_PARTNER {
     KSPIN_LOCK Lock;
 } TRUSTED_PARTNER;
 
-TRUSTED_PARTNER g_Model = { 0 };
-TRUSTED_PARTNER g_UI = { 0 }; // currently the UI component is not yet required to attest, so ignore it
+TRUSTED_PARTNER g_Service = { 0 };
 
 ////////////////////////////
 ///////// Macros ///////////
@@ -107,18 +106,46 @@ inline HANDLE GET_CALLER_ID(WDFREQUEST Request) {
 ///////////////////////////////////
 
 DRIVER_INITIALIZE DriverEntry;
+
+_Function_class_(EVT_WDF_DRIVER_UNLOAD)
+_IRQL_requires_same_
+_IRQL_requires_max_(PASSIVE_LEVEL)
 EVT_WDF_DRIVER_UNLOAD DriverUnload;
+
+_Function_class_(EVT_WDF_DRIVER_DEVICE_ADD)
+_IRQL_requires_same_
+_IRQL_requires_max_(PASSIVE_LEVEL) // The rule: IRQL annotations describe the required entry IRQL ; NOT the max IRQL that this function itself could raise upto
 EVT_WDF_DRIVER_DEVICE_ADD EvtDeviceAdd;
+
+_Function_class_(EVT_WDF_IO_QUEUE_IO_DEVICE_CONTROL)
+_IRQL_requires_same_
+_IRQL_requires_max_(PASSIVE_LEVEL)
 EVT_WDF_IO_QUEUE_IO_DEVICE_CONTROL EvtIoDeviceControl;
+
+_Function_class_(EVT_WDF_WORKITEM)
+_IRQL_requires_same_
+_IRQL_requires_max_(PASSIVE_LEVEL)
 EVT_WDF_WORKITEM EvtAddScanTaskToPendingList;
+
+_Function_class_(EVT_WDF_WORKITEM)
+_IRQL_requires_same_
+_IRQL_requires_max_(PASSIVE_LEVEL)
 EVT_WDF_WORKITEM EvtConductCleanupTask;
 
+_IRQL_requires_same_
+_IRQL_requires_max_(PASSIVE_LEVEL)
 VOID RoutineProcessNotify(PEPROCESS Process, HANDLE ProcessId, PPS_CREATE_NOTIFY_INFO CreateInfo);
 
-VOID EnqueueScanTaskAddWorkItem(WDFDEVICE Device, HANDLE ProcessId, PCUNICODE_STRING ImagePath);
+_IRQL_requires_same_
+_IRQL_requires_max_(PASSIVE_LEVEL)
+static VOID EnqueueScanTaskAddWorkItem(WDFDEVICE Device, HANDLE ProcessId, PCUNICODE_STRING ImagePath);
 
-VOID EnqueueCleanupTaskWorkItem(WDFDEVICE Device, INT CleanupTask, PVOID Arg);
+_IRQL_requires_same_
+_IRQL_requires_max_(PASSIVE_LEVEL)
+static VOID EnqueueCleanupTaskWorkItem(WDFDEVICE Device, INT CleanupTask, PVOID Arg);
 
+_IRQL_requires_same_
+_IRQL_requires_max_(PASSIVE_LEVEL)
 NTSTATUS GetFileIdFromPath(PCUNICODE_STRING FilePath, PFILE_ID_128 FileId, PULONG VolumeSerial);
 
 ////// DEVICE CONTEXT ///////
@@ -202,6 +229,7 @@ typedef struct _DECISION {
 
 //////////// IOCTL HANDLERS (CONTEXT-DEPENDENT) /////////////
 
+_IRQL_requires_same_
 _IRQL_requires_max_(PASSIVE_LEVEL)
 VOID HandleIOCTLRegisterScanner(
     WDFDEVICE device,
@@ -211,6 +239,7 @@ VOID HandleIOCTLRegisterScanner(
     size_t InputBufferLength
 );
 
+_IRQL_requires_same_
 _IRQL_requires_max_(PASSIVE_LEVEL)
 VOID HandleIOCTLGetPendingExecutable(
     WDFDEVICE device,
@@ -220,6 +249,7 @@ VOID HandleIOCTLGetPendingExecutable(
     size_t InputBufferLength
 );
 
+_IRQL_requires_same_
 _IRQL_requires_max_(PASSIVE_LEVEL)
 VOID HandleIOCTLPostScanningResult(
     WDFDEVICE device,
@@ -229,6 +259,7 @@ VOID HandleIOCTLPostScanningResult(
     size_t InputBufferLength
 );
 
+_IRQL_requires_same_
 _IRQL_requires_max_(PASSIVE_LEVEL)
 VOID HandleIOCTLGetNextDecision(
     WDFDEVICE device,
@@ -247,10 +278,8 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath)
     LOG_INFO("DriverEntry starting");
 
     LOG_INFO("Resetting trusted partners");
-    KeInitializeSpinLock(&g_Model.Lock);
-    g_Model.Pid = NULL;
-    KeInitializeSpinLock(&g_UI.Lock);
-    g_UI.Pid = NULL;
+    KeInitializeSpinLock(&g_Service.Lock);
+    g_Service.Pid = NULL;
 
     WDF_DRIVER_CONFIG config;
 
@@ -272,7 +301,6 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath)
 // ============================================================
 // DeviceAdd — create device + SDDL + interface
 // ============================================================
-_IRQL_requires_max_(PASSIVE_LEVEL)
 NTSTATUS EvtDeviceAdd(WDFDRIVER Driver, PWDFDEVICE_INIT DeviceInit)
 {
     PAGED_CODE() // TODO: Add this for other PASSIVE_LEVEL routines too?
@@ -346,6 +374,8 @@ NTSTATUS EvtDeviceAdd(WDFDRIVER Driver, PWDFDEVICE_INIT DeviceInit)
 // ============================================================
 // Process creation callback
 // ============================================================
+_IRQL_requires_same_
+_IRQL_requires_max_(PASSIVE_LEVEL)
 VOID RoutineProcessNotify(PEPROCESS Process, HANDLE ProcessId, PPS_CREATE_NOTIFY_INFO CreateInfo)
 {
     UNREFERENCED_PARAMETER(Process);
@@ -360,49 +390,37 @@ VOID RoutineProcessNotify(PEPROCESS Process, HANDLE ProcessId, PPS_CREATE_NOTIFY
         {
             KIRQL oldIrql = 0;
             BOOL matched = FALSE;
-            KeAcquireSpinLock(&g_Model.Lock, &oldIrql);
-            if (g_Model.Pid == ProcessId) {
-                g_Model.Pid = NULL;
+            KeAcquireSpinLock(&g_Service.Lock, &oldIrql);
+            if (g_Service.Pid == ProcessId) {
+                g_Service.Pid = NULL;
                 matched = TRUE;
             }
-            KeReleaseSpinLock(&g_Model.Lock, oldIrql);
+            KeReleaseSpinLock(&g_Service.Lock, oldIrql);
             if (matched) {
-                LOG_INFO("Trusted usermode process %p (AI model) exited, untrust this PID", ProcessId);
+                LOG_INFO("Trusted usermode process %p (Service) exited, untrust this PID", ProcessId);
                 LOG_INFO("Removing all leftover scan tasks for sanity.");
                 NEVER_FAIL(EnqueueCleanupTaskWorkItem(g_Device, CLEANUP_ALL_SCAN_TASKS, NULL));
                 // Claude:
-                // Problem: After a process terminates and you call EnqueueCleanupTaskWorkItem, the cleanup happens asynchronously.A new instance of the AI model could register before cleanup completes, leading to state corruption.
-                // So: We need to check in EvtConductCleanupTask whether a trusted instance of the AI model is registered, and only proceed to cleaning up if that's not the case - which we do.
+                // Problem: After a process terminates and you call EnqueueCleanupTaskWorkItem, the cleanup happens asynchronously.
+                // A new instance of the Service could register before cleanup completes, leading to state corruption.
+                // So: We need to check in EvtConductCleanupTask whether a trusted instance of the Service is registered,
+                // and only proceed to cleaning up if that's not the case - which we do.
             }
         }
 
-        {
-            KIRQL oldIrql = 0;
-            BOOL matched = FALSE;
-            KeAcquireSpinLock(&g_UI.Lock, &oldIrql);
-            if (g_UI.Pid == ProcessId) {
-                g_UI.Pid = NULL;
-                matched = TRUE;
-            }
-            KeReleaseSpinLock(&g_UI.Lock, oldIrql);
-            if (matched) {
-                LOG_INFO("Trusted usermode process %p (UI) exited, driver enters rest", ProcessId);
-            }
-        }
-        
         SUCCEED_FAST();
     }
 
     {
-        // Check if the AI model is there. If not, well, do not do anything
+        // Check if the Service is there. If not, well, do not do anything
         // to prevent malware (simplicity for now), also remove all scan tasks!
         BOOL isModelPresent = FALSE;
         KIRQL oldIrql = 0;
-        KeAcquireSpinLock(&g_Model.Lock, &oldIrql);
-        isModelPresent = (g_Model.Pid != NULL);
-        KeReleaseSpinLock(&g_Model.Lock, oldIrql);
+        KeAcquireSpinLock(&g_Service.Lock, &oldIrql);
+        isModelPresent = (g_Service.Pid != NULL);
+        KeReleaseSpinLock(&g_Service.Lock, oldIrql);
         if (!isModelPresent) {
-            LOG_INFO("AI model is not present, so skipped scanning process with PID = %p", ProcessId);
+            LOG_INFO("Service is not present, so skipped scanning process with PID = %p", ProcessId);
             SUCCEED_FAST();
         }
     }
@@ -413,7 +431,9 @@ VOID RoutineProcessNotify(PEPROCESS Process, HANDLE ProcessId, PPS_CREATE_NOTIFY
     SAFETY_END_RETURNING_VOID(NO_CLEANUP);
 }
 
-VOID EnqueueCleanupTaskWorkItem(WDFDEVICE Device, INT CleanupTask, PVOID Arg)
+_IRQL_requires_same_
+_IRQL_requires_max_(PASSIVE_LEVEL)
+static VOID EnqueueCleanupTaskWorkItem(WDFDEVICE Device, INT CleanupTask, PVOID Arg)
 {
     UNREFERENCED_PARAMETER(Arg); // TODO: Add an "Arg" field to CLEANUP_ITEM_CONTEXT if needed
     SAFETY_BEGIN();
@@ -441,7 +461,6 @@ VOID EnqueueCleanupTaskWorkItem(WDFDEVICE Device, INT CleanupTask, PVOID Arg)
     SAFETY_END_RETURNING_VOID(NO_CLEANUP);
 }
 
-_IRQL_requires_max_(PASSIVE_LEVEL) // The rule: IRQL annotations describe the required entry IRQL ; NOT the max IRQL that this function itself could raise upto
 VOID EvtConductCleanupTask(WDFWORKITEM WorkItem) {
     SAFETY_BEGIN();
     WILL_USE_LOCK(LPending);
@@ -460,16 +479,16 @@ VOID EvtConductCleanupTask(WDFWORKITEM WorkItem) {
     }
 
     if (CLEANUP_ALL_SCAN_TASKS == clCtx->CleanupTask) {
-        // Only clean up if the AI model is NOT registered
-        BOOL isAIModelPresent = FALSE;
+        // Only clean up if the Service is NOT registered
+        BOOL isServicePresent = FALSE;
         {
             KIRQL oldIrql = 0;
-            KeAcquireSpinLock(&g_Model.Lock, &oldIrql);
-            isAIModelPresent = g_Model.Pid != NULL;
-            KeReleaseSpinLock(&g_Model.Lock, oldIrql);
+            KeAcquireSpinLock(&g_Service.Lock, &oldIrql);
+            isServicePresent = g_Service.Pid != NULL;
+            KeReleaseSpinLock(&g_Service.Lock, oldIrql);
         }
 
-        if (!isAIModelPresent) {
+        if (!isServicePresent) {
             WAITLOCK_ACQUIRE(LPending, ctx->PendingListLock, NULL);
             while (!IsListEmpty(&ctx->PendingList)) {
                 PLIST_ENTRY entry = RemoveHeadList(&ctx->PendingList);
@@ -506,7 +525,9 @@ VOID EvtConductCleanupTask(WDFWORKITEM WorkItem) {
 // ============================================================
 // Queue a pending executable for scan
 // ============================================================
-VOID EnqueueScanTaskAddWorkItem(WDFDEVICE Device, HANDLE ProcessId, PCUNICODE_STRING ImagePath)
+_IRQL_requires_same_
+_IRQL_requires_max_(PASSIVE_LEVEL)
+static VOID EnqueueScanTaskAddWorkItem(WDFDEVICE Device, HANDLE ProcessId, PCUNICODE_STRING ImagePath)
 {
     SAFETY_BEGIN();
     LOG_INFO("EnqueueScanTaskAddWorkItem starting");
@@ -561,7 +582,6 @@ VOID EnqueueScanTaskAddWorkItem(WDFDEVICE Device, HANDLE ProcessId, PCUNICODE_ST
 // ============================================================
 // Adds new scan task to PendingList
 // ============================================================
-_IRQL_requires_max_(PASSIVE_LEVEL)
 VOID EvtAddScanTaskToPendingList(WDFWORKITEM WorkItem)
 {
     SAFETY_BEGIN();
@@ -575,14 +595,14 @@ VOID EvtAddScanTaskToPendingList(WDFWORKITEM WorkItem)
     PDEVICE_CONTEXT ctx = NULL;
     PWORK_ITEM_CONTEXT wiCtx = NULL;
 
-    // Only add if the AI model is NOT registered
+    // Only add if the Service model is NOT registered
     {
         BOOL isAIModelPresent = FALSE;
 
         KIRQL oldIrql = 0;
-        KeAcquireSpinLock(&g_Model.Lock, &oldIrql);
-        isAIModelPresent = g_Model.Pid != NULL;
-        KeReleaseSpinLock(&g_Model.Lock, oldIrql);
+        KeAcquireSpinLock(&g_Service.Lock, &oldIrql);
+        isAIModelPresent = g_Service.Pid != NULL;
+        KeReleaseSpinLock(&g_Service.Lock, oldIrql);
 
         if (!isAIModelPresent) {
             SUCCEED_FAST();
@@ -641,7 +661,6 @@ VOID EvtAddScanTaskToPendingList(WDFWORKITEM WorkItem)
 // ============================================================
 // IOCTL handler
 // ============================================================
-_IRQL_requires_max_(PASSIVE_LEVEL)
 VOID EvtIoDeviceControl(
     WDFQUEUE Queue,
     WDFREQUEST Request,
@@ -696,6 +715,7 @@ VOID EvtIoDeviceControl(
  * Initial handshake from the usermode scanner
  * (initial attestation).
  */
+_IRQL_requires_same_
 _IRQL_requires_max_(PASSIVE_LEVEL)
 VOID HandleIOCTLRegisterScanner(
     WDFDEVICE device,
@@ -752,6 +772,7 @@ VOID HandleIOCTLRegisterScanner(
  * 
  * Also moves this task to ScanningList.
  */
+_IRQL_requires_same_
 _IRQL_requires_max_(PASSIVE_LEVEL)
 VOID HandleIOCTLGetPendingExecutable(
     WDFDEVICE device,
@@ -829,6 +850,7 @@ VOID HandleIOCTLGetPendingExecutable(
  * component, check attestation and take
  * action.
  */
+_IRQL_requires_same_
 _IRQL_requires_max_(PASSIVE_LEVEL)
 VOID HandleIOCTLPostScanningResult(
     WDFDEVICE device,
@@ -927,16 +949,16 @@ VOID HandleIOCTLPostScanningResult(
     if (NT_SUCCESS(verifyStatus)) {
         if (!verdict->Pid) {
             // Fake decision for handshake - now that the caller
-            // attested correctly => it's the legitimate AI model.
+            // attested correctly => it's the legitimate Service.
             // Register it as a trusted partner.
             KIRQL oldIrql = 0;
-            KeAcquireSpinLock(&g_Model.Lock, &oldIrql);
-            g_Model.Pid = callerPid;
-            KeReleaseSpinLock(&g_Model.Lock, oldIrql);
+            KeAcquireSpinLock(&g_Service.Lock, &oldIrql);
+            g_Service.Pid = callerPid;
+            KeReleaseSpinLock(&g_Service.Lock, oldIrql);
         }
         else {
             // Normal decision: allow or block execution.
-            // TODO: We may need to also check callerPid == g_Model.Pid
+            // TODO: We may need to also check callerPid == g_Service.Pid
             // but first...
 
             //
@@ -966,7 +988,7 @@ VOID HandleIOCTLPostScanningResult(
                 LOG_INFO("Process %p allowed to execute.", verdict->Pid);
             }
             else {
-                LOG_INFO("Process %p denied by AI model. Terminating...", verdict->Pid);
+                LOG_INFO("Process %p denied by the Service. Terminating...", verdict->Pid);
                 TRY(TerminateProcessByPid(verdict->Pid, STATUS_ACCESS_DENIED));
             }
             WAITLOCK_ACQUIRE(LScanning, ctx->ScanningListLock, NULL);
@@ -1033,6 +1055,7 @@ VOID HandleIOCTLPostScanningResult(
  * (allow/deny execution) of the driver, from
  * oldest to latest.
  */
+_IRQL_requires_same_
 _IRQL_requires_max_(PASSIVE_LEVEL)
 VOID HandleIOCTLGetNextDecision(
     WDFDEVICE device,
@@ -1109,8 +1132,10 @@ VOID HandleIOCTLGetNextDecision(
 
 
 
+_Function_class_(EVT_WDF_DRIVER_UNLOAD)
+_IRQL_requires_same_
 _IRQL_requires_max_(PASSIVE_LEVEL)
-VOID DriverUnload(WDFDRIVER driver)
+VOID DriverUnload(_In_ WDFDRIVER driver)
 {
     UNREFERENCED_PARAMETER(driver);
     SAFETY_BEGIN();
@@ -1174,6 +1199,7 @@ VOID DriverUnload(WDFDRIVER driver)
 
 
 // TODO: Review this
+_IRQL_requires_same_
 _IRQL_requires_max_(PASSIVE_LEVEL)
 NTSTATUS GetFileIdFromPath(PCUNICODE_STRING FilePath, PFILE_ID_128 FileId, PULONG VolumeSerial) {
     NTSTATUS status;
