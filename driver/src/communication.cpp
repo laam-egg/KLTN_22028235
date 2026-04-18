@@ -117,7 +117,7 @@ bool GetBlockOperation(HANDLE hDevice, BLOCK_OPERATION_DTO* dto)
         IOCTL_GET_NEXT_BLOCK_OPERATION,
         NULL,
         0,
-        &dto,
+        dto,
         sizeof(BLOCK_OPERATION_DTO),
         &bytesReturned,
         NULL
