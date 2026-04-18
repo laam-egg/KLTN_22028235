@@ -1,29 +1,25 @@
-# Windows Service Template
+# pmd-service
 
-This repository provides a C++ template for creating a Windows Service, with the necessary files to install, uninstall, and control the service.
+pmd stands for PE Malware Detection.
 
-## Features
+This is a service that interacts with
+the [pmd-driver](https://github.com/pe-malware-detection/pmd-driver)
+to scan PE files for malware, utilizing
+the PMD engines, which are customizable.
 
-- C++ Windows Service template
-- Service Installer for easy installation and removal
-- Base classes for creating custom Windows Services
-- Logging and error handling
+## Acknowledgements
 
-## Files
+This project is based on the
+[Windows Service Template](https://github.com/magicsih/WindowsService).
 
-- **WindowsService.cpp**: Main file containing the `wmain` function to install, uninstall, or run the service.
-- **WindowsService.h**: Header file for the `CWindowsServiceImpl` class derived from `CServiceBase`.
-- **ServiceBase.h**: Header file for the `CServiceBase` class, which provides a base class for a service that will exist as part of a service application.
-
-## Usage
-
-1. Clone the repository and navigate to the project directory.
-2. Customize the `CWindowsServiceImpl` class in `WindowsService.h` to implement your desired service behavior.
-3. Compile the project with your preferred C++ compiler.
-4. Install the service by running the compiled executable with the `-install` or `/install` parameter: ```<your_executable_name> -install```
-5. Remove the service by running the compiled executable with the `-remove` or `/remove` parameter: ```<your_executable_name> -remove```
-6. Start, stop, or control the service using the Windows Services control panel or command-line tools like `sc` or `net`.
+- [The original README file](./README-template.md)
+- [The original LICENSE file](./LICENSE-template.md)
 
 ## License
 
-This project is open source and available under the [MIT License](LICENSE).
+Copyright (c) 2025 Vu Tung Lam
+
+This project is open source and available under the MIT License,
+which is compatible with the license of the template project.
+
+See the [LICENSE](./LICENSE.txt) file for details.

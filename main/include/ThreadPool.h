@@ -1,4 +1,8 @@
 /****************************** Module Header ******************************\
+* 2025: Some modifications by Vu Tung Lam for this to work with C++17.
+*
+* ***************************************************************************
+*s
 * Module Name:  ThreadPool.h
 * Project:      CppWindowsService
 * Copyright (c) Microsoft Corporation.
@@ -41,7 +45,8 @@
 #pragma once
 
 #include <memory>
-
+#include <windows.h>
+#include <threadpoolapiset.h>
 
 class CThreadPool
 {
@@ -52,15 +57,11 @@ public:
         T *object, ULONG flags = WT_EXECUTELONGFUNCTION)
     {
         typedef std::pair<void (T::*)(), T *> CallbackType;
-        std::auto_ptr<CallbackType> p(new CallbackType(function, object));
+        CallbackType* p = new CallbackType(function, object);
 
-        if (::QueueUserWorkItem(ThreadProc<T>, p.get(), flags))
+        if (0 == ::QueueUserWorkItem(ThreadProc<T>, p, flags))
         {
-            // The ThreadProc now has the responsibility of deleting the pair.
-            p.release();
-        }
-        else
-        {
+            delete p;
             throw GetLastError();
         }
     }
@@ -72,7 +73,7 @@ private:
     {
         typedef std::pair<void (T::*)(), T *> CallbackType;
 
-        std::auto_ptr<CallbackType> p(static_cast<CallbackType *>(context));
+        std::unique_ptr<CallbackType> p(static_cast<CallbackType *>(context));
 
         (p->second->*p->first)();
         return 0;

@@ -1,6 +1,7 @@
 #pragma region Includes
 #include "WindowsServiceImpl.h"
 #include "ThreadPool.h"
+#include "Logging.h"
 #pragma endregion
 
 CWindowsServiceImpl::CWindowsServiceImpl(PWSTR pszServiceName, 
@@ -34,6 +35,8 @@ void CWindowsServiceImpl::OnStart(DWORD dwArgc, LPWSTR *lpszArgv)
     // Log a service start message to the Application log.
     WriteEventLogEntry(L"WindowsService in OnStart", 
         EVENTLOG_INFORMATION_TYPE);
+    
+    DebugLog(L"Service is starting...");
 
     // Queue the main service function for execution in a worker thread.
     CThreadPool::QueueUserWorkItem(&CWindowsServiceImpl::ServiceWorkerThread, this);
@@ -41,6 +44,8 @@ void CWindowsServiceImpl::OnStart(DWORD dwArgc, LPWSTR *lpszArgv)
 
 void CWindowsServiceImpl::ServiceWorkerThread(void)
 {
+    DebugLog(L"Service worker thread is running.");
+
     // Periodically check if the service is stopping.
     while (!m_fStopping)
     {
@@ -50,6 +55,7 @@ void CWindowsServiceImpl::ServiceWorkerThread(void)
     }
 
     // Signal the stopped event.
+    DebugLog(L"Service worker thread is stopping.");
     SetEvent(m_hStoppedEvent);
 }
 
@@ -58,6 +64,8 @@ void CWindowsServiceImpl::OnStop()
     // Log a service stop message to the Application log.
     WriteEventLogEntry(L"WindowsService in OnStop", EVENTLOG_INFORMATION_TYPE);
 
+    DebugLog(L"Service is stopping...");
+
     // Indicate that the service is stopping and wait for the finish of the 
     // main service function (ServiceWorkerThread).
     m_fStopping = TRUE;
@@ -65,4 +73,6 @@ void CWindowsServiceImpl::OnStop()
     {
         throw GetLastError();
     }
+
+    DebugLog(L"Service has stopped.");
 }
