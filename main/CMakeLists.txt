@@ -18,6 +18,9 @@ endif()
 
 set(SOURCES
     src/main.cpp
+    src/app.cpp
+    src/main_view.cpp
+    src/data_fetcher.cpp
 )
 
 set(INCLUDES
@@ -28,6 +31,7 @@ set(LIBRARIES
     bcrypt
     user32
     gdi32
+    comctl32
 
     pmd_ui_common
     pmd_driver_communication
