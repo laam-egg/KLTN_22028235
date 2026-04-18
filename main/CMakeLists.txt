@@ -5,19 +5,6 @@ set(TARGET_NAME pmd_service)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-##########################
-##### STATIC LINKING #####
-#### so that it could ####
-## run on older systems ##
-## without VC redist... ##
-##########################
-
-if(MSVC)
-    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-endif()
-
-##########################
-
 add_executable(${TARGET_NAME}
     include/stdafx.h
         src/stdafx.cpp
@@ -42,6 +29,8 @@ target_include_directories(${TARGET_NAME} PRIVATE include)
 
 set(LIBRARIES
     bcrypt
+    pmd_service_common
+    pmd_driver_communication
 )
 
 target_link_libraries(${TARGET_NAME} PRIVATE ${LIBRARIES})
@@ -72,16 +61,3 @@ elseif (CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
 endif()
 
 ###############################
-
-##########################
-##### STATIC LINKING #####
-#### so that it could ####
-## run on older systems ##
-## without VC redist... ##
-##########################
-
-if(MINGW)
-    target_link_options(${TARGET_NAME} PRIVATE -static -static-libgcc)
-endif()
-
-##########################

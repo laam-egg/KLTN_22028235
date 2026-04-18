@@ -18,6 +18,7 @@ protected:
     void ServiceWorkerThread(void);
 private:
     BOOL m_fStopping;
+    HANDLE m_hStoppingEvent;
     HANDLE m_hStoppedEvent;
 };
 
