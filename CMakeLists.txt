@@ -21,6 +21,8 @@ endif()
 
 ##########################
 
+add_subdirectory(cmakerc)
 add_subdirectory(common)
 add_subdirectory(driver)
+add_subdirectory(engine)
 add_subdirectory(main)

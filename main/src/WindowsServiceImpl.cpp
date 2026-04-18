@@ -4,6 +4,7 @@
 #include "Logging.h"
 #include "utils.h"
 #include "pmd_driver/driver.h"
+#include "pmd_engine/engine.h"
 #pragma endregion
 
 CWindowsServiceImpl::CWindowsServiceImpl(PWSTR pszServiceName, 
@@ -63,6 +64,18 @@ void CWindowsServiceImpl::ServiceWorkerThread(void)
 
     DebugLog(L"Service worker thread is running.");
 
+    PMD_Engine_Decision decision = { 0 };
+    std::unique_ptr<PMDEngine> pEngine;
+    DebugLog(L"Opening pmd_engine...");
+    try {
+        pEngine = std::make_unique<PMDEngine>();
+    } catch (std::exception& ex) {
+        DebugLog(L"Failed to open pmd_engine: ", ex.what());
+        goto cleanup;
+    }
+    DebugLog(L"... pmd_engine opened successfully.");
+
+    DebugLog(L"Opening driver device...");
     HANDLE hDriver = OpenDriverDevice();
     while (hDriver == INVALID_HANDLE_VALUE || hDriver == NULL) {
         DebugLog(L"Failed to open driver device. Retrying in 10 seconds.");
@@ -107,6 +120,31 @@ void CWindowsServiceImpl::ServiceWorkerThread(void)
             std::wstring filePath = FileIdToPath(task.FileId, task.VolumeSerialNumber);
 
             DebugLog(L"Scanning file: ", filePath, " ( PID: ", (ULONG_PTR)task.Pid, L" )");
+            decision = pEngine->Predict(filePath);
+            if (decision.score >= 0.0 && decision.label >= 0) {
+                DebugLog(L"... Scan verdict: score = ", decision.score, L", label = ", decision.label);
+                DebugLog(L"Reporting scan verdict to driver...");
+                {
+                    SCAN_VERDICT_DTO verdict = { 0 };
+                    verdict.Version = 1;
+                    verdict.VolumeSerialNumber = task.VolumeSerialNumber;
+                    verdict.Pid = task.Pid;
+                    memcpy(verdict.PredScore, &decision.score, sizeof(double));
+                    verdict.FileId = task.FileId;
+                    verdict.AllowExecution = (decision.label == 0); // allow if label is 0 (benign)
+
+                    // TODO: With the current architecture,
+                    // it is not even necessary to send the verdict back to the driver
+                    // in case of AllowExecution = TRUE,
+                    // as the driver will allow execution by default.
+                    if (!SendVerdict(hDriver, &verdict)) {
+                        DebugLog(L"... Failed to send verdict to driver.");
+                        // break;
+                    }
+                }
+            } else {
+                DebugLog(L"... Scan result: Failed to get a valid decision from PMD engine.");
+            }
         }
     }
 

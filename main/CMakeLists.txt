@@ -31,6 +31,7 @@ set(LIBRARIES
     bcrypt
     pmd_service_common
     pmd_driver_communication
+    pmd_engine_communication
 )
 
 target_link_libraries(${TARGET_NAME} PRIVATE ${LIBRARIES})
