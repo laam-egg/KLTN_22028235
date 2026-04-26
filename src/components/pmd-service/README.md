@@ -17,7 +17,7 @@ This project is based on the
 
 ## License
 
-Copyright (c) 2025 Vu Tung Lam
+Copyright (c) 2026 Vu Tung Lam
 
 This project is open source and available under the MIT License,
 which is compatible with the license of the template project.

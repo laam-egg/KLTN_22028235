@@ -26,4 +26,4 @@ This repository provides a C++ template for creating a Windows Service, with the
 
 ## License
 
-This project is open source and available under the [MIT License](LICENSE-template).
+This project is open source and available under the [MIT License](./LICENSE-template).
