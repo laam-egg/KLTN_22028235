@@ -1,0 +1,49 @@
+# Visual Studio files and folders
+.vs/
+*.suo
+*.user
+*.sln.docstates
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+Win32/
+[Bb]in/
+[Oo]bj/
+*.pdb
+*.ilk
+*.lib
+*.exp
+*.sys
+*.inf
+!*driver*/*.inf
+*.cat
+*.cer
+*.pfx
+*.log
+*.tlog
+*.idb
+*.ipch
+*.obj
+*.res
+*.pch
+*.vc.opendb
+*.vcxproj.user
+*.vcxproj.filters
+*.vcxproj.layout
+
+# Driver-specific files
+*.sym
+*.kdmp
+*.dmp
+*.etl
+
+# NuGet packages
+**/packages/*
+!**/packages/build/
+
+# Other temporary files
+*.~
+*.bak
+*.tmp
