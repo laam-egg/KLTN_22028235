@@ -1,0 +1,1680 @@
+{
+    "md5": "dab390157e7d608e105fd05fa38b6131",
+    "sha1": "ff5705aaa68799dfa19673a3e12f23c4923d827a",
+    "sha256": "00056603182fcb005d1e581ce7f6016aa4c75d9a40de8593ea50677ccf4a4577",
+    "tlsh": "T1BB846DAA1FA6886BC3925B780AF1F73DA13DC3E07D5BC6025B504998BF2AF9D3D44540",
+    "first_submission_date": 1733977883,
+    "last_analysis_date": 1738472564,
+    "detection_ratio": "0/73",
+    "label": 0,
+    "file_type": "Win32",
+    "family": null,
+    "family_confidence": null,
+    "behavior": [],
+    "file_property": [],
+    "packer": [],
+    "exploit": [],
+    "group": [],
+    "histogram": [
+        22408,
+        3023,
+        3022,
+        2878,
+        2777,
+        2683,
+        3207,
+        3267,
+        3732,
+        3844,
+        3646,
+        4283,
+        4156,
+        3754,
+        3295,
+        4162,
+        4540,
+        3623,
+        3319,
+        3457,
+        3380,
+        3825,
+        3428,
+        3620,
+        3434,
+        3555,
+        3926,
+        3489,
+        3395,
+        2980,
+        3106,
+        2888,
+        2992,
+        2617,
+        2889,
+        2488,
+        2461,
+        2685,
+        2620,
+        2548,
+        2115,
+        1801,
+        1799,
+        1804,
+        1748,
+        1601,
+        1777,
+        1687,
+        1713,
+        1638,
+        1780,
+        1845,
+        1736,
+        1823,
+        1569,
+        1886,
+        1824,
+        1941,
+        1755,
+        2136,
+        2434,
+        1972,
+        2181,
+        2102,
+        2506,
+        1582,
+        1490,
+        1483,
+        1426,
+        1918,
+        1465,
+        1474,
+        1283,
+        1320,
+        1201,
+        1195,
+        1246,
+        1386,
+        1320,
+        1301,
+        1695,
+        1225,
+        1118,
+        1396,
+        1041,
+        1089,
+        1346,
+        1228,
+        950,
+        925,
+        895,
+        943,
+        944,
+        1047,
+        992,
+        950,
+        892,
+        1017,
+        790,
+        930,
+        899,
+        1325,
+        993,
+        869,
+        1075,
+        1098,
+        1133,
+        848,
+        1045,
+        882,
+        1022,
+        1034,
+        885,
+        646,
+        1011,
+        970,
+        1339,
+        1416,
+        752,
+        768,
+        707,
+        783,
+        671,
+        698,
+        678,
+        830,
+        659,
+        595,
+        869,
+        819,
+        795,
+        950,
+        650,
+        769,
+        562,
+        597,
+        538,
+        905,
+        554,
+        1347,
+        563,
+        717,
+        539,
+        516,
+        602,
+        487,
+        473,
+        498,
+        534,
+        454,
+        482,
+        439,
+        458,
+        467,
+        451,
+        553,
+        481,
+        461,
+        478,
+        500,
+        476,
+        447,
+        381,
+        474,
+        524,
+        402,
+        421,
+        409,
+        405,
+        367,
+        324,
+        417,
+        417,
+        444,
+        467,
+        507,
+        411,
+        406,
+        365,
+        405,
+        472,
+        391,
+        425,
+        449,
+        437,
+        344,
+        413,
+        393,
+        497,
+        392,
+        406,
+        452,
+        695,
+        476,
+        503,
+        484,
+        431,
+        333,
+        452,
+        538,
+        572,
+        443,
+        382,
+        423,
+        402,
+        384,
+        403,
+        429,
+        443,
+        355,
+        434,
+        416,
+        385,
+        410,
+        460,
+        404,
+        436,
+        361,
+        354,
+        381,
+        403,
+        376,
+        402,
+        407,
+        447,
+        411,
+        374,
+        379,
+        520,
+        396,
+        418,
+        385,
+        980,
+        489,
+        373,
+        584,
+        478,
+        401,
+        372,
+        409,
+        496,
+        398,
+        458,
+        411,
+        442,
+        375,
+        459,
+        426,
+        600,
+        465,
+        418,
+        450,
+        623,
+        402,
+        466,
+        67838
+    ],
+    "byteentropy": [
+        12288,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1892,
+        25,
+        39,
+        38,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        52,
+        1847,
+        14,
+        15,
+        8,
+        20,
+        25,
+        24,
+        13,
+        23,
+        0,
+        2,
+        2,
+        8,
+        2,
+        3,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        3055,
+        68,
+        92,
+        50,
+        73,
+        108,
+        142,
+        95,
+        107,
+        0,
+        14,
+        20,
+        35,
+        8,
+        12,
+        217,
+        9294,
+        6142,
+        1408,
+        566,
+        179,
+        192,
+        297,
+        167,
+        196,
+        13,
+        20,
+        37,
+        62,
+        33,
+        35,
+        3887,
+        6765,
+        3722,
+        3023,
+        2421,
+        453,
+        183,
+        1106,
+        567,
+        37,
+        11,
+        53,
+        12,
+        8,
+        11,
+        15,
+        4141,
+        16407,
+        12995,
+        11484,
+        7159,
+        1716,
+        814,
+        2062,
+        975,
+        263,
+        127,
+        42,
+        33,
+        48,
+        27,
+        35,
+        15445,
+        16902,
+        13975,
+        8288,
+        5266,
+        4104,
+        1862,
+        1930,
+        1029,
+        682,
+        403,
+        199,
+        141,
+        184,
+        115,
+        108,
+        16492,
+        40186,
+        44609,
+        21792,
+        16124,
+        10237,
+        7334,
+        4571,
+        2835,
+        1867,
+        1395,
+        1284,
+        981,
+        903,
+        637,
+        396,
+        51697,
+        9470,
+        11145,
+        8865,
+        11787,
+        11534,
+        7294,
+        4798,
+        3085,
+        1847,
+        857,
+        489,
+        350,
+        353,
+        253,
+        212,
+        23917,
+        7995,
+        6173,
+        4141,
+        4551,
+        4960,
+        4458,
+        4437,
+        4094,
+        3753,
+        1788,
+        910,
+        655,
+        992,
+        495,
+        952,
+        15182,
+        11040,
+        3310,
+        2222,
+        2518,
+        4245,
+        3537,
+        2569,
+        3148,
+        4909,
+        933,
+        1366,
+        904,
+        2005,
+        958,
+        2314,
+        7270,
+        10200,
+        9627,
+        9751,
+        10048,
+        9526,
+        9642,
+        9603,
+        10673,
+        9585,
+        10001,
+        9271,
+        10050,
+        9988,
+        10178,
+        10633,
+        10968
+    ],
+    "strings": {
+        "numstrings": 631,
+        "avlength": 9.827258320126782,
+        "printabledist": [
+            72,
+            26,
+            73,
+            18,
+            30,
+            23,
+            32,
+            27,
+            47,
+            20,
+            15,
+            25,
+            16,
+            47,
+            43,
+            46,
+            30,
+            34,
+            39,
+            42,
+            37,
+            31,
+            41,
+            29,
+            31,
+            34,
+            39,
+            20,
+            56,
+            57,
+            46,
+            30,
+            41,
+            56,
+            33,
+            81,
+            61,
+            68,
+            61,
+            66,
+            49,
+            77,
+            22,
+            37,
+            50,
+            50,
+            39,
+            43,
+            74,
+            31,
+            60,
+            105,
+            49,
+            26,
+            57,
+            145,
+            24,
+            18,
+            34,
+            33,
+            34,
+            34,
+            35,
+            28,
+            16,
+            190,
+            68,
+            118,
+            135,
+            451,
+            62,
+            63,
+            55,
+            213,
+            44,
+            40,
+            199,
+            101,
+            185,
+            202,
+            87,
+            26,
+            205,
+            186,
+            290,
+            101,
+            48,
+            54,
+            54,
+            79,
+            25,
+            34,
+            19,
+            32,
+            25,
+            17
+        ],
+        "printables": 6201,
+        "entropy": 6.097565650939941,
+        "string_counts": {
+            "clipboard": 4,
+            "command": 1,
+            "create": 12,
+            "delete": 5,
+            "directory": 5,
+            "disk": 2,
+            "dos_msg": 1,
+            "enum": 2,
+            "environment": 2,
+            "exit": 3,
+            "file": 24,
+            "install": 1,
+            "ipv4_addr": 1,
+            "module": 3,
+            "privilege": 3,
+            "process": 6,
+            "security": 2,
+            "shell": 3,
+            "system": 5,
+            "thread": 1,
+            "token": 3,
+            "window": 19
+        }
+    },
+    "general": {
+        "size": 395677,
+        "entropy": 6.779310524575175,
+        "is_pe": 1,
+        "start_bytes": [
+            77,
+            90,
+            144,
+            0
+        ]
+    },
+    "header": {
+        "coff": {
+            "timestamp": 1544912774,
+            "machine": "IMAGE_FILE_MACHINE_I386",
+            "number_of_sections": 5,
+            "number_of_symbols": 0,
+            "sizeof_optional_header": 224,
+            "pointer_to_symbol_table": 0,
+            "characteristics": [
+                "RELOCS_STRIPPED",
+                "EXECUTABLE_IMAGE",
+                "LINE_NUMS_STRIPPED",
+                "LOCAL_SYMS_STRIPPED",
+                "32BIT_MACHINE"
+            ]
+        },
+        "optional": {
+            "magic": 267,
+            "subsystem": "IMAGE_SUBSYSTEM_WINDOWS_GUI",
+            "major_image_version": 6,
+            "minor_image_version": 0,
+            "major_linker_version": 6,
+            "minor_linker_version": 0,
+            "major_operating_system_version": 4,
+            "minor_operating_system_version": 0,
+            "major_subsystem_version": 4,
+            "minor_subsystem_version": 0,
+            "sizeof_code": 26624,
+            "sizeof_headers": 1024,
+            "sizeof_image": 1802240,
+            "sizeof_initialized_data": 473088,
+            "sizeof_uninitialized_data": 16384,
+            "sizeof_stack_reserve": 1048576,
+            "sizeof_stack_commit": 4096,
+            "sizeof_heap_reserve": 1048576,
+            "sizeof_heap_commit": 4096,
+            "address_of_entrypoint": 13199,
+            "base_of_code": 4096,
+            "base_of_data": 0,
+            "image_base": 4194304,
+            "section_alignment": 4096,
+            "checksum": 0,
+            "number_of_rvas_and_sizes": 16,
+            "dll_characteristics": [
+                "DYNAMIC_BASE",
+                "NX_COMPAT",
+                "NO_SEH",
+                "TERMINAL_SERVER_AWARE"
+            ]
+        },
+        "dos": {
+            "e_magic": 23117,
+            "e_cblp": 144,
+            "e_cp": 3,
+            "e_crlc": 0,
+            "e_cparhdr": 4,
+            "e_minalloc": 0,
+            "e_maxalloc": 65535,
+            "e_ss": 0,
+            "e_sp": 184,
+            "e_csum": 0,
+            "e_ip": 0,
+            "e_cs": 0,
+            "e_lfarlc": 64,
+            "e_ovno": 0,
+            "e_oemid": 0,
+            "e_oeminfo": 0,
+            "e_lfanew": 216
+        }
+    },
+    "section": {
+        "entry": ".text",
+        "sections": [
+            {
+                "name": ".text",
+                "size": 26624,
+                "entropy": 6.450282348506287,
+                "vsize": 26151,
+                "size_ratio": 0.06728720648407666,
+                "vsize_ratio": 1.018087262437383,
+                "props": [
+                    "CNT_CODE",
+                    "MEM_EXECUTE",
+                    "MEM_READ"
+                ]
+            },
+            {
+                "name": ".rdata",
+                "size": 5632,
+                "entropy": 5.025178929113415,
+                "vsize": 5282,
+                "size_ratio": 0.01423383214086237,
+                "vsize_ratio": 1.066262779250284,
+                "props": [
+                    "CNT_INITIALIZED_DATA",
+                    "MEM_READ"
+                ]
+            },
+            {
+                "name": ".data",
+                "size": 1536,
+                "entropy": 4.037117731448378,
+                "vsize": 462840,
+                "size_ratio": 0.003881954220235192,
+                "vsize_ratio": 0.003318641431164117,
+                "props": [
+                    "CNT_INITIALIZED_DATA",
+                    "MEM_READ",
+                    "MEM_WRITE"
+                ]
+            },
+            {
+                "name": ".ndata",
+                "size": 0,
+                "entropy": 0.0,
+                "vsize": 1015808,
+                "size_ratio": 0.0,
+                "vsize_ratio": 0.0,
+                "props": [
+                    "CNT_UNINITIALIZED_DATA",
+                    "MEM_READ",
+                    "MEM_WRITE"
+                ]
+            },
+            {
+                "name": ".rsrc",
+                "size": 279552,
+                "entropy": 6.014363243196306,
+                "vsize": 279072,
+                "size_ratio": 0.7065156680828049,
+                "vsize_ratio": 1.00171998624011,
+                "props": [
+                    "CNT_INITIALIZED_DATA",
+                    "MEM_READ"
+                ]
+            }
+        ],
+        "overlay": {
+            "size": 81309,
+            "size_ratio": 0.20549336959186407,
+            "entropy": 7.992156454113764
+        }
+    },
+    "imports": {
+        "KERNEL32.dll": [
+            "SetEnvironmentVariableW",
+            "SetFileAttributesW",
+            "Sleep",
+            "GetTickCount",
+            "GetFileSize",
+            "GetModuleFileNameW",
+            "GetCurrentProcess",
+            "CopyFileW",
+            "SetCurrentDirectoryW",
+            "GetFileAttributesW",
+            "GetWindowsDirectoryW",
+            "GetTempPathW",
+            "GetCommandLineW",
+            "GetVersion",
+            "SetErrorMode",
+            "lstrlenW",
+            "lstrcpynW",
+            "GetDiskFreeSpaceW",
+            "ExitProcess",
+            "GetShortPathNameW",
+            "CreateThread",
+            "GetLastError",
+            "CreateDirectoryW",
+            "CreateProcessW",
+            "RemoveDirectoryW",
+            "lstrcmpiA",
+            "CreateFileW",
+            "GetTempFileNameW",
+            "WriteFile",
+            "lstrcpyA",
+            "MoveFileExW",
+            "lstrcatW",
+            "GetSystemDirectoryW",
+            "GetProcAddress",
+            "GetModuleHandleA",
+            "GetExitCodeProcess",
+            "WaitForSingleObject",
+            "lstrcmpiW",
+            "MoveFileW",
+            "GetFullPathNameW",
+            "SetFileTime",
+            "SearchPathW",
+            "CompareFileTime",
+            "lstrcmpW",
+            "CloseHandle",
+            "ExpandEnvironmentStringsW",
+            "GlobalFree",
+            "GlobalLock",
+            "GlobalUnlock",
+            "GlobalAlloc",
+            "FindFirstFileW",
+            "FindNextFileW",
+            "DeleteFileW",
+            "SetFilePointer",
+            "ReadFile",
+            "FindClose",
+            "lstrlenA",
+            "MulDiv",
+            "MultiByteToWideChar",
+            "WideCharToMultiByte",
+            "GetPrivateProfileStringW",
+            "WritePrivateProfileStringW",
+            "FreeLibrary",
+            "LoadLibraryExW",
+            "GetModuleHandleW"
+        ],
+        "USER32.dll": [
+            "GetSystemMenu",
+            "SetClassLongW",
+            "EnableMenuItem",
+            "IsWindowEnabled",
+            "SetWindowPos",
+            "GetSysColor",
+            "GetWindowLongW",
+            "SetCursor",
+            "LoadCursorW",
+            "CheckDlgButton",
+            "GetMessagePos",
+            "LoadBitmapW",
+            "CallWindowProcW",
+            "IsWindowVisible",
+            "CloseClipboard",
+            "SetClipboardData",
+            "EmptyClipboard",
+            "OpenClipboard",
+            "ScreenToClient",
+            "GetWindowRect",
+            "GetDlgItem",
+            "GetSystemMetrics",
+            "SetDlgItemTextW",
+            "GetDlgItemTextW",
+            "MessageBoxIndirectW",
+            "CharPrevW",
+            "CharNextA",
+            "wsprintfA",
+            "DispatchMessageW",
+            "PeekMessageW",
+            "ReleaseDC",
+            "EnableWindow",
+            "InvalidateRect",
+            "SendMessageW",
+            "DefWindowProcW",
+            "BeginPaint",
+            "GetClientRect",
+            "FillRect",
+            "DrawTextW",
+            "EndDialog",
+            "RegisterClassW",
+            "SystemParametersInfoW",
+            "CreateWindowExW",
+            "GetClassInfoW",
+            "DialogBoxParamW",
+            "CharNextW",
+            "ExitWindowsEx",
+            "DestroyWindow",
+            "GetDC",
+            "SetTimer",
+            "SetWindowTextW",
+            "LoadImageW",
+            "SetForegroundWindow",
+            "ShowWindow",
+            "IsWindow",
+            "SetWindowLongW",
+            "FindWindowExW",
+            "TrackPopupMenu",
+            "AppendMenuW",
+            "CreatePopupMenu",
+            "EndPaint",
+            "CreateDialogParamW",
+            "SendMessageTimeoutW",
+            "wsprintfW",
+            "PostQuitMessage"
+        ],
+        "GDI32.dll": [
+            "SelectObject",
+            "SetBkMode",
+            "CreateFontIndirectW",
+            "SetTextColor",
+            "DeleteObject",
+            "GetDeviceCaps",
+            "CreateBrushIndirect",
+            "SetBkColor"
+        ],
+        "SHELL32.dll": [
+            "SHGetSpecialFolderLocation",
+            "ShellExecuteExW",
+            "SHGetPathFromIDListW",
+            "SHBrowseForFolderW",
+            "SHGetFileInfoW",
+            "SHFileOperationW"
+        ],
+        "ADVAPI32.dll": [
+            "AdjustTokenPrivileges",
+            "RegCreateKeyExW",
+            "RegOpenKeyExW",
+            "SetFileSecurityW",
+            "OpenProcessToken",
+            "LookupPrivilegeValueW",
+            "RegEnumValueW",
+            "RegDeleteKeyW",
+            "RegDeleteValueW",
+            "RegCloseKey",
+            "RegSetValueExW",
+            "RegQueryValueExW",
+            "RegEnumKeyW"
+        ],
+        "COMCTL32.dll": [
+            "ImageList_Create",
+            "ImageList_AddMasked",
+            "ImageList_Destroy",
+            "COMCTL32.dll:ordinal17"
+        ],
+        "ole32.dll": [
+            "OleUninitialize",
+            "OleInitialize",
+            "CoTaskMemFree",
+            "CoCreateInstance"
+        ]
+    },
+    "exports": [],
+    "datadirectories": [
+        {
+            "has_relocs": 0,
+            "has_dynamic_relocs": 0
+        },
+        {
+            "name": "EXPORT",
+            "size": 0,
+            "virtual_address": 0
+        },
+        {
+            "name": "IMPORT",
+            "size": 160,
+            "virtual_address": 34320
+        },
+        {
+            "name": "RESOURCE",
+            "size": 279072,
+            "virtual_address": 1519616
+        },
+        {
+            "name": "EXCEPTION",
+            "size": 0,
+            "virtual_address": 0
+        },
+        {
+            "name": "SECURITY",
+            "size": 0,
+            "virtual_address": 0
+        },
+        {
+            "name": "BASERELOC",
+            "size": 0,
+            "virtual_address": 0
+        },
+        {
+            "name": "DEBUG",
+            "size": 0,
+            "virtual_address": 0
+        },
+        {
+            "name": "COPYRIGHT",
+            "size": 0,
+            "virtual_address": 0
+        },
+        {
+            "name": "GLOBALPTR",
+            "size": 0,
+            "virtual_address": 0
+        },
+        {
+            "name": "TLS",
+            "size": 0,
+            "virtual_address": 0
+        },
+        {
+            "name": "LOAD_CONFIG",
+            "size": 0,
+            "virtual_address": 0
+        },
+        {
+            "name": "BOUND_IMPORT",
+            "size": 0,
+            "virtual_address": 0
+        },
+        {
+            "name": "IAT",
+            "size": 688,
+            "virtual_address": 32768
+        },
+        {
+            "name": "DELAY_IMPORT",
+            "size": 0,
+            "virtual_address": 0
+        },
+        {
+            "name": "COM_DESCRIPTOR",
+            "size": 0,
+            "virtual_address": 0
+        },
+        {
+            "name": "RESERVED",
+            "size": 0,
+            "virtual_address": 0
+        }
+    ],
+    "richheader": [
+        6229955,
+        2,
+        65536,
+        165,
+        6098883,
+        15,
+        3154772,
+        10,
+        394951,
+        1
+    ],
+    "authenticode": {
+        "num_certs": 0,
+        "self_signed": 0,
+        "empty_program_name": 0,
+        "no_countersigner": 0,
+        "parse_error": 0,
+        "chain_max_depth": 0,
+        "latest_signing_time": 0,
+        "signing_time_diff": 0
+    },
+    "pefilewarnings": [
+        "Byte 0x..."
+    ],
+    "week_id": 63,
+    "caps": [
+        {
+            "Capability": "Find graphical window",
+            "Namespace": "host-interaction/gui/window/find",
+            "Addrs": []
+        },
+        {
+            "Capability": "Modify access privileges",
+            "Namespace": "host-interaction/process/modify",
+            "Addrs": []
+        },
+        {
+            "Capability": "Link function at runtime on windows",
+            "Namespace": "linking/runtime-linking",
+            "Addrs": []
+        },
+        {
+            "Capability": "Set file attributes",
+            "Namespace": "host-interaction/file-system/meta",
+            "Addrs": [
+                "0x401434",
+                "0x405984",
+                "0x405d8b"
+            ]
+        },
+        {
+            "Capability": "Get file attributes",
+            "Namespace": "host-interaction/file-system/meta",
+            "Addrs": [
+                "0x401434",
+                "0x4039aa",
+                "0x405c97",
+                "0x405d8b",
+                "0x405db0"
+            ]
+        },
+        {
+            "Capability": "Get file system object information",
+            "Namespace": "host-interaction/file-system",
+            "Addrs": [
+                "0x40338f"
+            ]
+        },
+        {
+            "Capability": "Create thread",
+            "Namespace": "host-interaction/thread/create",
+            "Addrs": [
+                "0x405461"
+            ]
+        },
+        {
+            "Capability": "Create process on windows",
+            "Namespace": "host-interaction/process/create",
+            "Addrs": [
+                "0x4058a3",
+                "0x4058e6"
+            ]
+        },
+        {
+            "Capability": "Encode data using xor",
+            "Namespace": "data-manipulation/encoding/xor",
+            "Addrs": [
+                "0x406787",
+                "0x406787"
+            ]
+        },
+        {
+            "Capability": "Set registry value",
+            "Namespace": "host-interaction/registry/create",
+            "Addrs": [
+                "0x401434"
+            ]
+        },
+        {
+            "Capability": "Read .ini file",
+            "Namespace": "host-interaction/file-system/read",
+            "Addrs": [
+                "0x401434"
+            ]
+        },
+        {
+            "Capability": "Read file on windows",
+            "Namespace": "host-interaction/file-system/read",
+            "Addrs": [
+                "0x401434"
+            ]
+        },
+        {
+            "Capability": "Query or enumerate registry key",
+            "Namespace": "host-interaction/registry",
+            "Addrs": [
+                "0x401434"
+            ]
+        },
+        {
+            "Capability": "Copy file",
+            "Namespace": "host-interaction/file-system/copy",
+            "Addrs": [
+                "0x401434",
+                "0x40338f"
+            ]
+        },
+        {
+            "Capability": "Move file",
+            "Namespace": "host-interaction/file-system/move",
+            "Addrs": [
+                "0x401434",
+                "0x406080"
+            ]
+        },
+        {
+            "Capability": "Query or enumerate registry value",
+            "Namespace": "host-interaction/registry",
+            "Addrs": [
+                "0x401434",
+                "0x406188"
+            ]
+        },
+        {
+            "Capability": "Delete registry value",
+            "Namespace": "host-interaction/registry/delete",
+            "Addrs": [
+                "0x401434"
+            ]
+        },
+        {
+            "Capability": "Create shortcut via ishelllink",
+            "Namespace": "persistence",
+            "Addrs": [
+                "0x401434"
+            ]
+        },
+        {
+            "Capability": "Query environment variable",
+            "Namespace": "host-interaction/environment-variable",
+            "Addrs": [
+                "0x401434"
+            ]
+        },
+        {
+            "Capability": "Enumerate files on windows",
+            "Namespace": "host-interaction/file-system/files/list",
+            "Addrs": [
+                "0x401434",
+                "0x4059cc"
+            ]
+        },
+        {
+            "Capability": "Set current directory",
+            "Namespace": "host-interaction/file-system",
+            "Addrs": [
+                "0x401434",
+                "0x40338f"
+            ]
+        },
+        {
+            "Capability": "Delete file",
+            "Namespace": "host-interaction/file-system/delete",
+            "Addrs": [
+                "0x401434",
+                "0x40338f",
+                "0x405984",
+                "0x4059cc"
+            ]
+        },
+        {
+            "Capability": "Delete registry key",
+            "Namespace": "host-interaction/registry/delete",
+            "Addrs": []
+        },
+        {
+            "Capability": "Get file size",
+            "Namespace": "host-interaction/file-system/meta",
+            "Addrs": [
+                "0x402edd",
+                "0x405f06"
+            ]
+        },
+        {
+            "Capability": "Check for time delay via gettickcount",
+            "Namespace": "anti-analysis/anti-debugging/debugger-detection",
+            "Addrs": [
+                "0x403116"
+            ]
+        },
+        {
+            "Capability": "Get common file path",
+            "Namespace": "host-interaction/file-system",
+            "Addrs": [
+                "0x40338f",
+                "0x405ddf",
+                "0x4062dc",
+                "0x406624"
+            ]
+        },
+        {
+            "Capability": "Check os version",
+            "Namespace": "host-interaction/os/version",
+            "Addrs": [
+                "0x40338f"
+            ]
+        },
+        {
+            "Capability": "Shutdown system",
+            "Namespace": "host-interaction/os",
+            "Addrs": [
+                "0x40338f"
+            ]
+        },
+        {
+            "Capability": "Accept command line arguments",
+            "Namespace": "host-interaction/cli",
+            "Addrs": [
+                "0x40338f"
+            ]
+        },
+        {
+            "Capability": "Terminate process",
+            "Namespace": "host-interaction/process/terminate",
+            "Addrs": [
+                "0x40338f"
+            ]
+        },
+        {
+            "Capability": "Set environment variable",
+            "Namespace": "host-interaction/environment-variable",
+            "Addrs": [
+                "0x40338f"
+            ]
+        },
+        {
+            "Capability": "Check if file exists",
+            "Namespace": "host-interaction/file-system/exists",
+            "Addrs": [
+                "0x4039aa",
+                "0x405c97",
+                "0x405d8b"
+            ]
+        },
+        {
+            "Capability": "Get disk size",
+            "Namespace": "host-interaction/hardware/storage",
+            "Addrs": [
+                "0x404722"
+            ]
+        },
+        {
+            "Capability": "Capture webcam image",
+            "Namespace": "collection/webcam",
+            "Addrs": [
+                "0x404c9e"
+            ]
+        },
+        {
+            "Capability": "Open clipboard",
+            "Namespace": "host-interaction/clipboard",
+            "Addrs": [
+                "0x405461"
+            ]
+        },
+        {
+            "Capability": "Write clipboard data",
+            "Namespace": "host-interaction/clipboard",
+            "Addrs": [
+                "0x405461"
+            ]
+        },
+        {
+            "Capability": "Get graphical window text",
+            "Namespace": "host-interaction/gui/window/get-text",
+            "Addrs": [
+                "0x405461"
+            ]
+        },
+        {
+            "Capability": "Create directory",
+            "Namespace": "host-interaction/file-system/create",
+            "Addrs": [
+                "0x4057f1"
+            ]
+        },
+        {
+            "Capability": "Delete directory",
+            "Namespace": "host-interaction/file-system/delete",
+            "Addrs": [
+                "0x405984"
+            ]
+        },
+        {
+            "Capability": "Enumerate files recursively",
+            "Namespace": "host-interaction/file-system/files/list",
+            "Addrs": [
+                "0x4059cc"
+            ]
+        },
+        {
+            "Capability": "Write file on windows",
+            "Namespace": "host-interaction/file-system/write",
+            "Addrs": []
+        },
+        {
+            "Capability": "Hash data with crc32",
+            "Namespace": "data-manipulation/checksum/crc32",
+            "Addrs": [
+                "0x406787"
+            ]
+        },
+        {
+            "Capability": "Packaged as a nsis installer",
+            "Namespace": "executable/installer/nsis",
+            "Addrs": []
+        },
+        {
+            "Capability": "(internal) installer file limitation",
+            "Namespace": "internal/limitation/static",
+            "Addrs": []
+        }
+    ],
+    "ttps": [
+        {
+            "Tactic": "DISCOVERY",
+            "Technique": "Application Window Discovery [T1010]"
+        },
+        {
+            "Tactic": "PRIVILEGE ESCALATION",
+            "Technique": "Access Token Manipulation [T1134]"
+        },
+        {
+            "Tactic": "EXECUTION",
+            "Technique": "Shared Modules [T1129]"
+        },
+        {
+            "Tactic": "DEFENSE EVASION",
+            "Technique": "File and Directory Permissions Modification [T1222]"
+        },
+        {
+            "Tactic": "DISCOVERY",
+            "Technique": "File and Directory Discovery [T1083]"
+        },
+        {
+            "Tactic": "DEFENSE EVASION",
+            "Technique": "Obfuscated Files or Information [T1027]"
+        },
+        {
+            "Tactic": "DISCOVERY",
+            "Technique": "Query Registry [T1012]"
+        },
+        {
+            "Tactic": "DISCOVERY",
+            "Technique": "Query Registry [T1012]"
+        },
+        {
+            "Tactic": "DEFENSE EVASION",
+            "Technique": "Modify Registry [T1112]"
+        },
+        {
+            "Tactic": "PERSISTENCE",
+            "Technique": "Boot or Logon Autostart Execution [T1547.009]"
+        },
+        {
+            "Tactic": "DISCOVERY",
+            "Technique": "System Information Discovery [T1082]"
+        },
+        {
+            "Tactic": "DISCOVERY",
+            "Technique": "File and Directory Discovery [T1083]"
+        },
+        {
+            "Tactic": "DEFENSE EVASION",
+            "Technique": "Modify Registry [T1112]"
+        },
+        {
+            "Tactic": "DISCOVERY",
+            "Technique": "File and Directory Discovery [T1083]"
+        },
+        {
+            "Tactic": "DISCOVERY",
+            "Technique": "File and Directory Discovery [T1083]"
+        },
+        {
+            "Tactic": "DISCOVERY",
+            "Technique": "System Information Discovery [T1082]"
+        },
+        {
+            "Tactic": "IMPACT",
+            "Technique": "System Shutdown/Reboot [T1529]"
+        },
+        {
+            "Tactic": "EXECUTION",
+            "Technique": "Command and Scripting Interpreter [T1059]"
+        },
+        {
+            "Tactic": "DISCOVERY",
+            "Technique": "File and Directory Discovery [T1083]"
+        },
+        {
+            "Tactic": "DISCOVERY",
+            "Technique": "System Information Discovery [T1082]"
+        },
+        {
+            "Tactic": "COLLECTION",
+            "Technique": "Video Capture [T1125]"
+        },
+        {
+            "Tactic": "COLLECTION",
+            "Technique": "Clipboard Data [T1115]"
+        },
+        {
+            "Tactic": "DISCOVERY",
+            "Technique": "File and Directory Discovery [T1083]"
+        }
+    ],
+    "mbc": [
+        {
+            "Objective": "FILE SYSTEM",
+            "Behavior": "Create File [C0016]"
+        },
+        {
+            "Objective": "DATA",
+            "Behavior": "Modulo [C0058]"
+        },
+        {
+            "Objective": "ANTI-BEHAVIORAL ANALYSIS",
+            "Behavior": "Dynamic Analysis Evasion [B0003.003]"
+        },
+        {
+            "Objective": "FILE SYSTEM",
+            "Behavior": "Set File Attributes [C0050]"
+        },
+        {
+            "Objective": "FILE SYSTEM",
+            "Behavior": "Get File Attributes [C0049]"
+        },
+        {
+            "Objective": "PROCESS",
+            "Behavior": "Create Thread [C0038]"
+        },
+        {
+            "Objective": "PROCESS",
+            "Behavior": "Create Process [C0017]"
+        },
+        {
+            "Objective": "OPERATING SYSTEM",
+            "Behavior": "Registry [C0036.004]"
+        },
+        {
+            "Objective": "OPERATING SYSTEM",
+            "Behavior": "Registry [C0036.003]"
+        },
+        {
+            "Objective": "DEFENSE EVASION",
+            "Behavior": "Obfuscated Files or Information [E1027.m02]"
+        },
+        {
+            "Objective": "DATA",
+            "Behavior": "Encode Data [C0026.002]"
+        },
+        {
+            "Objective": "OPERATING SYSTEM",
+            "Behavior": "Registry [C0036.001]"
+        },
+        {
+            "Objective": "FILE SYSTEM",
+            "Behavior": "Read File [C0051]"
+        },
+        {
+            "Objective": "FILE SYSTEM",
+            "Behavior": "Read File [C0051]"
+        },
+        {
+            "Objective": "OPERATING SYSTEM",
+            "Behavior": "Registry [C0036.005]"
+        },
+        {
+            "Objective": "FILE SYSTEM",
+            "Behavior": "Copy File [C0045]"
+        },
+        {
+            "Objective": "FILE SYSTEM",
+            "Behavior": "Move File [C0063]"
+        },
+        {
+            "Objective": "OPERATING SYSTEM",
+            "Behavior": "Registry [C0036.006]"
+        },
+        {
+            "Objective": "OPERATING SYSTEM",
+            "Behavior": "Registry [C0036.007]"
+        },
+        {
+            "Objective": "DISCOVERY",
+            "Behavior": "System Information Discovery [E1082]"
+        },
+        {
+            "Objective": "DISCOVERY",
+            "Behavior": "File and Directory Discovery [E1083]"
+        },
+        {
+            "Objective": "FILE SYSTEM",
+            "Behavior": "Delete File [C0047]"
+        },
+        {
+            "Objective": "OPERATING SYSTEM",
+            "Behavior": "Registry [C0036.002]"
+        },
+        {
+            "Objective": "DISCOVERY",
+            "Behavior": "File and Directory Discovery [E1083]"
+        },
+        {
+            "Objective": "ANTI-BEHAVIORAL ANALYSIS",
+            "Behavior": "Debugger Detection [B0001.032]"
+        },
+        {
+            "Objective": "DISCOVERY",
+            "Behavior": "File and Directory Discovery [E1083]"
+        },
+        {
+            "Objective": "DISCOVERY",
+            "Behavior": "System Information Discovery [E1082]"
+        },
+        {
+            "Objective": "EXECUTION",
+            "Behavior": "Command and Scripting Interpreter [E1059]"
+        },
+        {
+            "Objective": "PROCESS",
+            "Behavior": "Terminate Process [C0018]"
+        },
+        {
+            "Objective": "OPERATING SYSTEM",
+            "Behavior": "Environment Variable [C0034.001]"
+        },
+        {
+            "Objective": "DISCOVERY",
+            "Behavior": "File and Directory Discovery [E1083]"
+        },
+        {
+            "Objective": "DISCOVERY",
+            "Behavior": "System Information Discovery [E1082]"
+        },
+        {
+            "Objective": "IMPACT",
+            "Behavior": "Clipboard Modification [E1510]"
+        },
+        {
+            "Objective": "DISCOVERY",
+            "Behavior": "Application Window Discovery [E1010]"
+        },
+        {
+            "Objective": "FILE SYSTEM",
+            "Behavior": "Create Directory [C0046]"
+        },
+        {
+            "Objective": "FILE SYSTEM",
+            "Behavior": "Delete Directory [C0048]"
+        },
+        {
+            "Objective": "DISCOVERY",
+            "Behavior": "File and Directory Discovery [E1083]"
+        },
+        {
+            "Objective": "FILE SYSTEM",
+            "Behavior": "Writes File [C0052]"
+        },
+        {
+            "Objective": "DATA",
+            "Behavior": "Checksum [C0032.001]"
+        }
+    ]
+}
