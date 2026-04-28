@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analysis — {{ sha256[:12] }}…</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0c0f;
+      --surface: #111418;
+      --border: #1e2530;
+      --accent: #00ff9d;
+      --accent-dim: #00cc7a;
+      --danger: #ff4444;
+      --text: #c8d0dc;
+      --text-dim: #5a6478;
+      --mono: 'Share Tech Mono', monospace;
+      --sans: 'Syne', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      min-height: 100vh;
+      padding: 48px 24px;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,255,157,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,255,157,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .back {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      text-decoration: none;
+      margin-bottom: 36px;
+      transition: color 0.15s;
+    }
+    .back:hover { color: var(--accent); }
+
+    .meta {
+      margin-bottom: 32px;
+    }
+    .meta h1 {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    .meta .hash {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      word-break: break-all;
+    }
+
+    /* State panel */
+    #state {
+      padding: 36px;
+      border-radius: 8px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
+
+    /* Pending */
+    .pending-wrap { text-align: center; }
+    .spinner {
+      display: inline-block;
+      width: 36px;
+      height: 36px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+      margin-bottom: 20px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .pending-wrap h2 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+    .pending-wrap p {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--text-dim);
+    }
+
+    /* Success */
+    .result-html {
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      line-height: 1.7;
+      color: var(--text);
+    }
+    .result-html h1, .result-html h2, .result-html h3 { color: #fff; margin: 1em 0 0.4em; }
+    .result-html p { margin-bottom: 0.6em; }
+    .result-html code { background: rgba(255,255,255,0.06); padding: 1px 6px; border-radius: 3px; }
+    .result-html table { width: 100%; border-collapse: collapse; margin: 1em 0; }
+    .result-html th, .result-html td { padding: 8px 12px; border: 1px solid var(--border); text-align: left; }
+    .result-html th { color: var(--text-dim); font-weight: 400; }
+
+    /* Failed */
+    .failed-wrap h2 {
+      font-size: 1rem;
+      color: var(--danger);
+      margin-bottom: 12px;
+    }
+    .error-box {
+      background: rgba(255,68,68,0.06);
+      border: 1px solid rgba(255,68,68,0.2);
+      border-radius: 6px;
+      padding: 16px;
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--danger);
+      white-space: pre-wrap;
+      margin-bottom: 20px;
+    }
+    .btn-retry {
+      padding: 10px 28px;
+      background: transparent;
+      border: 1.5px solid var(--danger);
+      color: var(--danger);
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .btn-retry:hover {
+      background: var(--danger);
+      color: #000;
+    }
+    .btn-retry:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .notify {
+      margin-top: 16px;
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="/">← Back to home</a>
+
+  <div class="meta">
+    <h1>Sample Analysis</h1>
+    <div class="hash">{{ sha256 }}</div>
+  </div>
+
+  <div id="state">
+    <!-- Filled by JS -->
+  </div>
+</div>
+
+<script>
+  const SHA256 = "{{ sha256 }}";
+  const stateEl = document.getElementById('state');
+  let pollTimer = null;
+
+  function renderPending() {
+    stateEl.innerHTML = `
+      <div class="pending-wrap">
+        <div class="spinner"></div>
+        <h2>Analyzing…</h2>
+        <p>This file is being processed. The page will update automatically.</p>
+      </div>`;
+  }
+
+  function renderSuccess(html) {
+    document.open();
+    document.write(html);
+    document.close();
+  }
+
+  function renderFailed(msg) {
+    stateEl.innerHTML = `
+      <div class="failed-wrap">
+        <h2>Analysis Failed</h2>
+        <div class="error-box">${escHtml(msg)}</div>
+        <button class="btn-retry" id="retry-btn">Retry Analysis</button>
+        <div class="notify" id="retry-notify" style="display:none"></div>
+      </div>`;
+    document.getElementById('retry-btn').addEventListener('click', doRetry);
+  }
+
+  function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  async function poll() {
+    try {
+      const res = await fetch(`/status/${SHA256}`);
+      if (!res.ok) return;
+      const data = await res.json();
+
+      if (data.status === 'Pending') {
+        renderPending();
+        pollTimer = setTimeout(poll, 3000);
+      } else if (data.status === 'Success') {
+        renderSuccess(data.result_html);
+      } else if (data.status === 'Failed') {
+        renderFailed(data.error_message || 'Unknown error');
+      }
+    } catch {
+      pollTimer = setTimeout(poll, 5000);
+    }
+  }
+
+  async function doRetry() {
+    const btn = document.getElementById('retry-btn');
+    const notify = document.getElementById('retry-notify');
+    btn.disabled = true;
+    notify.style.display = 'block';
+    notify.textContent = 'Submitting retry…';
+
+    try {
+      const res = await fetch(`/retry/${SHA256}`, { method: 'POST' });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ detail: res.statusText }));
+        throw new Error(err.detail);
+      }
+      renderPending();
+      pollTimer = setTimeout(poll, 3000);
+    } catch (err) {
+      btn.disabled = false;
+      notify.textContent = `Error: ${err.message}`;
+    }
+  }
+
+  // Start
+  const initialStatus = "{{ status }}";
+  if (initialStatus === 'Success' || initialStatus === 'Failed') {
+    // Fetch full data immediately (template only has status)
+    poll();
+  } else {
+    renderPending();
+    pollTimer = setTimeout(poll, 3000);
+  }
+</script>
+</body>
+</html>

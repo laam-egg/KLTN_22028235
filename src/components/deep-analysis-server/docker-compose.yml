@@ -1,0 +1,39 @@
+services:
+
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root12345678
+      MYSQL_DATABASE:      database1
+      MYSQL_USER:          user1
+      MYSQL_PASSWORD:      12345678
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot12345678"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  app:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      MYSQL_HOST:     db
+      MYSQL_PORT:     3306
+      MYSQL_DATABASE: database1
+      MYSQL_USER:     user1
+      MYSQL_PASSWORD: 12345678
+    volumes:
+      - uploads:/app/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  db_data:
+  uploads:
