@@ -3,6 +3,7 @@
 #include <windows.h>
 #include <string>
 #include <sstream>
+#include <fstream>
 
 #include <io.h>
 #include <fcntl.h>
@@ -26,6 +27,15 @@ void _DebugLog(const Args&... args)
 
     OutputDebugStringW(oss.str().c_str());
     wprintf(L"%s", oss.str().c_str());
+
+    try {
+        std::wofstream logFile("pmd-service.debug.log", std::ios::app);
+        if (logFile) {
+            logFile << oss.str();
+        }
+    } catch (...) {
+        // Ignore
+    }
 }
 
 #ifdef DEBUGGING_RELATIVE_PATH

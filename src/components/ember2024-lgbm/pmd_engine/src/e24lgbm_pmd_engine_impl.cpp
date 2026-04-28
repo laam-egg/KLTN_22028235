@@ -1,7 +1,7 @@
 #include "e24lgbm_pmd_engine_impl.h"
 #include <efe/core.h>
 #include "ember2024_lgbm/model.h"
-#define THRESHOLD 0.8
+#define THRESHOLD 0.9
 #define FALSE 0
 #define TRUE 1
 

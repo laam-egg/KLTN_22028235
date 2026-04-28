@@ -3,7 +3,7 @@
 pmd stands for PE Malware Detection.
 
 This is a service that interacts with
-the [pmd-driver](https://github.com/pe-malware-detection/pmd-driver)
+the `pmd-driver`
 to scan PE files for malware, utilizing
 the PMD engines, which are customizable.
 

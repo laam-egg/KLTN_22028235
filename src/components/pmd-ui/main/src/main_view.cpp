@@ -2,6 +2,7 @@
 #include "pmd_ui/detection.h"
 #include "pmd_ui/data_fetcher.h"
 #include "pmd_ui/utils.h"
+#include "pmd_ui/upload_file.h"
 #include "pmd_driver/communication.h"
 
 #include <commctrl.h>
@@ -217,7 +218,22 @@ void MainWindow::ShowDetailDialog(int index)
     wchar_t sev[32]; swprintf(sev, 32, L"%.3f", d.severity);
     text += L"Severity: "; text += sev;
 
-    MessageBoxW(m_hwnd, text.c_str(), L"Detection Details", MB_OK | MB_ICONINFORMATION);
+    text += L"\n\nDo you want to submit this sample onto Deep Analysis for further inspection?";
+
+    int answer = MessageBoxW(m_hwnd, text.c_str(), L"Detection Details", MB_YESNO | MB_ICONINFORMATION);
+
+    if (IDYES == answer) {
+        try {
+            std::string url = UploadFileLookup(
+                L"pmd-deep-analysis.vutunglam.id.vn",
+                443,
+                d.filePath
+            );
+            ShellExecuteA(m_hwnd, "open", url.c_str(), nullptr, nullptr, SW_SHOWNORMAL);
+        } catch (std::exception const& ex) {
+            MessageBoxW(m_hwnd, std::wstring(L"Failed to submit file: " + std::wstring(ex.what(), ex.what() + strlen(ex.what()))).c_str(), L"Error", MB_OK | MB_ICONERROR);
+        }
+    }
 }
 
 void MainWindow::ShowNotification(const Detection& d)
