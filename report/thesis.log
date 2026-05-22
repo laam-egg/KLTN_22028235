@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.5.20)  22 MAY 2026 16:44
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.5.20)  22 MAY 2026 17:14
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1059,55 +1059,78 @@ Package hyperref Warning: Glyph not defined in PU encoding,
 
 
 ] (./chapters/glossary.tex
-LaTeX Font Info:    Calculating math sizes for size <10.83347> on input line 7.
+LaTeX Font Info:    Calculating math sizes for size <10.83347> on input line 6.
 
 
 LaTeX Font Warning: Font shape `OT1/cmr/m/n' in size <7.58339> not available
-(Font)              size <8> substituted on input line 7.
+(Font)              size <8> substituted on input line 6.
 
 
 LaTeX Font Warning: Font shape `OT1/cmr/m/n' in size <5.41673> not available
-(Font)              size <5> substituted on input line 7.
+(Font)              size <5> substituted on input line 6.
 
 
 LaTeX Font Warning: Font shape `OML/cmm/m/it' in size <7.58339> not available
-(Font)              size <8> substituted on input line 7.
+(Font)              size <8> substituted on input line 6.
 
 
 LaTeX Font Warning: Font shape `OML/cmm/m/it' in size <5.41673> not available
-(Font)              size <5> substituted on input line 7.
+(Font)              size <5> substituted on input line 6.
 
 
 LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <7.58339> not available
-(Font)              size <8> substituted on input line 7.
+(Font)              size <8> substituted on input line 6.
 
 
 LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <5.41673> not available
-(Font)              size <5> substituted on input line 7.
+(Font)              size <5> substituted on input line 6.
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 7--7
-|[]
+Underfull \hbox (badness 10000) in paragraph at lines 8--8
+[]|\T5/cmr/m/n/13 Application Pro-gram-ming
  []
 
 
-Overfull \hbox (7.12517pt too wide) in paragraph at lines 7--7
-[]
+Underfull \hbox (badness 4084) in paragraph at lines 10--10
+[]|\T5/cmr/m/n/13 Adversarial Tac-tics, Tech-
  []
 
 
-Overfull \hbox (2.89607pt too wide) in paragraph at lines 9--9
-[]|\T5/cmr/m/n/13 BiLSTM| 
+Underfull \hbox (badness 1448) in paragraph at lines 17--17
+[]|\T5/cmr/m/n/13 Endgame Mal-ware BEnch-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 9--9
-[]|\T5/cmr/m/n/13 Bidirectional Long Short
+Underfull \hbox (badness 1983) in paragraph at lines 17--17
+[]|\T5/cmr/m/n/13 Tªp dú li»u bench-mark m¢
  []
 
-) [10
+[10
 
-] (./chapters/c1/c1_introduction.tex [1
+]
+Overfull \vbox (0.14781pt too high) has occurred while \output is active []
+
+ [11]
+Underfull \hbox (badness 1117) in paragraph at lines 33--33
+[]|\T5/cmr/m/n/13 Framework cõa Mi-crosoft hé
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 50--50
+[]|\T5/cmr/m/n/13 Return-Oriented Pro-gram-
+ []
+
+
+Underfull \hbox (badness 1019) in paragraph at lines 52--52
+[]|\T5/cmr/m/n/13 Singular Value De-com-po-si-
+ []
+
+
+Underfull \hbox (badness 1789) in paragraph at lines 55--55
+\T5/cmr/m/n/13 thùc cõa Mi-crosoft ^^_º ph¡t
+ []
+
+) [12] [13] (./chapters/c1/c1_introduction.tex [1
 
 
 
@@ -1266,7 +1289,7 @@ Overfull \hbox (13.2978pt too wide) in paragraph at lines 1161--1164
 
 [31]) [32] [33] (./chapters/c3/c3_chapter.tex
 Ch\uhorn \ohorn ng 2.
-<figures/ml-pipeline.png, id=687, 492.8814pt x 697.4055pt>
+<figures/ml-pipeline.png, id=700, 492.8814pt x 697.4055pt>
 File: figures/ml-pipeline.png Graphic file (type png)
 <use figures/ml-pipeline.png>
 Package pdftex.def Info: figures/ml-pipeline.png  used on input line 13.
@@ -1295,7 +1318,7 @@ Overfull \hbox (28.40363pt too wide) in paragraph at lines 31--34
 
 
 ] [42]
-<figures/system-diagram.png, id=737, 896.8707pt x 484.9317pt>
+<figures/system-diagram.png, id=749, 896.8707pt x 484.9317pt>
 File: figures/system-diagram.png Graphic file (type png)
 <use figures/system-diagram.png>
 Package pdftex.def Info: figures/system-diagram.png  used on input line 113.
@@ -1304,7 +1327,7 @@ Package pdftex.def Info: figures/system-diagram.png  used on input line 113.
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-<figures/endpoint-sequence-diagram.png, id=738, 846.16125pt x 781.92125pt>
+<figures/endpoint-sequence-diagram.png, id=750, 846.16125pt x 781.92125pt>
 File: figures/endpoint-sequence-diagram.png Graphic file (type png)
 <use figures/endpoint-sequence-diagram.png>
 Package pdftex.def Info: figures/endpoint-sequence-diagram.png  used on input line 121.
@@ -1317,7 +1340,7 @@ Overfull \hbox (31.90242pt too wide) in paragraph at lines 250--252
 []\T5/cmr/m/n/13 So s¡nh \T5/cmtt/m/n/13 PredScore \T5/cmr/m/n/13 vîi ng÷ïng ph¡t hi»n ^^_¢ ^^_ành tr÷îc ^^_º x¡c ^^_ành \T5/cmtt/m/n/13 AllowExecution\T5/cmr/m/n/13 . 
  []
 
-<figures/pmd-ui.png, id=760, 669.2503pt x 446.41782pt>
+<figures/pmd-ui.png, id=773, 669.2503pt x 446.41782pt>
 File: figures/pmd-ui.png Graphic file (type png)
 <use figures/pmd-ui.png>
 Package pdftex.def Info: figures/pmd-ui.png  used on input line 277.
@@ -1325,7 +1348,7 @@ Package pdftex.def Info: figures/pmd-ui.png  used on input line 277.
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-<figures/pmd-ui-wanna-submit.png, id=761, 663.22781pt x 441.90094pt>
+<figures/pmd-ui-wanna-submit.png, id=774, 663.22781pt x 441.90094pt>
 File: figures/pmd-ui-wanna-submit.png Graphic file (type png)
 <use figures/pmd-ui-wanna-submit.png>
 Package pdftex.def Info: figures/pmd-ui-wanna-submit.png  used on input line 285.
@@ -1339,7 +1362,7 @@ Overfull \hbox (2.78853pt too wide) in paragraph at lines 292--296
  []
 
 [47] [48 <./figures/pmd-ui.png>]
-<figures/deep-analysis-server-homepage.png, id=782, 1060.96375pt x 653.44125pt>
+<figures/deep-analysis-server-homepage.png, id=794, 1060.96375pt x 653.44125pt>
 File: figures/deep-analysis-server-homepage.png Graphic file (type png)
 <use figures/deep-analysis-server-homepage.png>
 Package pdftex.def Info: figures/deep-analysis-server-homepage.png  used on input line 335.
@@ -1386,7 +1409,7 @@ LaTeX Warning: `h' float specifier changed to `ht'.
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-<figures/tc2_block.png, id=789, 1436.36626pt x 681.29532pt>
+<figures/tc2_block.png, id=801, 1436.36626pt x 681.29532pt>
 File: figures/tc2_block.png Graphic file (type png)
 <use figures/tc2_block.png>
 Package pdftex.def Info: figures/tc2_block.png  used on input line 542.
@@ -1394,7 +1417,7 @@ Package pdftex.def Info: figures/tc2_block.png  used on input line 542.
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-<figures/tc4_shap.png, id=790, 930.47626pt x 678.28406pt>
+<figures/tc4_shap.png, id=802, 930.47626pt x 678.28406pt>
 File: figures/tc4_shap.png Graphic file (type png)
 <use figures/tc4_shap.png>
 Package pdftex.def Info: figures/tc4_shap.png  used on input line 550.
@@ -1459,18 +1482,18 @@ Package rerunfilecheck Info: File `thesis.out' has not changed.
 (rerunfilecheck)             Checksum: 8F80BCCA1BEABF3B0D236C8B178A2CA6;17203.
  ) 
 Here is how much of TeX's memory you used:
- 27609 strings out of 467341
- 496747 string characters out of 5415375
+ 27612 strings out of 467341
+ 496771 string characters out of 5415375
  919447 words of memory out of 5000000
  55984 multiletter control sequences out of 15000+600000
  656777 words of font info for 103 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  108i,16n,107p,676b,653s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sfrm1200.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/vntex/vnr/vnbx12.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/vntex/vnr/vnbxti10.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/vntex/vnr/vnr10.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/vntex/vnr/vnr12.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/vntex/vnr/vnti12.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/vntex/vnr/vntt12.pfb>
-Output written on thesis.pdf (73 pages, 1982097 bytes).
+Output written on thesis.pdf (76 pages, 1988515 bytes).
 PDF statistics:
- 961 PDF objects out of 1000 (max. 8388607)
- 837 compressed objects within 9 object streams
- 213 named destinations out of 1000 (max. 500000)
+ 973 PDF objects out of 1000 (max. 8388607)
+ 846 compressed objects within 9 object streams
+ 216 named destinations out of 1000 (max. 500000)
  594 words of extra memory for PDF output out of 10000 (max. 10000000)
 

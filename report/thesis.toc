@@ -6,7 +6,7 @@
 \contentsline {chapter}{Mục lục}{v}{chapter*.1}%
 \contentsline {chapter}{Danh s\'ach h\`inh v\~e}{viii}{chapter*.1}%
 \contentsline {chapter}{Danh s\'ach b\h {a}ng}{ix}{chapter*.1}%
-\contentsline {chapter}{Danh mục các từ viết tắt}{x}{chapter*.2}%
+\contentsline {chapter}{Danh mục các từ viết tắt}{xi}{chapter*.2}%
 \contentsline {chapter}{Mở đầu}{1}{chapter*.3}%
 \contentsline {section}{Đặt vấn đề}{1}{section*.4}%
 \contentsline {section}{Mô tả bài toán}{3}{section*.5}%
