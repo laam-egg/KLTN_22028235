@@ -6,88 +6,141 @@
 \addcontentsline{toc}{section}{Đặt vấn đề}
 \markboth{Đặt vấn đề}{Đặt vấn đề}
 
-Trong bối cảnh chuyển đổi số quốc gia đang diễn ra mạnh mẽ,
-bảo đảm an toàn thông tin (ATTT) cho các hệ thống công nghệ
-thông tin (CNTT), đặc biệt là tại các doanh nghiệp, cơ quan
-nhà nước và hạ tầng trọng yếu của quốc gia, là yêu cầu quan
-trọng và cấp bách. Các cuộc tấn công mạng ngày càng tinh vi,
-có chủ đích (APT - Advanced Persistent Threat) và thường sử
-dụng các mẫu phần mềm độc hại (malware) được tùy chỉnh riêng
-biệt, chưa từng xuất hiện trước đó trên thế giới. Điều này
-khiến các hệ thống phòng thủ truyền thống, như antivirus
-dựa trên chữ ký (signature-based), trở nên kém hiệu quả
-trước các mối đe dọa mới. Theo thống kê mới nhất, các hệ
-thống an ninh mạng phát hiện trung bình hơn 467.000 mẫu phần
-mềm độc hại mỗi ngày trên toàn cầu trong năm 2024, tăng mạnh
-so với các năm trước. \cite{kaspersky2024} Tại Việt Nam, 46,15\% cơ quan và doanh
-nghiệp bị tấn công mạng ít nhất một lần, với tổng hơn 659.000
-vụ tấn công được ghi nhận, trong đó 26,14\% là các cuộc tấn
-công có chủ đích (APT) sử dụng mã độc nằm vùng, và khoảng
-14,5\% bị tấn công bằng ransomware mã hoá dữ liệu. Trên thực
-tế, gần 75\% chiến dịch APT toàn cầu có sử dụng malware, và
-có đến 80\% trong số đó tồn tại trong hệ thống hơn 6 tháng
-trước khi bị phát hiện, \cite{safegate2024} cho thấy rõ ràng các phương pháp
-phòng thủ truyền thống dựa trên chữ ký đang ngày càng kém
-hiệu quả trước các mối đe dọa tinh vi, mới xuất hiện.
+Trong bối cảnh chuyển đổi số quốc gia đang diễn ra mạnh mẽ, hạ tầng công nghệ
+thông tin (CNTT) không ngừng được mở rộng về quy mô và độ phức tạp. Hàng triệu
+thiết bị đầu cuối mới - từ máy trạm văn phòng, máy tính xách tay của nhân viên
+đến các hệ thống điều hành nghiệp vụ tại cơ quan nhà nước - được kết nối vào
+mạng lưới tổ chức mỗi năm. Song song với sự bùng nổ đó, ngân sách và nhân lực
+dành cho bảo mật thông tin thường tập trung vào lớp hạ tầng mạng, máy chủ và
+nền tảng đám mây, trong khi bảo mật tại tầng endpoint - tức các máy tính cá
+nhân và máy trạm của người dùng cuối - vẫn là mắt xích ít được chú trọng nhất
+trong toàn bộ chiến lược phòng thủ. Đây là một nghịch lý đáng lo ngại: chính
+endpoint lại là mắt xích yếu nhất (the weakest link) - nơi người dùng tương
+tác trực tiếp với dữ liệu, là điểm khởi phát của phần lớn các chuỗi tấn công,
+và đồng thời là mục tiêu tấn công phổ biến nhất của các tác nhân đe dọa trên
+toàn thế giới.
 
-Do đó, việc nghiên cứu và triển khai một mô-đun phát hiện
-mã độc định dạng Windows Portable Executable (PE) dựa trên
-học máy (machine learning) là yêu cầu cấp thiết, đồng thời
-mang ý nghĩa khoa học và thực tiễn rõ rệt. Khác với các
-phương pháp truyền thống dựa trên chữ ký, các mô hình học máy
-có khả năng tự động học đặc trưng từ dữ liệu, cho phép phân
-tích sâu các đặc điểm tĩnh (cấu trúc file, header PE, bảng
-import/export, entropy, chuỗi ký tự\dots) cũng như hành vi của
-mã độc. Nhờ đó, hệ thống có thể phát hiện hiệu quả các mẫu
-mã độc mới, chưa từng xuất hiện trước đây (zero-day malware),
-vốn là điểm yếu lớn của các giải pháp antivirus truyền thống.
+Thực tế đó đặt ra yêu cầu cấp bách về bảo đảm an toàn thông tin (ATTT) trên
+diện rộng, đặc biệt là tại các doanh nghiệp, cơ quan nhà nước và hạ tầng trọng
+yếu của quốc gia. Các cuộc tấn công mạng ngày càng tinh vi, có chủ đích
+(APT - \textit{Advanced Persistent Threat}) và thường sử dụng các mẫu phần
+mềm độc hại (malware) được tùy chỉnh riêng biệt, chưa từng xuất hiện trước đó
+trên thế giới. Điều này khiến các hệ thống phòng thủ truyền thống, như antivirus
+dựa trên chữ ký (signature-based), trở nên kém hiệu quả trước các mối đe dọa
+mới. Theo thống kê, các hệ thống an ninh mạng phát hiện trung bình hơn 467.000
+mẫu phần mềm độc hại mỗi ngày trên toàn cầu trong năm 2024, tăng mạnh so với
+các năm trước. \cite{kaspersky2024} Tại Việt Nam, 46,15\% cơ quan và doanh
+nghiệp bị tấn công mạng ít nhất một lần, với tổng hơn 659.000 vụ tấn công được
+ghi nhận, trong đó 26,14\% là các cuộc tấn công có chủ đích (APT) sử dụng mã
+độc nằm vùng, và khoảng 14,5\% bị tấn công bằng ransomware mã hoá dữ liệu.
+Trên thực tế, gần 75\% chiến dịch APT toàn cầu có sử dụng malware, và có đến
+80\% trong số đó tồn tại trong hệ thống hơn 6 tháng trước khi bị phát hiện,
+\cite{safegate2024} cho thấy rõ ràng các phương pháp phòng thủ truyền thống
+dựa trên chữ ký đang ngày càng kém hiệu quả trước các mối đe dọa tinh vi,
+mới xuất hiện.
 
-Việc áp dụng học máy trong bài toán phát hiện mã độc không
-chỉ giúp nâng cao tỷ lệ phát hiện (detection rate) mà còn
-góp phần giảm thiểu tỷ lệ cảnh báo sai (false positive),
-từ đó nâng cao độ tin cậy của các hệ thống phòng thủ an
-toàn thông tin. Đặc biệt, trong bối cảnh các chiến dịch
-tấn công có chủ đích (APT) ngày càng phổ biến và thường
-sử dụng mã độc được tùy chỉnh riêng cho từng mục tiêu,
-khả năng phát hiện dựa trên hành vi và đặc trưng tổng quát
-của các mô hình học máy đóng vai trò quan trọng trong việc tăng
-cường chiều sâu phòng thủ (defense in depth) cho các hệ
+Trong số các hệ điều hành phổ biến hiện nay, Windows luôn là mục tiêu bị
+nhắm đến nhiều nhất và liên tục nhất của các cuộc tấn công an ninh mạng.
+Điều này không phải ngẫu nhiên mà xuất phát trực tiếp từ bức tranh thị
+trường thiết bị đầu cuối (endpoint) toàn cầu. Tính
+đến năm 2024, Windows chiếm khoảng 72\% thị phần hệ điều hành desktop trên toàn
+thế giới, \cite{statcounter2024} bỏ xa macOS ở mức xấp xỉ 15\% và GNU/Linux
+ở mức chưa đến 4\%. \cite{statcounter2024} Tại môi trường doanh nghiệp và cơ
+quan nhà nước Việt Nam, tỉ lệ này còn cao hơn do các yêu cầu tương thích phần
+mềm nghiệp vụ, hệ thống quản lý văn bản và phần mềm kế toán vốn được xây dựng
+đặc thù cho nền tảng Windows. Về phía Linux, mặc dù hệ điều hành này đang ngày
+càng phổ biến trên máy chủ và môi trường đám mây, thị phần desktop của nó vẫn
+ở mức rất nhỏ, đồng nghĩa với việc số lượng người dùng cuối bị ảnh hưởng bởi
+malware nhắm vào Linux là không đáng kể so với Windows. Đối với macOS,
+kiến trúc bảo mật sandbox tương đối chặt chẽ hơn; ngoài ra, thị phần tại khu vực Đông Nam
+Á - trong đó có Việt Nam - vẫn rất hạn chế, khiến nó ít trở thành mục tiêu
+ưu tiên của các tác nhân đe dọa. Mặt khác, thị phần lớn đồng nghĩa với lợi
+nhuận tấn công lớn hơn: một chiến dịch malware nhắm vào Windows có khả năng
+lây nhiễm và gây thiệt hại trên quy mô hàng triệu thiết bị, đây là lý do khiến
+Windows luôn là hệ sinh thái bị nhắm mục tiêu nhiều nhất và liên tục nhất trong
+lịch sử an ninh mạng. Theo báo cáo của AV-TEST, trong số các mẫu malware mới
+được thu thập hàng năm, hơn 90\% nhắm vào nền tảng Windows \cite{avtestmalwarestats} - một
+tỉ lệ phản ánh rõ mức độ ưu tiên của những kẻ tấn công đối với hệ
+điều hành này.
+
+Tuy nhiên, không phải mọi loại tệp độc hại trên Windows đều mang mức độ
+nguy hiểm như nhau. Trong hệ sinh thái mối đe dọa trên Windows, định dạng
+Portable Executable (PE) - bao gồm các phần mở rộng \texttt{.EXE},
+\texttt{.DLL}, \texttt{.SYS}, và một số dạng khác - là định
+dạng nhị phân thực thi gốc (native binary) của hệ điều hành, và cũng là
+vector tấn công nguy hiểm nhất trong số đó. Khi được khởi chạy, một tệp PE
+tương tác trực tiếp với nhân hệ điều hành (kernel), có thể yêu cầu và nhận
+bất kỳ đặc quyền nào mà người dùng hoặc hệ thống cho phép, thao túng bộ nhớ,
+mở kết nối mạng, ghi vào registry và tạo ra các tiến trình con - tất cả mà
+không cần thông qua bất kỳ lớp ứng dụng trung gian nào. Trong khi đó, các
+định dạng tấn công khác đều bị giới hạn bởi ít nhất một lớp
+phụ thuộc. Tài liệu PDF độc hại phải khai thác lỗ hổng trong trình đọc PDF
+(Adobe Acrobat Reader, Foxit hay các trình đọc khác) và thường bị vô hiệu hóa
+ngay khi ứng dụng đó được vá lỗi. Macro trong Microsoft Office (Excel VBA,
+Word VBA\ldots) yêu cầu ứng dụng Office đang chạy \textit{và} người dùng phải
+chủ động bật tính năng macro - một rào cản ngày càng khó vượt qua hơn khi
+Microsoft liên tục siết chặt chính sách mặc định. Các file script như
+\texttt{.BAT}, \texttt{.PS1} hay \texttt{.JS} cần interpreter tương ứng và
+thường bị kiểm soát bởi chính sách (Group Policy) hoặc các giải pháp phòng thủ lớp ứng dụng.
+Do đó, tệp PE thực thi là \textit{vũ khí hoàn chỉnh và mạnh mẽ nhất} trong kho
+tấn công của "kẻ thù": không phụ thuộc ứng dụng trung gian, không cần người dùng
+bật thêm tính năng nào, chỉ cần một thao tác double-click là lập tức thực thi
+và tương tác với hệ thống trong phạm vi đặc quyền được cấp.
+
+Hơn nữa, tệp PE còn đóng vai trò là \textit{payload cuối cùng} (final payload)
+trong phần lớn các chuỗi tấn công đa giai đoạn. Dù kẻ tấn công bắt đầu bằng
+một email lừa đảo (phishing), một tài liệu Office có macro hay một tệp PDF
+được nhúng shellcode, mục tiêu cuối cùng của chúng gần như luôn là thả xuống
+(drop) và thực thi một tệp PE độc hại trên máy nạn nhân. Ransomware,
+Remote Access Trojan (RAT), rootkit, keylogger, spyware - tất cả các lớp
+malware nguy hiểm nhất đều được triển khai dưới dạng tệp PE. Theo dữ liệu
+từ bộ dữ liệu EMBER - một trong những bộ dữ liệu malware PE lớn nhất hiện có
+- có hơn một triệu mẫu PE độc hại được thu thập và phân tích, \cite{ember2018}
+phản ánh sự phổ biến và tầm quan trọng của định dạng này trong nghiên cứu
+phát hiện mã độc. Ngoài ra, định dạng PE với cấu trúc header phong phú -
+bao gồm DOS header, PE header, các section header, bảng import/export, bảng
+tài nguyên và nhiều trường siêu dữ liệu khác - cung cấp một không gian đặc
+trưng (feature space) dồi dào cho các mô hình học máy khai thác, điều mà các
+định dạng tấn công khác như script hay shellcode thô không có được.
+
+Do đó, việc nghiên cứu và triển khai một mô-đun phát hiện mã độc định dạng
+Windows Portable Executable (PE) dựa trên học máy (machine learning) là yêu
+cầu cấp thiết, đồng thời mang ý nghĩa khoa học và thực tiễn rõ rệt. Khác với
+các phương pháp truyền thống dựa trên chữ ký, các mô hình học máy có khả năng
+tự động học đặc trưng từ dữ liệu, cho phép phân tích sâu các đặc điểm tĩnh
+(cấu trúc tệp, PE header, bảng import/export, entropy, chuỗi ký tự\ldots) cũng
+như hành vi của mã độc. Nhờ đó, hệ thống có thể phát hiện hiệu quả các mẫu
+mã độc mới, chưa từng xuất hiện trước đây (zero-day malware), vốn là điểm yếu
+lớn của các giải pháp antivirus truyền thống. Việc áp dụng học máy trong bài
+toán phát hiện mã độc không chỉ giúp nâng cao tỷ lệ phát hiện (detection rate)
+mà còn góp phần giảm thiểu tỷ lệ cảnh báo sai (false positive), từ đó nâng
+cao độ tin cậy của các hệ thống phòng thủ an toàn thông tin. Đặc biệt, trong
+bối cảnh các chiến dịch tấn công có chủ đích (APT) ngày càng phổ biến và thường
+sử dụng mã độc được tùy chỉnh riêng cho từng mục tiêu, khả năng phát hiện dựa
+trên hành vi và đặc trưng tổng quát của các mô hình học máy đóng vai trò quan
+trọng trong việc tăng cường chiều sâu phòng thủ (defense in depth) cho các hệ
 thống CNTT.
 
-Bên cạnh ý nghĩa về mặt kỹ thuật, đề tài còn có giá trị
-nghiên cứu và đào tạo rõ rệt. Việc xây dựng mô-đun phát
-hiện mã độc PE dựa trên học máy giúp người nghiên cứu
-tiếp cận một cách hệ thống các kiến thức liên ngành,
-bao gồm: kiến trúc hệ điều hành Windows, định dạng file PE,
-kỹ thuật phân tích mã độc, xử lý dữ liệu, cũng như các thuật
-toán học máy hiện đại. Qua đó, đề tài góp phần củng cố nền
-tảng lý thuyết và kỹ năng thực hành trong lĩnh vực an toàn
-thông tin và trí tuệ nhân tạo - vốn là những lĩnh vực then
-chốt trong khoa học máy tính hiện nay.
+Bên cạnh ý nghĩa về mặt kỹ thuật, đề tài còn có giá trị nghiên cứu và đào
+tạo rõ rệt. Việc xây dựng mô-đun phát hiện mã độc PE dựa trên học máy giúp
+người nghiên cứu tiếp cận một cách hệ thống các kiến thức liên ngành, bao gồm
+kiến trúc hệ điều hành Windows, định dạng tệp PE, kỹ thuật phân tích mã độc,
+xử lý dữ liệu, cũng như các thuật toán học máy hiện đại. Qua đó, đề tài góp
+phần củng cố nền tảng lý thuyết và kỹ năng thực hành trong lĩnh vực an toàn
+thông tin và trí tuệ nhân tạo - vốn là những lĩnh vực then chốt trong khoa
+học máy tính hiện nay. Đề tài cũng góp phần nâng cao năng lực nghiên cứu và
+tự chủ công nghệ trong lĩnh vực an ninh mạng, thông qua việc chủ động xây dựng
+và đánh giá các mô hình phát hiện mã độc, thay vì hoàn toàn phụ thuộc vào các
+giải pháp đóng và công nghệ nước ngoài, đồng thời đáp ứng yêu cầu bảo đảm an
+toàn thông tin trong quá trình chuyển đổi số tại Việt Nam, phù hợp với các
+định hướng và chiến lược phát triển an toàn, an ninh mạng do Chính phủ đề ra.
+\cite{lsvn2026}
 
-Ngoài ra, đề tài còn mang ý nghĩa quan trọng trong việc:
-
-\begin{itemize}
-    \item Góp phần nâng cao năng lực nghiên cứu và tự chủ
-    công nghệ trong lĩnh vực an ninh mạng, thông qua việc
-    chủ động xây dựng và đánh giá các mô hình phát hiện
-    mã độc, thay vì hoàn toàn phụ thuộc vào các giải pháp
-    đóng và công nghệ nước ngoài.
-    \item Đáp ứng yêu cầu bảo đảm an toàn thông tin trong
-    quá trình chuyển đổi số tại Việt Nam, phù hợp với các
-    định hướng và chiến lược phát triển an toàn, an ninh mạng
-    do Chính phủ đề ra, \cite{lsvn2026} đặc biệt trong bối
-    cảnh gia tăng các mối đe dọa mạng nhắm vào hệ thống
-    CNTT trong nước.
-\end{itemize}
-
-Với những lý do trên, đề tài "Ứng dụng học máy trong phát hiện
-mã độc PE trên Windows" là một hướng nghiên cứu có giá trị
-khoa học, tính thời sự và khả năng ứng dụng thực tiễn cao,
-đồng thời phù hợp với mục tiêu đào tạo và nghiên cứu của
-các chuyên ngành liên quan đến an ninh, an toàn thông tin
-trong các cơ sở giáo dục đại học hiện nay.
-
+Với những lý do trên, đề tài \textit{``Ứng dụng học máy trong phát hiện mã độc
+PE trên Windows''} là một hướng nghiên cứu có giá trị khoa học, tính thời sự
+và khả năng ứng dụng thực tiễn cao, đồng thời phù hợp với mục tiêu đào tạo và
+nghiên cứu của các chuyên ngành liên quan đến an ninh, an toàn thông tin trong
+các cơ sở giáo dục đại học hiện nay.
 
 
 
@@ -149,7 +202,7 @@ Bài toán công nghệ mà khóa luận giải quyết:
         chạy trên máy endpoint Windows, bao gồm kernel driver (KMDF),
         Windows service, module trích xuất đặc trưng (C++), giao diện
         người dùng trên máy endpoint, và dịch vụ phân tích chuyên sâu
-        online (deep-analysis). Phần triển khai trong môi trường thực tế
+        online (deep-analysis-server). Phần triển khai trong môi trường thực tế
         (production) được tiếp cận ở mức mô phỏng và phân tích kiến
         trúc; đề tài không đặt mục tiêu triển khai hoàn chỉnh trên hệ
         thống quy mô lớn.

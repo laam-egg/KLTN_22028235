@@ -10,9 +10,24 @@ SafeGate.
 \newblock {Hơn 46\% cơ quan, doanh nghiệp Việt Nam bị tấn công mạng trong năm 2024}.
 \newblock \url{https://safegate.vn/vi/post/hon-46--co-quan--doanh-nghie--p-viet-nam-bi-ta--n-co--ng-ma--ng-trong-nam-2024-68.htm}, 2024.
 
+\bibitem{statcounter2024}
+{StatCounter}.
+\newblock Desktop {Operating System} market share worldwide - {StatCounter Global Stats}.
+\newblock \url{https://gs.statcounter.com/os-market-share/desktop/worldwide}, 2024.
+
+\bibitem{avtestmalwarestats}
+AVTest.
+\newblock Malware statistics.
+\newblock \url{https://www.av-test.org/en/statistics/malware}, 2024.
+
+\bibitem{ember2018}
+Hyrum~S. Anderson and Phil Roth.
+\newblock {EMBER}: An open dataset for training static {PE} malware machine learning models.
+\newblock In {\em arXiv preprint arXiv:1804.04637}, 2018.
+
 \bibitem{lsvn2026}
 Tạp chí điện tử Luật~sư Việt~Nam.
-\newblock Đặt mục tiêu đến năm 2030, việt nam có đội ngũ 10.000 chuyên gia an ninh mạng trình độ cao.
+\newblock {Đặt mục tiêu đến năm 2030, Việt Nam có đội ngũ 10.000 chuyên gia an ninh mạng trình độ cao}.
 \newblock \url{https://lsvn.vn/dat-muc-tieu-den-nam-2030-viet-nam-co-doi-ngu-10-000-chuyen-gia-an-ninh-mang-trinh-do-cao-a169160.html}, 2026.
 
 \bibitem{wikimalware}
@@ -25,11 +40,6 @@ Wikipedia.
 \newblock {Advanced persistent threat}.
 \newblock \url{https://en.wikipedia.org/wiki/Advanced_persistent_threat}, 2026.
 
-\bibitem{avtestmalwarestats}
-AVTest.
-\newblock Malware statistics.
-\newblock \url{https://www.av-test.org/en/statistics/malware}, 2024.
-
 \bibitem{wikiendpointsecurity}
 Wikipedia.
 \newblock Endpoint security.
@@ -37,25 +47,25 @@ Wikipedia.
 
 \bibitem{intel-sdm}
 {Intel Corporation}.
-\newblock {\em Intel 64 and IA-32 Architectures Software Developer's Manual}, 2021.
+\newblock {\em {Intel 64 and IA-32 Architectures Software Developer's Manual}}, 2021.
 
 \bibitem{amd64-manual}
 {Advanced Micro Devices}.
-\newblock {\em AMD64 Architecture Programmer's Manual, Volume 2: System Programming}, 2020.
+\newblock {\em {AMD64 Architecture Programmer's Manual, Volume 2: System Programming}}, 2020.
 
 \bibitem{ms-x64-calling}
 Microsoft.
-\newblock x64 calling convention.
+\newblock {x64 Calling Convention}.
 \newblock \url{https://learn.microsoft.com/en-us/cpp/build/x64-calling-convention?view=msvc-170}, 2025.
 
 \bibitem{ms-pe-format}
 Microsoft.
-\newblock Portable executable (pe) and coff specification.
+\newblock {Portable Executable (PE) and COFF Specification}.
 \newblock \url{https://learn.microsoft.com/en-us/windows/win32/debug/pe-format}, 2025.
 
 \bibitem{rickpefilestructure}
 0xRick's Blog.
-\newblock (7-part series) a dive into the pe file format - pe file structure.
+\newblock {(7-part series) A dive into the PE file format - PE file structure}.
 \newblock \url{https://0xrick.github.io/win-internals/pe1}, 2025.
 
 \bibitem{singh2021survey}
@@ -70,21 +80,18 @@ A.~Damodaran, F.~D. Troia, C.~A. Visaggio, et~al.
 
 \bibitem{ember2024benchmark}
 Robert~J. Joyce, Gideon Miller, Phil Roth, Richard Zak, Elliott Zaresky-Williams, Hyrum Anderson, Edward Raff, and James Holt.
-\newblock Ember2024 - a benchmark dataset for holistic evaluation of malware classifier.
+\newblock {EMBER2024 - A Benchmark Dataset for Holistic Evaluation of Malware Classifier}.
 \newblock In {\em Proceedings of the 31st ACM SIGKDD Conference on Knowledge Discovery and Data Mining}, 2025.
-
-\bibitem{ember2018}
-Hyrum~S. Anderson and Phil Roth.
-\newblock {EMBER}: An open dataset for training static {PE} malware machine learning models.
-\newblock In {\em arXiv preprint arXiv:1804.04637}, 2018.
 
 \bibitem{virusshare}
 {VirusShare}.
-\newblock {VirusShare} --- because sharing is caring, 2024.
+\newblock {VirusShare} - because sharing is caring.
+\newblock \url{https://virusshare.com}, 2024.
 
 \bibitem{virustotal}
 {VirusTotal}.
-\newblock {VirusTotal} --- free online virus, malware and {URL} scanner, 2024.
+\newblock {VirusTotal} - free online virus, malware and {URL} scanner.
+\newblock \url{https://www.virustotal.com}, 2024.
 
 \bibitem{sorel20m}
 Richard Harang and Ethan~M. Rudd.
@@ -108,15 +115,18 @@ Omer Sagi and Lior Rokach.
 
 \bibitem{capa}
 {Mandiant}.
-\newblock capa: The flare team's open-source tool to identify capabilities in executable files, 2020.
+\newblock capa: The flare team's open-source tool to identify capabilities in executable files.
+\newblock \url{https://github.com/mandiant/capa}, 2020.
 
 \bibitem{attack}
 {MITRE}.
-\newblock {MITRE ATT\&CK}: Adversarial tactics, techniques, and common knowledge, 2024.
+\newblock {MITRE ATT\&CK}: Adversarial tactics, techniques, and common knowledge.
+\newblock \url{https://attack.mitre.org}, 2024.
 
 \bibitem{mbc}
 {MITRE}.
-\newblock Malware behavior catalog ({MBC}), 2024.
+\newblock Malware behavior catalog ({MBC}).
+\newblock \url{https://github.com/MBCProject/mbc-markdown}, 2024.
 
 \bibitem{kim2022mapas}
 Jinsung Kim, Younghoon Ban, Eunbyeol Ko, Haehyun Cho, and Jeong~Hyun Yi.
@@ -145,19 +155,23 @@ Luca Demetrio, Battista Biggio, Giovanni Lagorio, Fabio Roli, and Alessandro Arm
 
 \bibitem{winapi}
 {Microsoft}.
-\newblock Windows {API} index, 2024.
+\newblock Windows {API} index.
+\newblock \url{https://learn.microsoft.com/en-us/windows/win32/apiindex/windows-api-list}, 2024.
 
 \bibitem{kmdf}
 {Microsoft}.
-\newblock Kernel-mode driver framework ({KMDF}), 2024.
+\newblock Kernel-mode driver framework ({KMDF}).
+\newblock \url{https://learn.microsoft.com/en-us/windows-hardware/drivers/wdf/}, 2024.
 
 \bibitem{fastapi}
 Sebastián Ramírez.
-\newblock {FastAPI}, 2024.
+\newblock {FastAPI}.
+\newblock \url{https://fastapi.tiangolo.com}, 2024.
 
 \bibitem{docker}
 {Docker Inc.}
-\newblock Docker: Accelerated container application development, 2024.
+\newblock Docker: Accelerated container application development.
+\newblock \url{https://www.docker.com}, 2024.
 
 \bibitem{lgbm}
 Guolin Ke, Qi~Meng, Thomas Finley, Taifeng Wang, Wei Chen, Weidong Ma, Qiwei Ye, and Tie-Yan Liu.

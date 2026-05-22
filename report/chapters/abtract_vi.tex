@@ -16,7 +16,7 @@ trích xuất năng lực mã độc (capability extraction) trong pipeline
 học máy, và xây dựng hệ thống bảo vệ endpoint hoạt động được trên
 Windows.
 
-Về phía nghiên cứu, khóa luận đề xuất và so sánh ba pipeline học
+Về mặt nghiên cứu, khóa luận đề xuất và so sánh ba pipeline học
 máy dựa trên mô hình LightGBM, sử dụng tập dữ liệu EMBER2024. Ba
 pipeline khác nhau ở cách xây dựng vector đặc trưng đầu vào: chỉ
 dùng đặc trưng EMBER2024 (baseline), bổ sung đặc trưng năng lực
@@ -29,9 +29,10 @@ baseline lần lượt là 0,34\% và 0,04\%. Kết quả này cho thấy thông
 tin ngữ nghĩa hành vi từ Capa mang lại giá trị phân biệt bổ sung
 thực chất so với đặc trưng cấu trúc PE thông thường.
 
-Về phía công nghệ, khóa luận thiết kế và hiện thực hóa kiến trúc
+Về mặt công nghệ, khóa luận thiết kế và hiện thực hóa kiến trúc
 hệ thống gồm năm thành phần: module trích xuất đặc trưng hiệu năng
-cao viết bằng C++ (nhanh hơn cài đặt Python gốc từ 12 đến 20 lần),
+cao viết bằng C++ (nhanh hơn từ 12 đến 20 lần so với thuật toán gốc
+được viết bằng Python của dự án EMBER2024),
 kernel driver phát hiện tiến trình thực thi dựa trên KMDF, dịch vụ
 nền tích hợp mô hình học máy, giao diện người dùng với thông báo
 thời gian thực, và dịch vụ phân tích sâu trực tuyến tích hợp Capa
@@ -43,5 +44,7 @@ tích chuyên sâu trực tuyến.
 \vspace*{1cm}
 \textbf{Từ khóa}: mã độc, học máy, EMBER2024,
 trích xuất năng lực, Windows driver.
+\\
+\textbf{GitHub repository}: \url{https://github.com/laam-egg/KLTN_22028235}
 
 \end{small}

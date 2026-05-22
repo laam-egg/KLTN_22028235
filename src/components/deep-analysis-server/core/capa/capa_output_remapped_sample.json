@@ -1,0 +1,49 @@
+{
+    "caps": [
+        {
+            "Capability": "reference analysis tools strings",
+            "Namespace": "anti-analysis",
+            "Addrs": []
+        },
+        {
+            "Capability": "packed with upack",
+            "Namespace": "anti-analysis/packer/upack",
+            "Addrs": []
+        },
+        {
+            "Capability": "contain an embedded PE file",
+            "Namespace": "executable/subfile/pe",
+            "Addrs": []
+        },
+        {
+            "Capability": "contains PDB path",
+            "Namespace": "executable/pe/pdb",
+            "Addrs": []
+        },
+        {
+            "Capability": "(internal) packer file limitation",
+            "Namespace": "internal/limitation/static",
+            "Addrs": []
+        }
+    ],
+    "ttps": [
+        {
+            "Tactic": "DEFENSE EVASION",
+            "Technique": "Obfuscated Files or Information :: Software Packing"
+        }
+    ],
+    "mbc": [
+        {
+            "Objective": "DISCOVERY",
+            "Behavior": "Analysis Tool Discovery :: Process detection"
+        },
+        {
+            "Objective": "ANTI-STATIC ANALYSIS",
+            "Behavior": "Software Packing"
+        },
+        {
+            "Objective": "EXECUTION",
+            "Behavior": "Install Additional Program"
+        }
+    ]
+}
