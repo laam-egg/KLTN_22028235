@@ -1,11 +1,260 @@
-\chapter{Đặt vấn đề}
+\chapter*{Mở đầu}
+\addcontentsline{toc}{chapter}{Mở đầu}
+\markboth{Mở đầu}{Mở đầu}
 
-Chương này cần trình bày được:
+\section*{Đặt vấn đề}
+\addcontentsline{toc}{section}{Đặt vấn đề}
+\markboth{Đặt vấn đề}{Đặt vấn đề}
+
+Trong bối cảnh chuyển đổi số quốc gia đang diễn ra mạnh mẽ,
+bảo đảm an toàn thông tin (ATTT) cho các hệ thống công nghệ
+thông tin (CNTT), đặc biệt là tại các doanh nghiệp, cơ quan
+nhà nước và hạ tầng trọng yếu của quốc gia, là yêu cầu quan
+trọng và cấp bách. Các cuộc tấn công mạng ngày càng tinh vi,
+có chủ đích (APT - Advanced Persistent Threat) và thường sử
+dụng các mẫu phần mềm độc hại (malware) được tùy chỉnh riêng
+biệt, chưa từng xuất hiện trước đó trên thế giới. Điều này
+khiến các hệ thống phòng thủ truyền thống, như antivirus
+dựa trên chữ ký (signature-based), trở nên kém hiệu quả
+trước các mối đe dọa mới. Theo thống kê mới nhất, các hệ
+thống an ninh mạng phát hiện trung bình hơn 467.000 mẫu phần
+mềm độc hại mỗi ngày trên toàn cầu trong năm 2024, tăng mạnh
+so với các năm trước. \cite{kaspersky2024} Tại Việt Nam, 46,15\% cơ quan và doanh
+nghiệp bị tấn công mạng ít nhất một lần, với tổng hơn 659.000
+vụ tấn công được ghi nhận, trong đó 26,14\% là các cuộc tấn
+công có chủ đích (APT) sử dụng mã độc nằm vùng, và khoảng
+14,5\% bị tấn công bằng ransomware mã hoá dữ liệu. Trên thực
+tế, gần 75\% chiến dịch APT toàn cầu có sử dụng malware, và
+có đến 80\% trong số đó tồn tại trong hệ thống hơn 6 tháng
+trước khi bị phát hiện, \cite{safegate2024} cho thấy rõ ràng các phương pháp
+phòng thủ truyền thống dựa trên chữ ký đang ngày càng kém
+hiệu quả trước các mối đe dọa tinh vi, mới xuất hiện.
+
+Do đó, việc nghiên cứu và triển khai một mô-đun phát hiện
+mã độc định dạng Windows Portable Executable (PE) dựa trên
+học máy (machine learning) là yêu cầu cấp thiết, đồng thời
+mang ý nghĩa khoa học và thực tiễn rõ rệt. Khác với các
+phương pháp truyền thống dựa trên chữ ký, các mô hình học máy
+có khả năng tự động học đặc trưng từ dữ liệu, cho phép phân
+tích sâu các đặc điểm tĩnh (cấu trúc file, header PE, bảng
+import/export, entropy, chuỗi ký tự\dots) cũng như hành vi của
+mã độc. Nhờ đó, hệ thống có thể phát hiện hiệu quả các mẫu
+mã độc mới, chưa từng xuất hiện trước đây (zero-day malware),
+vốn là điểm yếu lớn của các giải pháp antivirus truyền thống.
+
+Việc áp dụng học máy trong bài toán phát hiện mã độc không
+chỉ giúp nâng cao tỷ lệ phát hiện (detection rate) mà còn
+góp phần giảm thiểu tỷ lệ cảnh báo sai (false positive),
+từ đó nâng cao độ tin cậy của các hệ thống phòng thủ an
+toàn thông tin. Đặc biệt, trong bối cảnh các chiến dịch
+tấn công có chủ đích (APT) ngày càng phổ biến và thường
+sử dụng mã độc được tùy chỉnh riêng cho từng mục tiêu,
+khả năng phát hiện dựa trên hành vi và đặc trưng tổng quát
+của các mô hình học máy đóng vai trò quan trọng trong việc tăng
+cường chiều sâu phòng thủ (defense in depth) cho các hệ
+thống CNTT.
+
+Bên cạnh ý nghĩa về mặt kỹ thuật, đề tài còn có giá trị
+nghiên cứu và đào tạo rõ rệt. Việc xây dựng mô-đun phát
+hiện mã độc PE dựa trên học máy giúp người nghiên cứu
+tiếp cận một cách hệ thống các kiến thức liên ngành,
+bao gồm: kiến trúc hệ điều hành Windows, định dạng file PE,
+kỹ thuật phân tích mã độc, xử lý dữ liệu, cũng như các thuật
+toán học máy hiện đại. Qua đó, đề tài góp phần củng cố nền
+tảng lý thuyết và kỹ năng thực hành trong lĩnh vực an toàn
+thông tin và trí tuệ nhân tạo - vốn là những lĩnh vực then
+chốt trong khoa học máy tính hiện nay.
+
+Ngoài ra, đề tài còn mang ý nghĩa quan trọng trong việc:
+
 \begin{itemize}
-    \item Bối cảnh và lý do chọn đề tài: Bài toán KLTN giải quyết là gì, trong bối cảnh Khoa học/kỹ thuật/thực tiễn như thế nào? Vì sao đề tài này quan trọng và có ý nghĩa?
-
-    \item Mô tả bài toán: Phát biểu rõ ràng bài toán mà KLTN giải quyết, gồm đầu vào, đầu ra, phạm vi và các giả định (nếu có)
-
-    \item Mục tiêu và phạm vi nghiên cứu của KLTN
-    \item Cấu trúc KLTN
+    \item Góp phần nâng cao năng lực nghiên cứu và tự chủ
+    công nghệ trong lĩnh vực an ninh mạng, thông qua việc
+    chủ động xây dựng và đánh giá các mô hình phát hiện
+    mã độc, thay vì hoàn toàn phụ thuộc vào các giải pháp
+    đóng và công nghệ nước ngoài.
+    \item Đáp ứng yêu cầu bảo đảm an toàn thông tin trong
+    quá trình chuyển đổi số tại Việt Nam, phù hợp với các
+    định hướng và chiến lược phát triển an toàn, an ninh mạng
+    do Chính phủ đề ra, \cite{lsvn2026} đặc biệt trong bối
+    cảnh gia tăng các mối đe dọa mạng nhắm vào hệ thống
+    CNTT trong nước.
 \end{itemize}
+
+Với những lý do trên, đề tài "Ứng dụng học máy trong phát hiện
+mã độc PE trên Windows" là một hướng nghiên cứu có giá trị
+khoa học, tính thời sự và khả năng ứng dụng thực tiễn cao,
+đồng thời phù hợp với mục tiêu đào tạo và nghiên cứu của
+các chuyên ngành liên quan đến an ninh, an toàn thông tin
+trong các cơ sở giáo dục đại học hiện nay.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\section*{Mô tả bài toán}
+\addcontentsline{toc}{section}{Mô tả bài toán}
+\markboth{Mô tả bài toán}{Mô tả bài toán}
+
+Khóa luận tập trung giải quyết hai bài toán có liên hệ mật thiết với
+nhau: \textit{bài toán nghiên cứu} phương pháp học máy để phân loại file
+PE (phân loại nhị phân, với nhãn phân loại là lành tính hoặc mã độc),
+và \textit{bài toán công nghệ} về triển khai dịch vụ phát hiện mã độc trên
+máy endpoint (Windows).
+
+Cụ thể, bài toán nghiên cứu mà khóa luận giải quyết:
+
+\begin{itemize}
+    \item \textbf{Đầu vào:} Một file thực thi định dạng PE trên Windows,
+        cùng với nhãn phân loại tương ứng (trong giai đoạn huấn luyện).
+    \item \textbf{Đầu ra:} Nhãn phân loại (lành tính - benign hoặc
+        mã độc - malware).
+    \item \textbf{Phạm vi:} Phân tích tĩnh (static analysis), không
+        thực thi file trong môi trường sandbox. Dữ liệu thực nghiệm sử
+        dụng tập EMBER2024.
+    \item \textbf{Giả định:} File PE hợp lệ về mặt cấu trúc và có thể
+        đọc được bằng các công cụ phân tích tĩnh thông thường.
+    \item \textbf{Phương pháp:} Xây dựng và so sánh các pipeline học
+        máy kết hợp đặc trưng từ EMBER2024 với đặc trưng năng lực mã
+        độc được trích xuất bằng công cụ Capa. Áp dụng kỹ thuật giảm
+        chiều TruncatedSVD để nén đặc trưng Capa, và SHAP để giải thích
+        kết quả dự đoán của mô hình.
+\end{itemize}
+
+Bài toán công nghệ mà khóa luận giải quyết:
+
+\begin{itemize}
+    \item \textbf{Đầu vào:} Một file PE cần kiểm tra, được cung cấp
+        thông qua giao diện người dùng (tải lên thủ công) hoặc được
+        phát hiện tự động bởi driver khi có tiến trình thực thi trên
+        máy endpoint.
+    \item \textbf{Đầu ra:} Kết quả phân loại (lành tính hoặc mã độc),
+        danh sách các năng lực/hành vi đặc trưng được trích xuất, giải
+        thích trực quan quyết định của mô hình với kỹ thuật xAI, và
+        lịch sử các lần quét được lưu trữ để tra cứu.
+    \item \textbf{Phạm vi:} Xây dựng hệ thống gồm nhiều thành phần
+        chạy trên máy endpoint Windows, bao gồm kernel driver (KMDF),
+        Windows service, module trích xuất đặc trưng (C++), giao diện
+        người dùng trên máy endpoint, và dịch vụ phân tích chuyên sâu
+        online (deep-analysis). Phần triển khai trong môi trường thực tế
+        (production) được tiếp cận ở mức mô phỏng và phân tích kiến
+        trúc; đề tài không đặt mục tiêu triển khai hoàn chỉnh trên hệ
+        thống quy mô lớn.
+    \item \textbf{Giả định:} Môi trường thực thi là máy tính cá nhân
+        hoặc máy trạm chạy Windows, có đủ quyền để cài đặt driver và
+        Windows service. Riêng dịch vụ phân tích file PE chuyên sâu
+        online được triển khai dưới dạng ứng dụng web trên hệ điều
+        hành Linux.
+    \item \textbf{Phương pháp:} Tích hợp pipeline học máy từ bài toán
+        nghiên cứu vào kiến trúc dịch vụ gồm hai chế độ - antivirus
+        offline chạy nền trên endpoint và dịch vụ phân tích sâu online
+        - kết hợp các kỹ thuật lập trình hệ thống Windows như lập
+        trình driver (KMDF), Windows service và Windows API.
+\end{itemize}
+
+
+
+
+
+
+
+
+\section*{Mục tiêu và phạm vi nghiên cứu của khóa luận}
+\addcontentsline{toc}{section}{Mục tiêu và phạm vi nghiên cứu của khóa luận}
+\markboth{Mục tiêu và phạm vi nghiên cứu của khóa luận}{Mục tiêu và phạm vi nghiên cứu của khóa luận}
+
+Khóa luận đặt ra ba mục tiêu chính như sau:
+
+\begin{enumerate}
+    \item \textbf{Nghiên cứu kỹ thuật trích xuất năng lực mã độc (capability extraction):}
+    Tìm hiểu và làm chủ các phương pháp phân tích tĩnh file PE nhằm trích xuất
+    các năng lực và hành vi đặc trưng của mã độc. Đây là nền tảng để xây dựng
+    bộ đặc trưng (feature set) có ý nghĩa ngữ nghĩa cao hơn so với các đặc
+    trưng cấu trúc thông thường, từ đó nâng cao hiệu quả phân loại của mô
+    hình học máy.
+    \item \textbf{Đánh giá thực nghiệm trên tập dữ liệu thực tế:}
+    Huấn luyện và đánh giá các mô hình học máy trên tập dữ liệu EMBER2024 - một
+    trong những tập dữ liệu benchmark chuẩn được công nhận, có quy mô lớn phù hợp
+    cho bài toán nghiên cứu, xây dựng mô hình phát hiện mã độc PE.
+    Thực nghiệm nhằm làm rõ bộ đặc trưng nào mang lại hiệu quả phân
+    loại tốt nhất, cũng như đóng góp của kỹ thuật capability extraction
+    vào hiệu quả tổng thể của mô hình học máy.
+    \item \textbf{Thiết kế và mô phỏng kiến trúc agent bảo mật trên endpoint:}
+    Nghiên cứu và thiết kế kiến trúc triển khai mô hình phát hiện mã độc dưới
+    dạng một agent chạy trực tiếp trên máy endpoint Windows. Phần này tiếp cận
+    ở mức mô phỏng và phân tích kiến trúc, tập trung vào việc tìm hiểu và áp
+    dụng các kỹ thuật lập trình hệ thống Windows bao gồm lập trình driver (KMDF),
+    lập trình Windows service và sử dụng Windows API. Đề tài không đặt mục tiêu
+    triển khai hoàn chỉnh trên hệ thống quy mô lớn.
+\end{enumerate}
+
+Do đó, phạm vi nghiên cứu của khóa luận có thể được tóm tắt như sau:
+
+\begin{itemize}
+    \item \textbf{Đối tượng phân tích:} File thực thi định dạng PE (.exe, .dll)
+    trên hệ điều hành Windows.
+    \item \textbf{Phương pháp phân tích:} Phân tích tĩnh (static analysis);
+    không bao gồm phân tích động (dynamic analysis) hay phân tích trong sandbox.
+    \item \textbf{Dữ liệu:} Tập dữ liệu EMBER2024 dùng cho huấn luyện và đánh giá mô hình.
+    \item \textbf{Mô hình học máy:} Tập trung vào các mô hình học máy truyền thống
+    (gradient boosting).
+    \item \textbf{Triển khai:} Ở mức thiết kế kiến trúc và mô phỏng thành phần
+    (Proof-of-Concept), phù hợp mục tiêu nghiên cứu, áp dụng các kỹ thuật lập
+    trình hệ thống trên hệ điều hành Windows.
+\end{itemize}
+
+
+
+
+
+
+
+\section*{Cấu trúc khóa luận}
+\addcontentsline{toc}{section}{Cấu trúc khóa luận}
+\markboth{Cấu trúc khóa luận}{Cấu trúc khóa luận}
+
+Phần còn lại của khóa luận được tổ chức thành các chương như sau:
+
+\textbf{Chương 1 - Cơ sở lý thuyết và công nghệ sử dụng:}
+Trình bày các kiến thức nền tảng cần thiết để hiểu các phương pháp
+được đề xuất ở các chương sau, bao gồm: tổng quan về mã độc và định
+dạng file PE, các phương pháp phát hiện mã độc, kỹ thuật trích xuất
+năng lực mã độc (capability extraction) bằng công cụ Capa, các mô hình
+học máy và kỹ thuật giảm chiều dữ liệu được sử dụng, phương pháp giải
+thích mô hình (xAI) với SHAP, các công trình nghiên cứu liên quan, và
+các công nghệ, thư viện áp dụng trong đề tài.
+
+\textbf{Chương 2 - Thiết kế và đánh giá các pipeline học máy trong
+phát hiện mã độc:}
+Trình bày kiến trúc tổng thể của giải pháp, thiết kế chi tiết ba
+pipeline học máy được đề xuất dựa trên các tổ hợp đặc trưng khác nhau
+(EMBER2024 thuần, EMBER2024 kết hợp Capa one-hot, EMBER2024 kết hợp
+Capa TruncatedSVD), và kết quả so sánh thực nghiệm giữa các pipeline
+trên tập dữ liệu EMBER2024. Từ đó xác định pipeline phù hợp nhất để
+đưa vào triển khai ở Chương 3.
+
+\textbf{Chương 3 - Phát triển dịch vụ phát hiện mã độc trên máy endpoint và dịch vụ phân tích mã độc online:}
+Trình bày phân tích yêu cầu và thiết kế chi tiết hệ thống agent chạy
+trên máy endpoint Windows, bao gồm các thành phần: kernel driver
+(KMDF), Windows service, module trích xuất đặc trưng, server/dịch vụ
+phân tích chuyên sâu online tích hợp Capa và SHAP, và giao diện người
+dùng trên máy endpoint. Chương này cũng trình bày kết quả cài đặt,
+các kịch bản kiểm thử và đánh giá hệ thống.
+
+\textbf{Kết luận và hướng phát triển:}
+Tổng kết các kết quả đạt được của cả hai bài toán nghiên cứu và công
+nghệ, nêu rõ những hạn chế còn tồn tại, và đề xuất hướng phát triển
+trong tương lai.

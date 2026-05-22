@@ -1,4 +1,83 @@
-\chapter*{Kết luận}
-\addcontentsline{toc}{chapter}{Kết luận}
+\chapter*{Kết luận và hướng phát triển}
+\addcontentsline{toc}{chapter}{Kết luận và hướng phát triển}
 
-Tóm tắt bài toán, giải pháp và các kết quả đạt được
+Khóa luận đã giải quyết hai bài toán có liên hệ mật thiết với nhau:
+nghiên cứu phương pháp học máy để phát hiện mã độc PE và triển khai
+kết quả nghiên cứu vào một hệ thống bảo vệ endpoint hoạt động được
+trên Windows.
+
+Về bài toán nghiên cứu, khóa luận đã xây dựng và đánh giá thực nghiệm
+ba pipeline học máy trên tập dữ liệu EMBER2024, tập trung vào việc
+đánh giá đóng góp của kỹ thuật trích xuất năng lực mã độc (capability
+extraction) bằng công cụ Capa. Kết quả cho thấy tất cả các pipeline
+có bổ sung đặc trưng Capa đều vượt baseline EMBER2024 thuần túy trên
+Partial AUC (FPR $\leq$ 0,5\%). Pipeline kết hợp EMBER2024 với Capa
+đã giảm chiều bằng TruncatedSVD-256 đạt kết quả tốt nhất với Partial
+AUC = 0,8850 và Full AUC = 0,9926, cải thiện lần lượt 0,34\% và
+0,04\% so với baseline (0,8816 và 0,9922). Kết quả này xác nhận rằng
+thông tin ngữ nghĩa hành vi từ Capa mang lại giá trị phân biệt bổ
+sung thực chất, đồng thời cho thấy TruncatedSVD vừa phù hợp với đặc
+trưng dạng thưa của Capa, vừa có tác dụng lọc nhiễu tốt hơn so với
+multi-hot encoding thuần túy.
+
+Về bài toán công nghệ, khóa luận đã thiết kế và hiện thực hóa kiến
+trúc hệ thống bảo vệ endpoint gồm năm thành phần: module trích xuất
+đặc trưng C++ (ember2024-fe-cpp) đạt tốc độ nhanh hơn cài đặt Python
+gốc từ 12 đến 20 lần; kernel driver phát hiện tiến trình thực thi
+(pmd-driver); dịch vụ nền tích hợp mô hình học máy (pmd-service); giao
+diện người dùng với thông báo thời gian thực (pmd-ui); và dịch vụ phân
+tích sâu trực tuyến tích hợp Capa và SHAP (deep-analysis-server). Việc
+tích hợp SHAP theo nhóm đặc trưng giúp người dùng hiểu được lý do mô
+hình đưa ra quyết định phân loại, nâng cao tính minh bạch và khả năng
+ứng dụng thực tế của hệ thống.
+
+Tuy nhiên, khóa luận vẫn còn một số hạn chế. Về
+phía nghiên cứu, thực nghiệm so sánh các pipeline được thực hiện trên
+tập con 450.000 mẫu thay vì toàn bộ tập EMBER2024, do giới hạn về
+thời gian chạy Capa. Đề tài cũng chỉ tập trung vào phân tích tĩnh và
+một mô hình học máy duy nhất (LightGBM), chưa so sánh với các kiến
+trúc học sâu. Về phía hệ thống, driver chưa được ký số nên chỉ có thể
+nạp qua chế độ Provisioning trên máy ảo phát triển (dev machine), không phù hợp với
+triển khai trên máy người dùng thực tế (song đây là giới hạn của
+phạm vi đề tài). Ngoài ra, kernel module hiện chưa có các cơ chế chống
+can thiệp (anti-tampering) cần thiết cho môi trường triển khai thực tế.
+
+Từ những kết quả và hạn chế trên, khóa luận đề xuất một số hướng
+phát triển tiếp theo. Trước hết, cần mở rộng thực nghiệm trên toàn
+bộ tập EMBER2024 và so sánh với các kiến trúc học sâu để có đánh giá
+toàn diện hơn về hiệu quả của capability extraction. Tiếp theo, mặc
+dù bổ sung đặc trưng Capa mang lại cải thiện có ý nghĩa, mức cải
+thiện còn khiêm tốn gợi ý rằng việc biểu diễn capability ở mức hành
+vi đơn lẻ chưa khai thác hết tiềm năng của thông tin ngữ nghĩa. Một
+hướng nghiên cứu đầy triển vọng là nâng mức trừu tượng từ capability
+lên \textit{intent} - tức là suy luận ý đồ của mã độc (đánh cắp dữ
+liệu, duy trì/persistence, tránh phát hiện/evade detection...)
+từ sự kết hợp của
+nhiều capability, thay vì xử lý từng capability độc lập. Đây là một
+research gap còn khá mở, trong đó các framework như MITRE ATT\&CK có
+thể đóng vai trò nền tảng để xây dựng biểu diễn đặc trưng cấp cao
+hơn. Song song đó, tích hợp phân tích động theo hướng hybrid analysis
+- ví dụ thông qua knowledge distillation như đã trình bày trong
+Chương~1 - có thể nâng cao khả năng phát hiện các mẫu mã độc trốn
+tránh phân tích tĩnh. Về phía hệ thống, các hướng phát triển
+tiếp theo bao gồm cho phép cấu hình ngưỡng phân loại (threshold) linh hoạt;
+tăng cường cơ chế chống can thiệp tại kernel module
+(pmd-driver) nhằm đảm bảo tính toàn vẹn trong
+môi trường thực tế, bao gồm tận dụng Trusted Platform Module (TPM);
+bổ sung callback ở cấp kernel để giám sát thêm các sự kiện như DLL
+image mapping, và xây dựng cơ chế tạm thời khóa file PE trong quá
+trình chờ quét ở user mode. Cuối cùng, mở rộng pipeline sang các định
+dạng file khác ngoài PE - chẳng hạn ELF, PDF và APK - là các
+hướng phát triển tiềm năng khi nền tảng nghiên cứu đã được
+xây dựng vững chắc.
+
+Nhìn chung, khóa luận đã có những đóng góp ở cả phương diện
+nghiên cứu và ứng dụng thực tiễn. Về mặt nghiên cứu, đề tài
+cung cấp các bằng chứng thực nghiệm cho thấy hiệu quả của
+phương pháp trích xuất capability trong bài toán phát hiện
+mã độc PE. Về mặt công nghệ, khóa luận xây dựng thành công
+một hệ thống bảo vệ endpoint hoàn chỉnh, kết hợp giữa lập
+trình hệ thống trên Windows và các kỹ thuật học máy hiện đại.
+Những kết quả và kinh nghiệm thu được từ đề tài được kỳ vọng
+sẽ trở thành nền tảng hữu ích cho các nghiên cứu và ứng dụng
+tiếp theo trong lĩnh vực phát hiện mã độc và an toàn thông tin.

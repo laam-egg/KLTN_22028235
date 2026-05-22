@@ -1,4 +1,11 @@
 \addvspace {10\p@ }
+\contentsline {table}{\numberline {1.1}{\ignorespaces \textit {Các calling convention phổ biến trên Windows}}}{33}{table.caption.8}%
 \addvspace {10\p@ }
+\contentsline {table}{\numberline {2.1}{\ignorespaces Kết quả so sánh các pipeline theo ROC-AUC (validation) và AUC (test set).}}{38}{table.caption.19}%
 \addvspace {10\p@ }
-\addvspace {10\p@ }
+\contentsline {table}{\numberline {3.1}{\ignorespaces Các thành phần chính của hệ thống}}{43}{table.caption.20}%
+\contentsline {table}{\numberline {3.2}{\ignorespaces So sánh hiệu năng giữa hai bộ trích xuất đặc trưng EMBER2024 - Python và C++}}{44}{table.caption.23}%
+\contentsline {table}{\numberline {3.3}{\ignorespaces Môi trường cài đặt và kiểm thử}}{51}{table.caption.27}%
+\contentsline {table}{\numberline {3.4}{\ignorespaces Phân tách phần tự cài đặt và phần tận dụng}}{52}{table.caption.28}%
+\contentsline {table}{\numberline {3.5}{\ignorespaces Kịch bản kiểm thử end-to-end}}{53}{table.caption.29}%
+\contentsline {table}{\numberline {3.6}{\ignorespaces Kết quả kiểm thử end-to-end}}{54}{table.caption.30}%

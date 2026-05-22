@@ -1,0 +1,112 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.0.3 Chrome/140.0.7339.249 Electron/38.7.0 Safari/537.36" version="29.0.3">
+  <diagram name="Page-1" id="2LecRuXytexnynSbgQt3">
+    <mxGraphModel dx="2505" dy="981" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="ybxV2-9zJp-cH0ALqbZ4-36" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFBF4;dashed=1;dashPattern=8 8;" vertex="1" parent="1">
+          <mxGeometry x="580" y="60" width="580" height="500" as="geometry" />
+        </mxCell>
+        <mxCell id="ybxV2-9zJp-cH0ALqbZ4-33" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F9FBFF;dashed=1;dashPattern=8 8;" vertex="1" parent="1">
+          <mxGeometry x="-80" y="60" width="570" height="670" as="geometry" />
+        </mxCell>
+        <mxCell id="ybxV2-9zJp-cH0ALqbZ4-29" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.75;entryDx=0;entryDy=0;endArrow=none;endFill=0;" edge="1" parent="1" source="ybxV2-9zJp-cH0ALqbZ4-1" target="ybxV2-9zJp-cH0ALqbZ4-3">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="420" y="615" />
+              <mxPoint x="420" y="170" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ybxV2-9zJp-cH0ALqbZ4-30" value="Decision History&lt;div&gt;(Allow/Block)&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="ybxV2-9zJp-cH0ALqbZ4-29">
+          <mxGeometry x="-0.0055" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ybxV2-9zJp-cH0ALqbZ4-1" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;&lt;b&gt;pmd-driver&lt;/b&gt;&lt;/font&gt;&lt;div&gt;&lt;font&gt;KMDF - process creation callback&lt;/font&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="170" y="560" width="200" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="ybxV2-9zJp-cH0ALqbZ4-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=none;endFill=0;" edge="1" parent="1" source="ybxV2-9zJp-cH0ALqbZ4-2" target="ybxV2-9zJp-cH0ALqbZ4-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ybxV2-9zJp-cH0ALqbZ4-28" value="Process Creation Notification" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="ybxV2-9zJp-cH0ALqbZ4-12">
+          <mxGeometry x="-0.0673" y="1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ybxV2-9zJp-cH0ALqbZ4-2" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;&lt;b&gt;pmd-service&lt;/b&gt;&lt;/font&gt;&lt;div&gt;Windows Service - C++&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="170" y="280" width="200" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="ybxV2-9zJp-cH0ALqbZ4-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;" edge="1" parent="1" source="ybxV2-9zJp-cH0ALqbZ4-3" target="ybxV2-9zJp-cH0ALqbZ4-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ybxV2-9zJp-cH0ALqbZ4-3" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;&lt;b&gt;pmd-ui&lt;/b&gt;&lt;/font&gt;&lt;div&gt;Windows GUI API - C++&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="170" y="80" width="200" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="ybxV2-9zJp-cH0ALqbZ4-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;endArrow=none;endFill=0;" edge="1" parent="1" source="ybxV2-9zJp-cH0ALqbZ4-4" target="ybxV2-9zJp-cH0ALqbZ4-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ybxV2-9zJp-cH0ALqbZ4-26" value="EMBERv3 features" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="ybxV2-9zJp-cH0ALqbZ4-10">
+          <mxGeometry x="0.0333" y="-1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ybxV2-9zJp-cH0ALqbZ4-4" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;&lt;b&gt;ember2024-fe-cpp&lt;/b&gt;&lt;/font&gt;&lt;div&gt;C++ DLL - EMBERv3 feature extraction&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="-60" y="440" width="150" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="ybxV2-9zJp-cH0ALqbZ4-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;" edge="1" parent="1" source="ybxV2-9zJp-cH0ALqbZ4-5" target="ybxV2-9zJp-cH0ALqbZ4-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ybxV2-9zJp-cH0ALqbZ4-27" value="Inference" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="ybxV2-9zJp-cH0ALqbZ4-11">
+          <mxGeometry x="-0.2069" relative="1" as="geometry">
+            <mxPoint x="6" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ybxV2-9zJp-cH0ALqbZ4-5" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;&lt;b&gt;Local LightGBM model&lt;/b&gt;&lt;/font&gt;&lt;div&gt;EMBER2024 pretrained&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="-60" y="290" width="150" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="ybxV2-9zJp-cH0ALqbZ4-6" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;&lt;b&gt;deep-analysis-server&lt;/b&gt;&lt;/font&gt;&lt;div&gt;FastAPI - Capa+TruncatedSVD256 - LightGBM - SHAP&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="783" y="80" width="210" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="ybxV2-9zJp-cH0ALqbZ4-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.25;entryY=1;entryDx=0;entryDy=0;endArrow=none;endFill=0;" edge="1" parent="1" source="ybxV2-9zJp-cH0ALqbZ4-7" target="ybxV2-9zJp-cH0ALqbZ4-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ybxV2-9zJp-cH0ALqbZ4-20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;" edge="1" parent="1" source="ybxV2-9zJp-cH0ALqbZ4-7" target="ybxV2-9zJp-cH0ALqbZ4-16">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ybxV2-9zJp-cH0ALqbZ4-7" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;&lt;b&gt;Remote LightGBM model&lt;/b&gt;&lt;/font&gt;&lt;div&gt;EMBERv3 + TruncatedSVD - Trained on 450K&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="703" y="270" width="150" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="ybxV2-9zJp-cH0ALqbZ4-18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.25;entryY=1;entryDx=0;entryDy=0;endArrow=none;endFill=0;" edge="1" parent="1" source="ybxV2-9zJp-cH0ALqbZ4-14" target="ybxV2-9zJp-cH0ALqbZ4-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ybxV2-9zJp-cH0ALqbZ4-25" value="EMBERv3 features" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="ybxV2-9zJp-cH0ALqbZ4-18">
+          <mxGeometry x="-0.3123" y="1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ybxV2-9zJp-cH0ALqbZ4-14" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;&lt;b&gt;ember2024-fe-cpp&lt;/b&gt;&lt;/font&gt;&lt;div&gt;C++ DLL - EMBERv3 feature extraction&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="603" y="440" width="150" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="ybxV2-9zJp-cH0ALqbZ4-24" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.75;entryY=1;entryDx=0;entryDy=0;endArrow=none;endFill=0;" edge="1" parent="1" source="ybxV2-9zJp-cH0ALqbZ4-15" target="ybxV2-9zJp-cH0ALqbZ4-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ybxV2-9zJp-cH0ALqbZ4-15" value="&lt;span style=&quot;font-size: 14px;&quot;&gt;&lt;b&gt;Capa&lt;/b&gt;&lt;/span&gt;&lt;br&gt;&lt;div&gt;Capability extractor from MANDIANT&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="813" y="440" width="150" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="ybxV2-9zJp-cH0ALqbZ4-16" value="&lt;span style=&quot;font-size: 14px;&quot;&gt;&lt;b&gt;SHAP&lt;/b&gt;&lt;/span&gt;&lt;br&gt;&lt;div&gt;Explain model decision&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="923" y="270" width="150" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="ybxV2-9zJp-cH0ALqbZ4-22" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.714;entryY=1.025;entryDx=0;entryDy=0;entryPerimeter=0;endArrow=none;endFill=0;" edge="1" parent="1" source="ybxV2-9zJp-cH0ALqbZ4-16" target="ybxV2-9zJp-cH0ALqbZ4-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ybxV2-9zJp-cH0ALqbZ4-35" value="Máy endpoint (Windows)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="-70" y="660" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ybxV2-9zJp-cH0ALqbZ4-37" value="Máy chủ phân tích (Ubuntu)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="1030" y="490" width="120" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

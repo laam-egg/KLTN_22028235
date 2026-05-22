@@ -5,9 +5,41 @@
 \addcontentsline{toc}{chapter}{Abstract}
 \begin{small}
 
-Summary of the graduation thesis: The problem statement, the proposed approach, and the achieved results.
+% Summary of the graduation thesis: The problem statement, the proposed approach, and the achieved results.
 
+This thesis investigates the application of machine learning to the
+detection of Portable Executable (PE) malware on the Windows operating
+system, with two main contributions: an empirical evaluation of
+capability extraction as a feature engineering technique in machine
+learning pipelines, and the design and implementation of a functional
+endpoint protection system on Windows.
+
+On the research side, three LightGBM-based machine learning pipelines
+are proposed and compared using the EMBER2024 dataset. The pipelines
+differ in how their input feature vectors are constructed: using only
+EMBER2024 features (baseline), augmenting with Capa-derived capability
+features encoded as one-hot vectors, and augmenting with Capa features
+reduced via TruncatedSVD. Experiments conducted on 450,000 training
+samples and 50,000 test samples show that the pipeline combining
+EMBER2024 with Capa TruncatedSVD-256 achieves the best performance,
+with a Partial AUC (FPR $\leq$ 0.5\%) of 0.8850 and a Full AUC of
+0.9926, improving over the baseline by 0.34\% and 0.04\% respectively.
+These results demonstrate that the behavioral semantic information
+provided by Capa contributes meaningful discriminative value beyond
+conventional PE structural features.
+
+On the engineering side, the thesis designs and implements a five-
+component system architecture: a high-performance C++ feature
+extraction module (12 to 20 times faster than the original Python
+implementation), a KMDF-based kernel driver for process execution
+monitoring, a Windows background service integrating the machine
+learning model, a real-time notification user interface, and an online
+deep analysis service incorporating Capa and SHAP. The system is
+capable of detecting and blocking malware at the moment of execution
+on the endpoint, while also providing in-depth analysis and model
+decision explanations through the online deep analysis service.
 
 \vspace*{1cm}
-\textbf{Keywords}: Liệt kê 3-5 từ khoá liên quan
+\textbf{Keywords}: malware detection, machine learning,
+EMBER2024, capability extraction, Windows driver.
 \end{small}

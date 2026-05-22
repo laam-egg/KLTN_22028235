@@ -1,36 +1,298 @@
+\chapter{Thiết kế và đánh giá các pipeline học máy trong phát hiện mã độc}
 
+\section{Tổng quan kiến trúc giải pháp}
 
+Hình~\ref{fig:pipeline_overview} mô tả kiến trúc tổng thể của giải
+pháp học máy được đề xuất trong chương này. Quy trình bắt đầu từ một
+file PE đầu vào, đi qua hai nhánh trích xuất đặc trưng song song,
+sau đó được ghép nối thành một vector thống nhất và đưa vào mô hình
+LightGBM để phân loại.
 
-\chapter{Phương pháp đề xuất}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{figures/ml-pipeline.png}
+    \caption{Kiến trúc tổng thể của giải pháp phát hiện mã độc PE
+    dựa trên học máy.}
+    \label{fig:pipeline_overview}
+\end{figure}
 
-\paragraph{Đối với các KLTN giải quyết bài toán nghiên cứu:}
+\textbf{Nhánh đặc trưng EMBER2024} trích xuất vector đặc trưng tĩnh
+2.568 chiều từ file PE theo định dạng EMBERv3 (EMBER2024), bao gồm các nhóm đặc
+trưng về cấu trúc PE header, section, import table, chuỗi văn bản,
+nội dung nhị phân và chữ ký số. Đây là nhánh bắt buộc, có mặt trong
+cả ba pipeline.
 
+\textbf{Nhánh đặc trưng Capa} (tùy chọn) chạy công cụ Capa trên file
+PE để trích xuất danh sách các năng lực (capability) mà file có thể
+thực hiện. Kết quả được mã hóa thành vector và ghép nối với vector
+EMBER2024 trước khi đưa vào mô hình. Do Capa yêu cầu thời gian phân
+tích đáng kể trên mỗi file, nhánh này chỉ được kích hoạt trong dịch
+vụ phân tích sâu (deep-analysis-server) - không chạy tại endpoint.
+Ngoài ra, mỗi pipeline cũng áp dụng cách xử lý nhánh đặc trưng Capa
+khác nhau (nếu có sử dụng).
+
+Lựa chọn \textbf{LightGBM} làm mô hình phân loại xuất phát từ các
+lý do đã trình bày ở Chương 1: hiệu năng cao trên dữ liệu đặc trưng
+tĩnh nhiều chiều, tốc độ suy luận nhanh phù hợp với triển khai thực
+tế, và khả năng diễn giải thông qua feature importance. Bản thân
+LightGBM đã là một phương pháp ensemble nội tại (gradient boosting
+của nhiều cây quyết định), do đó không cần thêm lớp ensemble bên
+ngoài. Bên cạnh đó, mô hình đã huấn luyện (pre-trained) trên toàn bộ
+tập EMBER2024 gốc cũng cho kết quả rất tốt, với ROC-AUC tổng thể
+là 0.9949.
+
+Chương này so sánh \textbf{ba pipeline} khác nhau về cách xây dựng
+vector đặc trưng đầu vào cho LightGBM:
 \begin{itemize}
-    \item Tiêu đề của chương thường là ``Phương pháp đề xuất/Mô hình đề xuất cho bài toán XYZ''. 
-    \item Chương này cần trình bày được:
-    \begin{itemize}
-        \item Tổng quan phương pháp/Kiến trúc tổng thể
-        \item Mô hình/thuật toán/phương pháp chi tiết
-        \item Cần lý giải được vì sao giải quyết bài toán như vậy, phân tích ưu, nhược điểm 
-    \end{itemize}
+    \item \textbf{Pipeline a}: chỉ sử dụng đặc trưng EMBER2024
+        (baseline).
+    \item \textbf{Pipeline b}: EMBER2024 kết hợp đặc trưng Capa
+        dạng multi-hot encoding.
+    \item \textbf{Pipeline c}: EMBER2024 kết hợp đặc trưng Capa
+        sau khi giảm chiều bằng TruncatedSVD, thử nghiệm với các
+        số chiều 64, 128 và 256.
 \end{itemize}
 
-\paragraph{Đối với các KTLN xây dựng hệ thống:}
-\begin{itemize}
-    \item Tiêu đề của chương thường là ``Phân tích và thiết kế hệ thống XYZ''.
-    \item Chương này cần trình bày được:
-    \begin{itemize}
-        \item Phân tích yêu cầu
-        \item Kiến trúc tổng quan của hệ thống
-        \item Thiết kế hệ thống chi tiết: Biểu đồ ca sử dụng, các biểu đồ tuần tự, biểu đồ luồng hoạt động, biểu đồ lớp cho các ca sử dụng chính
-        \item Thiết kế CSDL
-    \end{itemize}
-\end{itemize}
 
-Lưu ý:
-\begin{itemize}
-    \item \textbf{Không} đưa các bảng biểu/hình ảnh không liên quan vào KLTN
-    \item Tiêu đề Bảng đặt trên bảng, tiêu đề Hình đặt dưới hình
-    \item Toàn bộ hình ảnh, bảng biểu phải được tham chiếu và giải thích rõ ràng. \textbf{Không} chấp nhận các KLTN với các mục chỉ có hình/bảng không có giải thích/mô tả/thảo luận. 
-    \item \textbf{Không} viết KLTN theo dạng ``gạch đầu dòng'' để đảm bảo rõ ràng và liền mạch trong việc giải thích và lập luận.
-\end{itemize}
+
+
+
+
+
+
+
+
+
+
+\section{Thiết kế các pipeline học máy}
+
+\subsection{Tập dữ liệu EMBER2024}
+
+EMBER2024 \cite{ember2024benchmark} là tập dữ liệu benchmark quy mô lớn được
+thu thập từ tháng 9 năm 2023 đến tháng 12 năm 2024, bao gồm hơn 3,2
+triệu file thuộc sáu định dạng khác nhau (Win32, Win64, .NET, APK,
+ELF và PDF). Tập dữ liệu được chia theo thời gian: \textbf{tập huấn
+luyện} gồm 2.626.000 file từ 52 tuần đầu và \textbf{tập kiểm tra}
+gồm 606.000 file từ 12 tuần cuối. Cách chia này mô phỏng điều kiện
+thực tế, trong đó mô hình phải phát hiện các mẫu mã độc mới hơn so
+với dữ liệu huấn luyện.
+
+Vector đặc trưng sử dụng định dạng \textbf{EMBERv3} với 2.568 chiều,
+là phiên bản mở rộng so với EMBERv2, bổ sung hỗ trợ DOS header, data
+directories, Rich header, chữ ký Authenticode và cảnh báo phân tích
+PE (PE file warnings).
+
+Trong phạm vi thực nghiệm so sánh các pipeline, do giới hạn tài
+nguyên tính toán và thời gian chạy Capa trên số lượng lớn mẫu, đề
+tài sử dụng một tập con gồm \textbf{450.000 mẫu huấn luyện} và
+\textbf{50.000 mẫu kiểm tra}, được lấy mẫu từ tập dữ liệu gốc của
+EMBER2024 với tỷ lệ độc/sạch (malware/benign) cân bằng. Lưu ý rằng khi triển
+khai pipeline a tại endpoint (Chương 3), mô hình được sử dụng là mô
+hình LightGBM gốc do nhóm tác giả EMBER2024 cung cấp, được huấn
+luyện trên toàn bộ tập dữ liệu.
+
+\subsection{Pipeline a: EMBER2024 thuần}
+
+Pipeline a là baseline của thực nghiệm, sử dụng trực tiếp vector đặc
+trưng EMBERv3 2.568 chiều làm đầu vào cho LightGBM mà không bổ sung
+bất kỳ đặc trưng nào khác. Pipeline này phản ánh cách tiếp cận phổ
+biến nhất trong các nghiên cứu sử dụng tập dữ liệu EMBER, đồng thời
+là nền tảng để đánh giá mức độ đóng góp của đặc trưng Capa ở các
+pipeline sau. Việc huấn luyện pipeline a trên tập con nhằm đảm
+bảo việc so sánh các pipeline là công bằng và khách quan, thay
+vì sử dụng mô hình gốc đã huấn luyện sẵn (pretrained) trên toàn
+bộ tập dữ liệu đầy đủ của dự án EMBER2024.
+
+\subsection{Pipeline b: EMBER2024 kết hợp Capa multi-hot}
+
+Pipeline b bổ sung đặc trưng năng lực từ Capa vào vector EMBER2024.
+Với mỗi file PE, Capa trả về danh sách các capability mà file có thể
+thực hiện. Danh sách này được mã hóa thành vector nhị phân dạng
+\textbf{multi-hot}: mỗi chiều tương ứng với một capability trong
+từ điển capability toàn cục, nhận giá trị 1 nếu file có capability
+đó và 0 nếu không có. Vector Capa multi-hot sau đó được ghép nối
+(concatenate) với vector EMBER2024 gốc tạo thành vector đầu vào tổng hợp
+cho mô hình LightGBM.
+
+Nhược điểm của cách mã hóa này là vector Capa multi-hot có số chiều
+lớn và rất thưa (sparse) - phần lớn các chiều có thể nhận giá trị 0 -
+dẫn đến chi phí tính toán cao hơn và nguy cơ gây nhiễu cho mô hình.
+Pipeline c được thiết kế để khắc phục hạn chế này.
+
+\subsection{Pipeline c: EMBER2024 kết hợp Capa TruncatedSVD}
+
+Pipeline c áp dụng kỹ thuật giảm chiều \textbf{TruncatedSVD} lên
+vector Capa multi-hot trước khi ghép nối với vector EMBER2024. TruncatedSVD
+phân tích ma trận đặc trưng Capa của toàn bộ tập huấn luyện và chiếu
+vector Capa từ không gian chiều cao xuống một không gian chiều thấp
+hơn, đồng thời giữ lại các thành phần phương sai lớn nhất - tức là
+các tổ hợp capability có tính phân biệt cao nhất giữa các mẫu.
+
+Để xác định số chiều nén phù hợp, thực nghiệm được thực hiện với ba
+giá trị: \textbf{64, 128 và 256 chiều}. Vector nén sau đó được ghép
+nối với vector EMBER2024 2.568 chiều, tạo thành vector đầu vào tổng
+hợp có số chiều lần lượt là 2.632, 2.696 và 2.824.
+
+Lý do lựa chọn TruncatedSVD thay cho các kỹ thuật giảm chiều phổ biến
+khác như PCA (Principal Component Analysis) xuất phát từ đặc điểm của
+dữ liệu Capa. Vector Capa multi-hot là ma trận \textbf{rất thưa
+(sparse)}: với mỗi file PE, chỉ một phần nhỏ trong tổng số capability
+được kích hoạt, dẫn đến phần lớn các chiều nhận giá trị 0.
+PCA truyền thống yêu cầu dữ liệu được chuẩn hóa quanh giá trị trung bình
+(mean-centering) trước khi phân tích các thành phần chính. Đối với dữ
+liệu sparse, thao tác này thường phá vỡ cấu trúc thưa của ma trận,
+khiến dữ liệu trở nên dense và làm tăng đáng kể chi phí bộ nhớ cũng như
+thời gian tính toán trên các tập dữ liệu lớn.
+Ngược lại, TruncatedSVD có thể hoạt động trực tiếp trên ma trận sparse
+mà không cần mean-centering, đồng thời chỉ tính toán một số lượng nhỏ
+các singular value và singular vector quan trọng nhất. Do đó, TruncatedSVD
+là lựa chọn phù hợp trong pipeline này, vừa đảm bảo hiệu quả tính toán trên
+tập dữ liệu quy mô lớn, vừa tương thích tự nhiên với đặc trưng Capa
+dạng thưa mà không làm mất đi tính chất thống kê quan trọng của dữ
+liệu.
+
+\subsection{Cấu hình huấn luyện}
+
+Tất cả các pipeline đều sử dụng mô hình LightGBM với cùng bộ siêu
+tham số, nhằm đảm bảo tính công bằng khi so sánh. Quá trình huấn
+luyện áp dụng cơ chế dừng sớm \texttt{lgb.early\_stopping(50)}: dừng
+huấn luyện nếu điểm ROC-AUC trên tập validation không cải thiện trong
+50 vòng (rounds) liên tiếp. Độ đo theo dõi trong quá trình huấn luyện là
+ROC-AUC trên tập validation; độ đo chính để so sánh các pipeline trên
+tập kiểm tra là \textbf{Partial AUC tại FPR $\leq$ 0,5\%} và Full
+AUC, được trình bày ở phần tiếp theo.
+
+
+
+
+
+\section{Đánh giá và so sánh các pipeline}
+
+\subsection{Lựa chọn độ đo đánh giá}
+
+Trong bài toán phát hiện mã độc tại môi trường thực tế, False Positive
+Rate (FPR) - tỷ lệ dương tính giả (tỷ lệ file lành tính bị phân loại nhầm thành mã độc)
+- là chỉ số đặc biệt quan trọng. Một hệ thống cảnh báo nhầm quá
+nhiều sẽ mất đi tính khả dụng và gây mất niềm tin của người dùng,
+đặc biệt trong môi trường doanh nghiệp nơi hàng nghìn file được thực
+thi mỗi ngày. Do đó, đề tài sử dụng \textbf{Partial AUC tại FPR
+$\leq$ 0,5\%} làm độ đo chính - chỉ số này đo khả năng phát hiện
+mã độc của mô hình trong vùng FPR cực thấp, phản ánh sát nhất yêu
+cầu vận hành thực tế. \textbf{Full AUC} được sử dụng như độ đo phụ
+để đánh giá hiệu quả tổng thể trên toàn bộ tất cả các ngưỡng phân loại.
+
+
+
+
+\subsection{Kết quả thực nghiệm}
+
+Bảng~\ref{tab:pipeline_results} trình bày ROC-AUC trên tập validation
+theo các mốc iteration và kết quả cuối cùng trên tập kiểm tra của năm
+cấu hình được thử nghiệm.
+
+\begin{table}[h]
+\centering
+\caption{Kết quả so sánh các pipeline theo ROC-AUC (validation) và
+AUC (test set).}
+\label{tab:pipeline_results}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Iteration} &
+\textbf{Pipeline a} &
+\textbf{Pipeline b} &
+\textbf{Pipeline c} &
+\textbf{Pipeline c} &
+\textbf{Pipeline c} \\
+& \textbf{(EMBER2024)} &
+\textbf{(+Capa multi-hot)} &
+\textbf{(+Capa SVD-64)} &
+\textbf{(+Capa SVD-128)} &
+\textbf{(+Capa SVD-256)} \\
+\midrule
+100 & 0.991358 & 0.991224 & 0.991288 & 0.991317 & 0.991116 \\
+200 & 0.992569 & 0.992687 & 0.992706 & 0.992782 & 0.992563 \\
+300 & 0.992794 & 0.993042 & 0.992997 & 0.993162 & 0.992987 \\
+400 & ---$^{(1)}$ & 0.993130 & 0.993082 & 0.993283 & 0.993159 \\
+500 & ---$^{(1)}$ & 0.993251 & 0.993194 & ---$^{(2)}$ & 0.993282 \\
+\midrule
+\multicolumn{6}{l}{\textit{Kết quả trên tập kiểm tra (test set)}} \\
+\midrule
+Partial AUC (FPR$\leq$0,5\%) &
+0.8816 & 0.8843 & 0.8830 & 0.8838 & \textbf{0.8850} \\
+Full AUC &
+0.9922 & \textbf{0.9927} & \textbf{0.9927} & 0.9925 & 0.9926 \\
+\bottomrule
+\end{tabular}%
+}
+\vspace{4pt}
+\begin{flushleft}
+\small
+$^{(1)}$ Dừng sớm (early stopping) tại iteration 251, ROC-AUC validation = 0.992813.\\
+$^{(2)}$ Dừng sớm (early stopping) tại iteration 446, ROC-AUC validation = 0.993314.
+\end{flushleft}
+\end{table}
+
+\subsection{Nhận xét kết quả}
+
+Từ kết quả trong Bảng~\ref{tab:pipeline_results}, có thể rút ra một
+số nhận xét sau:
+
+\textbf{Đặc trưng Capa có đóng góp thực chất.}
+Tất cả các pipeline có bổ sung đặc trưng Capa đều vượt baseline
+pipeline a trên Partial AUC - độ đo chính của thực nghiệm. Điều
+này cho thấy thông tin về năng lực mang lại giá trị phân biệt bổ sung
+mà đặc trưng EMBER2024 thuần túy chưa phản ánh đủ. Đáng chú ý, ở
+các iteration đầu (100--20 vòng), pipeline a và các pipeline Capa
+có kết quả xấp xỉ nhau; sự khác biệt chỉ bộc lộ rõ từ iteration 200
+trở đi, khi mô hình bắt đầu khai thác sâu hơn các mối quan hệ trong
+đặc trưng.
+
+\textbf{Pipeline a hội tụ sớm nhất.}
+Baseline dừng sớm tại iteration 251, trong khi các pipeline có Capa
+tiếp tục cải thiện đến iteration 400--500. Điều này phản ánh rằng
+việc bổ sung đặc trưng Capa làm tăng độ phức tạp của không gian đặc
+trưng, cho phép mô hình tiếp tục học thêm thông tin hữu ích trong
+các vòng huấn luyện tiếp theo.
+
+\textbf{TruncatedSVD-256 là lựa chọn tốt nhất trong nhóm pipeline c.}
+Trong ba thử nghiệm giảm chiều bằng TruncatedSVD được thử nghiệm, SVD-256 đạt Partial AUC
+cao nhất (0.8850) trên tập kiểm tra, vượt SVD-64 (0.8830) và SVD-128
+(0.8838). Kết quả này cho thấy việc giữ lại nhiều chiều hơn giúp bảo
+toàn thông tin năng lực tốt hơn, đặc biệt trong vùng FPR thấp.
+SVD-128 dừng sớm nhất trong nhóm (iteration 446) và đạt Full AUC
+validation cao nhất (0.993314), nhưng lại không dẫn đến Partial AUC
+tốt nhất trên tập kiểm tra - điều này gợi ý rằng hội tụ nhanh
+không đồng nghĩa với hiệu năng tốt trong vùng FPR thấp.
+
+\textbf{So sánh pipeline b và pipeline c.}
+Pipeline b (Capa multi-hot) đạt Full AUC bằng với SVD-64 (0.9927),
+nhưng Partial AUC (0.8843) thấp hơn SVD-256 (0.8850). Điều này cho
+thấy TruncatedSVD không chỉ giúp giảm chi phí tính toán mà còn có
+tác dụng lọc nhiễu, loại bỏ các chiều capability ít có tính phân biệt
+và giữ lại các tổ hợp capability quan trọng nhất.
+
+\subsection{Thảo luận và lựa chọn pipeline triển khai}
+
+Dựa trên kết quả thực nghiệm, đề tài lựa chọn hai pipeline để đưa
+vào triển khai tại Chương~3, với tiêu chí cân bằng giữa hiệu quả
+phát hiện và yêu cầu vận hành:
+
+\textbf{Pipeline a} được lựa chọn cho \textbf{dịch vụ antivirus
+offline tại endpoint}. Mặc dù Partial AUC thấp hơn các pipeline có
+Capa, pipeline a có ưu thế quyết định về tốc độ: trích xuất đặc trưng
+EMBER2024 thuần túy có thể thực hiện trong dưới một phân mười giây đối
+với file nhỏ, phù hợp với yêu cầu phân tích thời gian thực tại máy endpoint.
+Hơn nữa, khi triển khai tại endpoint, đề tài sử dụng mô hình
+LightGBM gốc được nhóm tác giả EMBER2024 cung cấp - đã được huấn
+luyện trên toàn bộ 2,6 triệu mẫu - thay vì mô hình huấn luyện trên
+tập con 450K mẫu, nhờ đó đảm bảo hiệu năng phân loại tốt nhất có thể
+cho dịch vụ offline.
+
+\textbf{Pipeline c (SVD-256)} được lựa chọn cho \textbf{dịch vụ phân
+tích sâu online (deep-analysis-server)}. Trong ngữ cảnh này, thời gian
+phân tích có thể kéo dài hơn do người dùng chủ động yêu cầu phân tích
+một file cụ thể, và kết quả trả về cần mang nhiều thông tin ngữ nghĩa
+hơn - bao gồm danh sách capability được trích xuất và giải thích
+SHAP. Bên cạnh đó, pipeline c cũng đạt Partial AUC cao nhất (0.8850) trong số các
+pipeline được thử nghiệm.

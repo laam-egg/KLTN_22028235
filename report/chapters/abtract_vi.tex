@@ -6,10 +6,42 @@
 
 \begin{small}
 
-Tóm tắt nội dung KL tốt nghiệp: Bài toán, phương pháp giải quyết, kết quả đạt được 
+\chapter*{Tóm tắt}
+\addcontentsline{toc}{chapter}{Tóm tắt}
 
+Khóa luận này nghiên cứu ứng dụng học máy trong phát hiện mã độc
+định dạng PE (Portable Executable) trên hệ điều hành Windows, với
+hai đóng góp chính: đánh giá thực nghiệm hiệu quả của kỹ thuật
+trích xuất năng lực mã độc (capability extraction) trong pipeline
+học máy, và xây dựng hệ thống bảo vệ endpoint hoạt động được trên
+Windows.
+
+Về phía nghiên cứu, khóa luận đề xuất và so sánh ba pipeline học
+máy dựa trên mô hình LightGBM, sử dụng tập dữ liệu EMBER2024. Ba
+pipeline khác nhau ở cách xây dựng vector đặc trưng đầu vào: chỉ
+dùng đặc trưng EMBER2024 (baseline), bổ sung đặc trưng năng lực
+từ công cụ Capa dạng one-hot, và bổ sung đặc trưng Capa đã giảm
+chiều bằng TruncatedSVD. Kết quả thực nghiệm trên 450.000 mẫu huấn
+luyện và 50.000 mẫu kiểm tra cho thấy pipeline kết hợp EMBER2024
+với Capa TruncatedSVD-256 đạt hiệu quả tốt nhất với Partial AUC
+(FPR $\leq$ 0,5\%) = 0,8850 và Full AUC = 0,9926, cải thiện so với
+baseline lần lượt là 0,34\% và 0,04\%. Kết quả này cho thấy thông
+tin ngữ nghĩa hành vi từ Capa mang lại giá trị phân biệt bổ sung
+thực chất so với đặc trưng cấu trúc PE thông thường.
+
+Về phía công nghệ, khóa luận thiết kế và hiện thực hóa kiến trúc
+hệ thống gồm năm thành phần: module trích xuất đặc trưng hiệu năng
+cao viết bằng C++ (nhanh hơn cài đặt Python gốc từ 12 đến 20 lần),
+kernel driver phát hiện tiến trình thực thi dựa trên KMDF, dịch vụ
+nền tích hợp mô hình học máy, giao diện người dùng với thông báo
+thời gian thực, và dịch vụ phân tích sâu trực tuyến tích hợp Capa
+và SHAP. Hệ thống cho phép phát hiện và chặn mã độc ngay tại thời
+điểm thực thi tại endpoint, đồng thời cung cấp khả năng phân tích
+sâu và giải thích quyết định của mô hình thông qua dịch vụ phân
+tích chuyên sâu trực tuyến.
 
 \vspace*{1cm}
-\textbf{Từ khóa}: Liệt kê 3-5 từ khoá liên quan
+\textbf{Từ khóa}: mã độc, học máy, EMBER2024,
+trích xuất năng lực, Windows driver.
 
 \end{small}

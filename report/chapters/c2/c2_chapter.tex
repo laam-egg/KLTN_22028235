@@ -1,18 +1,1195 @@
 \chapter{Cơ sở lý thuyết}
 
-Trong chương này cần trình bày được các kiến thức cơ sở là nền tảng cần thiết để người đọc hiểu đầy đủ các phương pháp được trình bày ở các chương sau. Chương này thường bao gồm các nội dung sau:
+
+
+
+\section{Tổng quan về mã độc PE trên hệ điều hành Windows}
+
+
+
+
+\subsection{Tổng quan về mã độc (malware)}
+
+Mã độc (malware - malicious software) là thuật ngữ dùng để
+chỉ các chương trình phần mềm được thiết kế với mục đích
+gây hại cho hệ thống máy tính, đánh cắp dữ liệu, gián điệp
+người dùng, hoặc thực hiện các hành vi trái phép khác mà
+không có sự cho phép của chủ sở hữu hệ thống. Mã độc có
+thể lây lan qua nhiều con đường khác nhau như email,
+phần mềm giả mạo, thiết bị lưu trữ di động hoặc qua
+mạng Internet.
+
+Các nhà nghiên cứu chia mã độc thành nhiều loại khác nhau,
+và mỗi loại mã độc lại có thể được phân loại chi tiết hơn
+(chia thành các phân nhóm nhỏ hơn). Một số loại mã độc phổ
+biến trong hệ thống máy tính và hệ thống mạng bao gồm: \cite{wikimalware}
+
+\begin{enumerate}
+    \item \textbf{Virus máy tính (Computer virus):}
+	Lây nhiễm bằng cách chèn mã độc vào các tập tin hợp lệ
+	(vật chủ) và phát tán khi người dùng mở các tập tin đó.
+
+	\item \textbf{Sâu (Worm):} Loại mã độc có khả năng
+	tự nhân bản và lây lan nhanh qua mạng mà không cần
+	đến tập tin chủ (vật chủ) như virus.
+
+    \item \textbf{Trojan:} Loại mã độc ngụy trang dưới
+	dạng phần mềm hợp lệ để đánh lừa người dùng cài đặt.
+
+    \item \textbf{Mã độc tống tiền (Ransomware):}
+	Mã hóa dữ liệu của nạn nhân và đòi tiền chuộc để khôi phục.
+
+    \item \textbf{Phần mềm gián điệp (Spyware):}
+	Theo dõi và ghi lại hành vi người dùng để đánh cắp thông
+	tin nhạy cảm. Một trong những dạng spyware đầu tiên là
+	keylogger - ghi lại các thao tác gõ phím của người dùng.
+	Một số phần mềm gián điệp hiện đại còn khai thác thông
+	tin kênh bên (side-channel) từ các đặc tính vật lý của
+	hệ thống (như điện năng tiêu thụ, nhiệt độ, thời gian
+	thực thi\dots) nhằm phục vụ cho việc phân tích, giải mã
+	thông tin mã hóa, bẻ khóa hệ thống, truy cập trái
+	phép\dots
+
+    \item \textbf{Rootkit:} Loại mã độc ẩn mình sâu trong
+	hệ thống, che giấu các tiến trình hoặc tệp tin liên
+	quan để tránh bị phát hiện. Rootkit có thể làm được
+	điều này là nhờ nó can thiệp sâu vào kernel hoặc
+	các thành phần hệ thống quan trọng, cho phép nó
+	kiểm soát hệ thống cũng như các phần mềm bảo mật.
+\end{enumerate}
+
+Mã độc có thể được chứa trong nhiều loại tệp tin, thậm chí cả PDF.
+Trên hệ điều hành Windows, một trong những loại tệp tin chứa mã độc
+phổ biến hơn cả là định dạng PE (Portable Executable) - định dạng
+tập tin thực thi tiêu chuẩn của Windows, thường có phần mở rộng
+.exe, .dll, .sys... Mã độc PE lợi dụng cấu trúc đặc trưng của
+định dạng này, cũng như những lỗ hổng trong cách thức hệ điều hành
+Windows nạp (load) chúng vào bộ nhớ, từ đó chèn mã độc vào các
+vùng nhớ, giấu mã hoặc thực hiện các hành vi tinh vi như tải
+xuống mã độc bổ sung, thực thi theo điều kiện, hoặc chống phân
+tích ngược\dots
+
+Mã độc hiện đại thường là một phần trong các chiến dịch tấn công
+có chủ đích (APT - Advanced Persistent Threat). Các chiến dịch
+này được tổ chức bài bản, kéo dài trong thời gian dài và thường
+nhắm vào các tổ chức, doanh nghiệp hoặc cơ quan chính phủ để
+đánh cắp thông tin, gây rối hoạt động hoặc phá hoại. \cite{wikiapt}
+
+Hiện nay, thế giới đang chứng kiến sự gia tăng mạnh mẽ cả về số
+lượng lẫn mức độ tinh vi của các loại mã độc. Theo báo cáo của
+AV-TEST (2024), \cite{avtestmalwarestats} trung bình mỗi ngày có hơn 450.000 mẫu mã độc
+mới được phát hiện trên toàn cầu, cho thấy mức độ phát triển
+nhanh chóng và khó kiểm soát của các mối đe dọa này. Đặc biệt,
+mã độc dạng PE (Portable Executable) vẫn chiếm tỷ lệ lớn trong
+các cuộc tấn công nhắm vào hệ điều hành Windows, nền tảng phổ
+biến trong cả môi trường cá nhân lẫn doanh nghiệp. Do khả năng
+thực thi dễ dàng, linh hoạt và tích hợp sâu vào hệ thống, mã
+độc PE có thể lợi dụng nhiều kỹ thuật để tránh bị phát hiện,
+đồng thời phát tán nhanh chóng trong mạng nội bộ của tổ chức.
+Điều này đặt ra rủi ro nghiêm trọng về mất mát dữ liệu, gián
+đoạn hoạt động kinh doanh và thậm chí là ảnh hưởng đến an ninh
+quốc gia nếu các cơ quan chính phủ bị xâm nhập.
+
+Trong bối cảnh chuyển đổi số đang diễn ra mạnh mẽ tại Việt Nam
+cũng như nhiều quốc gia trên thế giới theo định hướng Cách mạng
+công nghiệp 4.0, các hệ thống thông tin ngày càng trở nên phức
+tạp, kết nối chặt chẽ và phụ thuộc nhiều hơn vào công nghệ.
+Điều này đồng nghĩa với việc mở rộng bề mặt tấn công (attack
+surface) cho các đối tượng xấu và làm gia tăng nguy cơ bị mã độc
+tấn công, đặc biệt trong các tổ chức trọng yếu như ngân hàng,
+y tế, cơ quan nhà nước hay doanh nghiệp hạ tầng. Chính vì vậy,
+nhu cầu xây dựng và triển khai các phương pháp phát hiện và
+ngăn chặn mã độc hiệu quả, trong đó có mã độc PE, đang trở
+thành một vấn đề cấp bách, không chỉ đối với các tổ chức
+chuyên về an ninh mạng mà còn đối với toàn bộ hệ sinh thái
+số quốc gia.
+
+
+
+
+
+
+
+
+
+
+
+
+
+\subsection{Tổng quan về các phương pháp phát hiện và ngăn chặn mã độc}
+
+Mã độc ngày nay không chỉ đơn giản là những đoạn mã phá hoại mà
+đã phát triển thành các công cụ tấn công tinh vi, được sử dụng
+trong các chiến dịch APT, ransomware, gián điệp công nghiệp và
+thậm chí là tấn công vào cơ sở hạ tầng quốc gia. Trước thực trạng
+đó, không một giải pháp đơn lẻ nào có thể đảm bảo an toàn tuyệt
+đối, mà cần đến một chiến lược an ninh mạng nhiều lớp
+(multi-layered security), kết hợp các phương pháp phát hiện và
+ngăn chặn từ nhiều góc độ, chẳng hạn như:
+
 \begin{itemize}
-    \item Các khái niệm, định nghĩa cơ bản
-    \item Các mô hình, phương pháp, thuật toán nền tảng
-    \item Các công cụ, công nghệ, nền tảng liên quan
-    \item Các giải pháp/nghiên cứu liên quan
-    
+	\item \textbf{Lớp bảo vệ mạng:} Phát hiện mã độc qua lưu
+	lượng mạng, sandbox, IDS/IPS.
+
+	\item \textbf{Lớp cổng kết nối:} Ngăn chặn mã độc qua email,
+	web, tệp tải về.
+
+	\item \textbf{Lớp endpoint:} Phát hiện và phản ứng trực tiếp
+	trên thiết bị đầu cuối - nơi mã độc thực sự được thực thi.
+
+	\item \textbf{Lớp ứng dụng/cloud:} Bảo vệ dịch vụ, dữ liệu
+	và nền tảng trong môi trường đám mây.
+
+	\item \textbf{Lớp phân tích và phản ứng:} Bao gồm Threat
+	Intelligence, SOC, SIEM, Threat Hunting\dots
 \end{itemize}
 
-Lưu ý:
+Trong đó, việc bảo vệ endpoint (thiết bị đầu cuối) \cite{wikiendpointsecurity} đóng vai
+trò đặc biệt quan trọng bởi đây là nơi mã độc thực sự tác động
+đến người dùng, dữ liệu và tài sản số của tổ chức. Các thiết bị
+đầu cuối như máy tính cá nhân, máy chủ, laptop nhân viên, thiết
+bị IoT\dots là đích đến cuối cùng của phần lớn mã độc. Dù tấn
+công bắt đầu từ email, trình duyệt hay thiết bị USB, mã độc vẫn
+cần được thực thi trên endpoint để gây hại. Do đó, bảo vệ
+endpoint là tuyến phòng thủ cuối cùng và quan trọng nhất, giúp
+tổ chức phát hiện sớm các hành vi đáng ngờ ngay tại thiết bị,
+ngăn chặn mã độc trước khi nó thực hiện hành vi phá hoại hoặc
+lây lan, cũng như có khả năng phản ứng kịp thời, cách ly thiết
+bị, thu thập bằng chứng phục vụ điều tra. Một giải pháp phát
+hiện mã độc ngay tại máy endpoint của người dùng có thể được
+coi là rất hữu ích và hiệu quả.
+
+Trên cơ sở đó, việc khóa luận tập trung phát triển tính năng
+agent phát hiện mã độc chạy trên máy endpoint là hoàn toàn phù hợp
+với nhu cầu thực tiễn. Thay vì chỉ dừng lại ở việc xây dựng mô hình
+học máy thuần túy, khóa luận hướng đến tích hợp mô hình vào một hệ
+thống có thể vận hành thực sự trên môi trường Windows - nơi mã độc
+PE thực sự hoạt động và gây hại. Tuy nhiên, việc xây dựng một giải pháp bảo vệ endpoint hoàn chỉnh
+đòi hỏi sự kết hợp của nhiều lớp kỹ thuật khác nhau, từ phân tích
+và phân loại file cho đến giám sát hành vi thời gian thực ở tầng hệ
+điều hành. Để giải quyết hiệu quả bài toán phân loại, cần có một
+pipeline học máy đủ mạnh, được xây dựng trên bộ đặc trưng phong phú
+và có ý nghĩa ngữ nghĩa. Bên cạnh đặc trưng cấu trúc thông thường
+của file PE, việc bổ sung thông tin về \textit{năng lực} (capability)
+mà file có thể thực hiện - chẳng hạn khả năng mã hóa dữ liệu, kết
+nối mạng, leo thang đặc quyền hay can thiệp vào tiến trình hệ thống
+- mang lại góc nhìn ngữ nghĩa sâu hơn, giúp mô hình phân biệt mã
+độc hiệu quả hơn so với chỉ dựa vào đặc trưng thống kê đơn thuần.
+Chi tiết việc xây dựng và tích hơp pipeline sẽ được trình bày,
+làm rõ trong Chương 2 và Chương 3.
+
+
+
+
+
+
+\subsection{Tổng quan về x86/amd64 Assembly}
+
+Trong lĩnh vực an toàn thông tin, đặc biệt là trong phân tích và
+phát hiện mã độc trên hệ điều hành Windows, kiến thức nền tảng về
+kiến trúc vi xử lý x86/amd64 và định dạng tệp thực thi PE
+(Portable Executable) đóng vai trò rất quan trọng. Đây là hai
+yếu tố kỹ thuật cốt lõi giúp hiểu rõ cách mã độc hoạt động,
+cách chúng lẩn tránh các cơ chế bảo vệ, cũng như cách các
+công cụ phân tích có thể phát hiện và vô hiệu hóa chúng.
+
+Windows hiện vẫn là hệ điều hành phổ biến nhất cho người dùng
+cá nhân và doanh nghiệp. Các mã độc nhắm vào nền tảng này - đặc
+biệt là dạng mã độc PE - tiếp tục chiếm tỷ lệ lớn trong các
+chiến dịch tấn công thực tế. Với khả năng can thiệp trực tiếp
+vào bộ nhớ, ẩn mình trong tiến trình hợp pháp, hoặc khai thác
+các kỹ thuật cấp thấp, mã độc PE đòi hỏi người phòng thủ phải
+nắm vững kiến thức kỹ thuật ở tầng thấp (low-level), cụ thể là:
 
 \begin{itemize}
-    \item Cần tham chiếu đến các tài liệu tham khảo \textbf{đúng} và \textbf{đủ}. Thiếu tham chiếu đến tài liệu tham khảo coi như sao chép.
-    \item \textbf{Không} chép lại nội dung từ các tài liệu tham khảo, SV cần diễn đạt lại các nội dung tương ứng phù hợp với bài toán và phạm vi của KLTN
-    \item Đối với các KLTN xây dựng hệ thống, nội dung của chương này chỉ tập trung trình bày các công cụ/công nghệ sử dụng (không đi sâu lý thuyết/thuật toán) thì có thể đổi tên tiêu đề thành ``Nền tảng và công nghệ sử dụng''
+    \item Cấu trúc và cách thức hoạt động của mã máy (Assembly)
+	trên nền kiến trúc x86/amd64. Hiện nay, đây vẫn là kiến trúc
+	tập lệnh (ISA) phổ biến nhất được sử dụng bởi các thiết bị
+	Windows cũng như các tệp PE.
+    \item Định dạng và đặc điểm nội tại của các tệp PE.
 \end{itemize}
+
+Việc hiểu được cách các mã máy được sinh ra, tổ chức trong
+một tệp PE, và cuối cùng được nạp vào bộ nhớ và thực thi,
+là nền tảng không thể thiếu cho các chuyên gia làm việc trong
+các lĩnh vực như phân tích mã độc (malware analysis), kỹ thuật
+dịch ngược (reverse engineering) và xây dựng hệ thống phát
+hiện mã độc bằng học máy (ML-based malware detection).
+Khóa luận này sẽ trình bày chi tiết về hai chủ đề chính:
+kiến trúc x86/amd64 và định dạng tệp PE, trong đó đặc biệt
+nhấn mạnh tới các điểm dễ bị lợi dụng bởi mã độc cũng như
+các đặc trưng hữu ích cho việc phát hiện và phân tích chúng.
+
+Hai kiến trúc x86 (32-bit) và amd64 (64-bit, còn gọi là x86-64)
+là nền tảng xử lý phổ biến nhất trên máy tính cá nhân và máy chủ
+sử dụng hệ điều hành Windows. Cả hai kiến trúc này đều thuộc họ
+CISC (Complex Instruction Set Computing), với tập lệnh đa dạng
+và phong phú, cho phép lập trình viên thao tác trực tiếp với
+bộ nhớ, thanh ghi, và luồng điều khiển chương trình. \cite{intel-sdm} \cite{amd64-manual} \cite{ms-x64-calling}
+
+\textbf{Về thanh ghi và cấu trúc bộ xử lý}, kiến trúc x86
+cung cấp 8 thanh ghi 32-bit tổng quát: EAX, EBX, ECX, EDX,
+ESI, EDI, EBP, ESP. Kiến trúc amd64 mở rộng số lượng
+thanh ghi tổng quát lên 16, với kích thước 64-bit: RAX,
+RBX, RCX, RDX, RSI, RDI, RBP, RSP và 8 thanh ghi còn lại
+R8-R15. Các thanh ghi ESP, RSP (Stack Pointer) và EIP,
+RIP (Instruction Pointer) đóng vai trò quan trọng trong
+điều khiển luồng thực thi, và cũng bị lợi dụng bởi một số
+kỹ thuật tấn công phổ biến, chẳng hạn return-oriented
+programming (ROP).
+
+\textbf{Về chế độ vận hành}, hai kiến trúc đều cung cấp
+các chế độ real mode, protected mode và long mode.
+Trong real mode (chế độ thực), CPU không thực hiện bảo
+vệ bộ nhớ cấp phần cứng (hardware-level memory protection) - tức
+không gian địa chỉ luôn ánh xạ 1:1 với địa chỉ thực của bộ nhớ.
+Trong khi đó, protected mode (chế độ bảo vệ) được sử dụng rộng
+rãi trong x86, hỗ trợ phân vùng bộ nhớ và quyền truy cập,
+không cho phép các chương trình đọc, ghi trực tiếp vào địa
+chỉ thực của bộ nhớ mà phải sử dụng địa chỉ ảo (virtual addresses).
+Long mode là chế độ chỉ có ở amd64, cho phép truy cập không gian
+bộ nhớ lên tới 64 bit, sử dụng paging để bảo vệ vùng nhớ.
+
+\textbf{Về tập lệnh và cú pháp}, hai kiến trúc đều có
+tập lệnh hợp ngữ (assembly) rất đa dạng và có nhiều lệnh
+(mnemonics) tương đồng, bao gồm thao tác số học (ADD,
+SUB, INC, DEC), logic (AND, OR, XOR), đọc, ghi dữ liệu
+(MOV, PUSH, POP), điều khiển luồng (CALL, JMP, RET, LOOP,
+JZ, JNZ\dots). Cú pháp phổ biến của hợp ngữ trên Windows
+là Intel syntax. Ngoài ra còn có AT\&T syntax. Cần lưu ý
+rằng một đoạn mã máy có thể được dịch trở lại thành mã
+hợp ngữ khác nhau do sự khác biệt về syntax hay các biến
+thể của các trình hợp dịch (assembler) và dịch ngược
+(disassembler).
+
+Ngoài ra, trong phân tích mã độc và nghiên cứu file thực thi nhị phân (binary),
+việc hiểu về quy ước hay giao ước gọi hàm (calling convention) cũng rất
+quan trọng. Một calling convention quyết định cách các tham số được
+truyền vào hàm, cách hàm đó lưu giá trị trả về, và cách
+vùng nhớ stack được quản lý khi gọi hàm đó. Các calling
+convention phổ biến được cho trong \ref{tab:calling-conventions}. Biết được
+calling convention, người ta có thể xác định điểm vào
+hàm, tham số, và luồng điều khiển khi xem disassembly - điều
+cực kỳ quan trọng khi phân tích thủ công các tệp thực thi PE.
+Hơn nữa, mã độc thường thao túng stack hoặc gọi các API hệ
+thống một cách gián tiếp (indirect call, ví dụ dùng
+\texttt{LoadLibrary} và \texttt{GetProcAddress} trên Windows),
+khiến việc hiểu rõ calling convention là cần thiết để truy vết
+hành vi thực sự của mã độc. Một số mã độc còn cố tình vi
+phạm calling convention chuẩn để gây lỗi, gây khó hiểu (confuse)
+cho các công cụ phân tích tĩnh như disassembler, công cụ dịch
+ngược sang ngôn ngữ C (chẳng hạn Ghidra, IDA)\dots
+
+Có thể thấy, các lệnh hợp ngữ chỉ thực hiện các thao tác đơn
+giản, hơn nữa các calling convention chỉ là giao ước giữa
+các hàm với nhau, hoàn toàn không bị bắt buộc hay bị kiểm
+tra bởi CPU. Do đó, kiến trúc x86/amd64 tạo điều kiện cho
+các cuộc tấn công khai thác lỗ hổng ở tầng thấp, chẳng hạn
+buffer overflow, return-oriented programming (ROP) hay
+shellcode injection. Nhiều mã độc được viết
+bằng assembly tối giản, nhỏ gọn, khó phát hiện khi chưa
+giải mã hoặc unpack. Việc hiểu và áp dụng hợp ngữ trên
+Windows, đặc biệt là x86 và amd64, đóng vai trò quan
+trọng trong phân tích mã độc, cũng như nghiên cứu giải
+pháp phát hiện và ngăn chặn mã độc mới.
+
+\begin{table}[h]
+  \centering
+  \begin{tabularx}{\textwidth}{|X|X|X|X|X|}
+  \hline
+  \textbf{Tên} & \textbf{Kiến trúc} & \textbf{Truyền tham số \textit{(kiểu số nguyên hoặc pointer)}} & \textbf{Trách nhiệm clean up stack} & \textbf{Ghi chú} \\
+  \hline
+  \texttt{cdecl} & x86 & Đẩy tham số lên stack (tham số cuối được đẩy trước) & Caller & Dùng phổ biến trong C \\
+  \hline
+  \texttt{stdcall} & x86 & Như \texttt{cdecl} & \textit{Callee} & Dùng trong WINAPI \\
+  \hline
+  \texttt{fastcall} & x86 & ECX, EDX, và đẩy các tham số còn lại lên stack như \texttt{cdecl} & \textit{Callee} & Nhanh hơn, thường thấy trong tối ưu (compiler optimization), song không phổ biến \\
+  \hline
+  \texttt{Microsoft x64} & amd64 & RCX, RDX, R8, R9, và đẩy các tham số còn lại lên stack như \texttt{cdecl} & Caller & Mặc định trên Windows 64-bit \\
+  \hline
+  \end{tabularx}
+  \caption{\textit{Các calling convention phổ biến trên Windows}}
+  \label{tab:calling-conventions}
+\end{table}
+
+
+
+
+
+
+
+
+\subsection{Tổng quan về định dạng PE (Portable Executable) trên Windows}
+
+Định dạng PE (Portable Executable) \cite{ms-pe-format} \cite{rickpefilestructure}
+là định dạng chuẩn
+cho các tệp thực thi trên hệ điều hành Windows, bao gồm \texttt{.exe},
+\texttt{.dll}, \texttt{.sys}, và một số định dạng khác. PE là phần mở
+rộng của định dạng COFF (Common Object File Format), được Microsoft
+phát triển để hỗ trợ nạp mã máy vào bộ nhớ và thực thi một cách linh
+hoạt. Mỗi tệp PE là một tổ chức chặt chẽ giữa mã máy (executable
+code), dữ liệu (data), siêu dữ liệu (metadata), và thông tin cần thiết
+để hệ điều hành có thể thực thi chương trình đúng ngữ cảnh.
+
+Cấu trúc tổng quát của tệp PE gồm 5 bộ phận chính kế tiếp nhau:
+
+\begin{itemize}
+    \item \textbf{DOS Header} (còn gọi là MS-DOS Header): vùng có kích
+        thước 64 bytes nhằm mục đích tương thích ngược với hệ điều hành
+        MS-DOS. Nếu chạy tệp PE trong DOS, header này khiến DOS nhận
+        diện tệp là một tệp thực thi bình thường và sẽ thực thi phần mã
+        máy trong DOS stub. Đối với Windows NT, bộ phận này chỉ còn tồn
+        tại vì lý do lịch sử. Đặc trưng của DOS Header là mở đầu bằng
+        2 byte \texttt{"MZ"} (\texttt{0x5A4D}) - được gọi là
+        \textit{magic number} - là dấu hiệu nhận diện tệp thực thi
+        của DOS.
+
+    \item \textbf{DOS Stub:} vùng chứa mã máy chạy được trong DOS.
+        Thông thường vùng này in ra dòng thông báo \textit{``This
+        program cannot be run in DOS mode''} rồi thoát chương trình.
+        Phần này chỉ tồn tại vì lý do tương thích ngược; hệ điều hành
+        Windows không thực thi mã máy trong phần này.
+
+    \item \textbf{PE Header} (NT Header): vùng chứa các metadata -
+        thông tin tổng thể về tập tin, chẳng hạn kiến trúc CPU của mã
+        thực thi, số sections, và characteristics (đặc tính tập tin:
+        executable, system file\dots). Đặc trưng của vùng này là mở đầu
+        bằng một signature chứa 4 bytes \texttt{0x50450000}, tức
+        \texttt{"PE{\textbackslash}0{\textbackslash}0"} theo ASCII.
+
+    \item \textbf{Section Headers:} chứa thông tin từng section, bao
+        gồm địa chỉ bắt đầu, kích thước và các thuộc tính của section.
+
+    \item \textbf{Sections:} vùng chứa nội dung thực sự của các
+        section, với vị trí và thuộc tính đã được định nghĩa trong
+        Section Headers. Các sections điển hình bao gồm:
+        \begin{itemize}
+            \item \texttt{.text}: chứa mã thực thi.
+            \item \texttt{.data}: biến toàn cục/biến tĩnh có thể đọc
+                và ghi.
+            \item \texttt{.rdata}: dữ liệu chỉ đọc.
+            \item \texttt{.reloc}: bảng ánh xạ lại địa chỉ
+                (relocations).
+            \item \texttt{.rsrc}: tài nguyên (resources) như ảnh,
+                icon, form\dots
+        \end{itemize}
+\end{itemize}
+
+Kiến trúc x86/amd64 và định dạng PE trên Windows, tuy linh hoạt và
+hiệu quả cho thực thi mã, nhưng cũng ẩn chứa nhiều điểm yếu có thể
+bị mã độc lợi dụng để xâm nhập, ẩn mình và hoạt động âm thầm trong
+hệ thống. Dưới đây liệt kê một số điểm yếu tiêu biểu:
+
+\begin{itemize}
+    \item \textbf{Bộ nhớ phẳng (flat) và chia sẻ (shared):} Trên
+        Windows, tiến trình có thể truy cập toàn bộ không gian địa chỉ
+        ảo của mình. Nếu không có cơ chế bảo vệ như DEP (Data Execution
+        Prevention) hay ASLR (Address Space Layout Randomization), mã
+        độc có thể thay đổi dữ liệu, ghi đè mã, hoặc thực thi từ vùng
+        dữ liệu một cách dễ dàng.
+
+    \item \textbf{Thiếu kiểm soát chặt chẽ giữa code và data:} Kết
+        hợp với kỹ thuật code injection (tiêm mã vào tiến trình khác),
+        mã độc có thể viết và thực thi mã ở bất kỳ đâu nếu có quyền
+        phù hợp. Chẳng hạn, mã độc có thể che giấu payload bằng cách
+        mã hóa, sau đó giải mã ra một vùng nhớ và đặt quyền thực thi
+        trên vùng đó để kích hoạt mã độc.
+
+    \item \textbf{Indirect calls/jumps:} Assembly cho phép gọi hàm
+        hoặc nhảy đến địa chỉ được lưu trong thanh ghi hoặc bộ nhớ
+        (ví dụ: \texttt{CALL [EAX]}, \texttt{JMP RAX}). Mã độc dùng
+        kỹ thuật này để ẩn đích thực thi, gây khó khăn cho phân tích
+        tĩnh và các công cụ dịch ngược.
+
+    \item \textbf{Gọi API động:} Mã độc thường sử dụng
+        \texttt{LoadLibrary}, \texttt{GetProcAddress}, resolve hashing,
+        hoặc kỹ thuật gọi hàm theo địa chỉ offset để lẩn tránh các bộ
+        lọc theo chuỗi API tĩnh.
+\end{itemize}
+
+Lợi dụng linh hoạt các điểm yếu trên, người ta đã phát triển rất
+nhiều kỹ thuật khai thác nhắm vào tập tin PE và môi trường thực thi
+Windows, chẳng hạn:
+
+\begin{itemize}
+    \item \textbf{Section spoofing:} Tạo các section giả với tên hợp
+        lệ như \texttt{.text} hoặc \texttt{.rdata} nhưng chứa mã độc,
+        gây nhầm lẫn cho công cụ phân tích; hoặc tạo section tùy ý
+        chứa mã độc (\texttt{.xyz}, \texttt{.UPX}, \texttt{.bss},\dots).
+
+    \item \textbf{PE header corruption:} Thay đổi hoặc làm hỏng PE
+        Header nhằm làm gián đoạn công cụ phân tích hoặc antivirus.
+
+    \item \textbf{Entry point manipulation:} Thay đổi Entry Point để
+        trỏ vào mã độc thay vì hàm \texttt{main} hoặc \texttt{WinMain}
+		thông thường.
+
+    \item \textbf{Import table spoofing:} Tạo bảng IAT (Import Address
+        Table) giả, hoặc mã hóa các chuỗi API để vượt qua signature
+        detection.
+
+    \item \textbf{Packing/obfuscation:} Sử dụng packer, crypter để mã
+        hóa toàn bộ phần \texttt{.text}, chỉ giải mã khi chạy, từ đó
+        vô hiệu hóa phân tích tĩnh thông thường. Một số kỹ thuật làm
+        nhiễu trong Relocation và Exception Table cũng thường được sử
+        dụng.
+
+    \item \textbf{Process hollowing/doppelgänging:} Tạo một tiến trình
+        hợp pháp (như \texttt{notepad.exe}), rồi ghi đè bộ nhớ của
+        tiến trình đó bằng mã độc, giúp chạy dưới tên process hợp lệ.
+
+    \item \textbf{Reflective DLL injection:} Tiêm DLL trực tiếp vào
+        bộ nhớ mà không cần ghi xuống đĩa, tránh bị antivirus phát
+        hiện.
+
+    \item \textbf{Syscall direct invocation:} Mã độc bỏ qua các API
+        cấp cao và trực tiếp gọi syscall của Windows, vượt qua hook
+        của EDR (Endpoint Detection and Response).
+
+    \item \textbf{Return-oriented programming (ROP):} Dùng các đoạn
+        mã ngắn (gadgets) có sẵn trong thư viện để tạo luồng thực thi,
+        giúp né DEP và gây khó khăn cho phân tích dòng điều khiển.
+\end{itemize}
+
+Việc hiểu rõ đặc điểm và điểm yếu của kiến trúc x86/amd64 và định
+dạng PE trên Windows là điều kiện tiên quyết để xây dựng các hệ thống
+phát hiện mã độc hiệu quả. Đây cũng là nền tảng để áp dụng các kỹ
+thuật như disassembly, symbolic execution, feature extraction và học
+máy trong phân tích mã độc hiện đại.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\subsection{Tổng quan về các phương pháp phân tích mã độc PE}
+
+Trước khi đưa vào mô hình học máy để phát hiện và phân loại (là lành
+tính hay có chứa mã độc, mã độc thuộc loại nào\dots), một tập tin PE
+cần được phân tích và trích xuất đặc trưng. Có ba phương pháp phân
+tích tập tin PE cơ bản: phân tích tĩnh, phân tích động và phương pháp
+lai. \cite{singh2021survey, damodaran2017comparison}
+
+\textbf{Phân tích tĩnh} (static analysis) trích xuất đặc trưng mà
+không cần thực thi mẫu mã độc. Nhiều loại đặc trưng tĩnh khác nhau
+có thể được thu thập, bao gồm: giá trị băm (hash), chuỗi N-gram, mã
+vận hành (opcode), chuỗi văn bản (string), và thông tin tiêu đề PE
+(PE header). Dựa trên những đặc trưng này, các phần mềm phát hiện mã
+độc như chương trình chống virus, hệ thống phát hiện xâm nhập (IDS),
+v.v. được xây dựng. Để kiểm tra mẫu mã độc ở cấp độ mã máy, các tập
+tin thực thi được dịch ngược thành mã hợp ngữ (assembly) thông qua
+các công cụ như OllyDbg, IDA Pro, Capstone và WinDbg. Mã hợp ngữ sau
+đó được kiểm tra nhằm xác định luồng thực thi, cấu trúc hoặc mẫu hành
+vi độc hại, từ đó phục vụ phát hiện các biến thể mới của mã độc hiện
+có. Tuy nhiên, phân tích mã hợp ngữ là quá trình tốn thời gian. Hơn
+nữa, các kỹ thuật làm rối mã (code obfuscation) - như mã hóa đoạn
+mã, hoán đổi thứ tự lệnh, hay chèn mã không thực thi (dead code) -
+còn khiến việc phân tích trở nên phức tạp hơn.
+
+\textbf{Phân tích động} (dynamic analysis) thực thi tập tin PE và ghi
+lại các hoạt động của chương trình trong thời gian chạy, bao gồm: thao
+tác với hệ thống tập tin, thay đổi khóa registry, tạo tiến trình khác,
+các hoạt động mạng, lời gọi API hệ điều hành, gửi dữ liệu đến máy chủ
+điều khiển (Command and Control - C2)\dots Dựa trên các hoạt động
+này, tập tin được phân loại là lành tính (benign) hoặc mã độc
+(malicious). Không giống phân tích tĩnh, phân tích động dựa trên sự
+tương tác thực tế giữa chương trình và hệ thống. Các tập tin PE chứa
+mã độc được thực thi trong môi trường ảo hóa được kiểm soát (sử dụng
+các công cụ như VirtualBox hoặc VMware) để tránh gây hại cho hệ thống
+thật.
+
+\textbf{Phương pháp lai} (hybrid) kết hợp các
+yếu tố của cả phân tích tĩnh và phân tích động. Chẳng hạn, công cụ
+``HDM Analyser'' \cite{singh2021survey, damodaran2017comparison} sử dụng cả hai phương pháp trong giai đoạn huấn luyện
+(training phase), nhưng chỉ áp dụng phân tích tĩnh trong giai đoạn
+kiểm tra (testing phase) - nhằm tận dụng độ chính xác cao của phân
+tích động khi huấn luyện, đồng thời duy trì hiệu năng của phân tích
+tĩnh khi triển khai. So sánh cho thấy HDM Analyser đạt độ chính xác
+tổng thể và độ phức tạp thời gian tốt hơn so với các phương pháp chỉ
+dùng một trong hai loại phân tích.
+
+Khó khăn cốt lõi của phương pháp lai là sự bất đối xứng về đặc trưng
+khả dụng giữa hai giai đoạn: trong huấn luyện, cả đặc trưng tĩnh lẫn
+động đều có thể được thu thập đầy đủ trong môi trường kiểm soát, nhưng trong
+triển khai thực tế, đôi khi đặc trưng động không thể được thu thập đầy đủ vì không thể thực
+thi tùy tiện một file PE đáng ngờ trên hệ thống thật. Do đó, mô hình
+được huấn luyện với đặc trưng phong phú hơn so với những gì có thể
+cung cấp tại thời điểm triển khai (inference) - dẫn đến suy giảm hiệu năng
+trong vận hành thực tế. Để giải quyết vấn đề trên, có một số phương pháp như sau:
+
+\begin{itemize}
+    \item \textbf{Feature distillation:} Huấn luyện mô hình nhận cả
+        đặc trưng tĩnh và động, sau đó phân tích các đặc trưng tĩnh
+        quan trọng nhất. Phương pháp này có thể gây mất thông tin nếu
+        đặc trưng động mới là yếu tố quyết định (có feature importance
+        lớn hơn).
+
+    \item \textbf{Pseudo-dynamic features:} Tạo đặc trưng động giả
+        bằng cách huấn luyện một mô hình phụ để dự đoán đặc trưng động
+        từ đặc trưng tĩnh. Chất lượng dự đoán của kiến trúc tổng thể
+        do đó phụ thuộc khá lớn vào độ chính xác của mô hình phụ.
+
+    \item \textbf{Knowledge distillation:} Huấn luyện một mô hình giáo
+        viên (teacher) $T$ nhận đầu vào là các đặc trưng tĩnh và động,
+        cho đầu ra là logits. Sử dụng $T$ để tạo lại dữ liệu huấn luyện
+        chỉ gồm đặc trưng tĩnh và các logits tương ứng, rồi dùng tập
+        dữ liệu mới này để huấn luyện mô hình học sinh (student) $S$
+        (nhận đầu vào là đặc trưng tĩnh, đầu ra là logits). Mục tiêu
+        là $S$ bắt chước đầu ra của $T$ mà không cần đến đặc trưng
+        động. Việc dùng logits thay vì nhãn cứng (hard labels) giúp $S$
+        phân biệt được các ranh giới ``mềm'' giữa các lớp đầu ra, từ
+        đó phân loại tốt hơn.
+\end{itemize}
+
+Ba phương pháp trên thể hiện các chiến lược khác nhau nhằm giải quyết
+bài toán mất cân bằng giữa khả năng phân biệt cao của đặc trưng động
+và yêu cầu hiệu năng, an toàn trong triển khai thực tế - vốn là ưu
+điểm của đặc trưng tĩnh. Feature distillation phù hợp với các hệ thống
+yêu cầu mô hình đơn giản, dễ diễn giải. Pseudo-dynamic features là lựa
+chọn tốt khi cần duy trì cấu trúc phân lớp ban đầu (chẳng hạn giữ
+nguyên chiều của vector đầu vào). Knowledge distillation là hướng tiếp
+cận tiên tiến hơn, giúp truyền tải hiệu quả phân biệt từ đặc trưng
+động sang mô hình gọn nhẹ, phù hợp với triển khai thực tế quy mô lớn.
+
+Việc lựa chọn phương pháp không chỉ là bài toán kỹ thuật, mà còn phản
+ánh sự cân bằng giữa độ chính xác, hiệu năng và khả năng mở rộng -
+những yếu tố cốt lõi trong thiết kế hệ thống phát hiện mã độc hiện đại.
+Trong phạm vi khóa luận, để tập trung vào chất lượng mô hình và khả
+năng triển khai thực tế, \textit{phương pháp phân tích tĩnh
+kết hợp với trích xuất năng lực (capability extraction)} được
+lựa chọn sử dụng. Trong đó, \textit{capability extraction} là kỹ thuật
+xác định các hành vi và khả năng tiềm ẩn của file PE thông qua phân
+tích tĩnh mã nhị phân, mà không cần thực thi file. Tuy bản chất vẫn
+là phân tích tĩnh, capability extraction cho phép thu được thông tin
+mang tính ngữ nghĩa hành vi - vốn là ưu điểm đặc trưng của phân
+tích động - từ đó hình thành một hướng tiếp cận dung hòa giữa hai phương pháp:
+vừa duy trì được hiệu năng và độ an toàn của phân tích tĩnh, vừa bổ
+sung chiều sâu ngữ nghĩa mà các kỹ thuật phân tích tĩnh truyền thống
+thường không xem xét đầy đủ.
+
+
+
+
+
+
+
+
+
+
+\section{Tổng quan về ứng dụng học máy trong phát hiện mã độc}
+
+Phát hiện mã độc bằng học máy là quá trình sử dụng các thuật toán học
+máy để xây dựng mô hình phân loại, cho phép tự động phân biệt giữa
+phần mềm hợp lệ và mã độc dựa trên các đặc trưng được trích xuất từ
+dữ liệu. Khác với phương pháp dựa trên chữ ký, học máy không phụ
+thuộc hoàn toàn vào các mẫu mã độc đã biết, mà có khả năng khái quát
+hóa từ dữ liệu huấn luyện để phát hiện các biến thể mới hoặc các mẫu
+mã độc chưa từng xuất hiện trước đó.
+
+Trong bối cảnh mã độc PE trên hệ điều hành Windows ngày càng được
+thiết kế tinh vi, thường xuyên sử dụng các kỹ thuật đóng gói, làm rối
+mã và né tránh phân tích, học máy cho phép khai thác mối quan hệ tiềm
+ẩn giữa các đặc trưng mà con người khó có thể xác định bằng các quy
+tắc thủ công. Các đặc trưng này có thể xuất phát từ cấu trúc file PE,
+hành vi gọi API, hoặc các biểu diễn trừu tượng hơn được học tự động
+bởi các mô hình học sâu.
+
+Từ góc độ triển khai, một hệ thống phát hiện mã độc dựa trên học máy
+thường tuân theo một quy trình tổng quát, bao gồm: thu thập dữ liệu,
+phân tích và trích xuất đặc trưng, huấn luyện mô hình, và đánh giá
+hiệu quả. Việc áp dụng quy trình này giúp đảm bảo tính hệ thống, khả
+năng tái lập và tính khách quan trong đánh giá kết quả.
+
+Liên quan đến dữ liệu đầu vào, học máy có thể được áp dụng cho nhiều
+hướng phân tích mã độc khác nhau, bao gồm phân tích tĩnh, phân tích
+động hoặc kết hợp cả hai. Bên cạnh đó, sự phát triển của học sâu đã mở ra khả năng tự động học
+biểu diễn đặc trưng từ dữ liệu thô, chẳng hạn như byte sequence hoặc
+opcode, thay vì phụ thuộc hoàn toàn vào đặc trưng được thiết kế thủ
+công. Các mô hình học sâu tận dụng ưu điểm này để nâng cao khả năng
+phát hiện các mẫu mã độc phức tạp, trong khi các mô hình học máy
+truyền thống như LightGBM lại thể hiện ưu thế về hiệu năng và tính ổn
+định khi triển khai.
+
+Như vậy, phát hiện mã độc bằng học máy không chỉ là sự thay thế đơn
+thuần cho các phương pháp truyền thống, mà là một hướng tiếp cận mang
+tính tổng hợp, kết hợp kiến thức về hệ điều hành, định dạng PE, kỹ
+thuật phân tích mã độc và các thuật toán học máy hiện đại. Các phần
+tiếp theo sẽ lần lượt trình bày các hướng tiếp cận phổ biến, kỹ thuật
+trích xuất đặc trưng, và mô hình học máy được lựa chọn trong khuôn
+khổ khóa luận.
+
+\subsection{Các hướng tiếp cận phổ biến trong phát hiện mã độc bằng học máy}
+
+Trong lĩnh vực phát hiện mã độc, đặc biệt là đối với mã độc định dạng
+PE trên hệ điều hành Windows, các phương pháp dựa trên học máy hiện
+nay có thể được phân loại theo nhiều hướng tiếp cận khác nhau, tùy
+thuộc vào loại dữ liệu đầu vào, cách trích xuất đặc trưng và mô hình
+học máy được sử dụng.
+
+\textbf{Hướng tiếp cận dựa trên học máy truyền thống.}
+Học máy truyền thống là hướng tiếp cận sớm và vẫn được sử dụng rộng
+rãi trong phát hiện mã độc. Các mô hình tiêu biểu trong nhóm này bao
+gồm Logistic Regression, Support Vector Machine (SVM), Random Forest,
+XGBoost và LightGBM. Đặc điểm chung của các mô hình này là yêu cầu
+đặc trưng đầu vào được thiết kế thủ công, dựa trên kiến thức chuyên
+gia về cấu trúc file PE và hành vi của mã độc. Hiệu quả của mô hình
+do đó phụ thuộc lớn vào chất lượng và tính phân biệt của tập đặc
+trưng. Tuy nhiên, các mô hình học máy truyền thống thường có ưu điểm
+về thời gian huấn luyện và suy luận nhanh, khả năng diễn giải kết quả
+tương đối tốt, và dễ dàng triển khai trong các hệ thống thực tế.
+
+\textbf{Hướng tiếp cận dựa trên học sâu.}
+Học sâu (Deep Learning) tận dụng các mạng nơ-ron nhiều tầng để tự
+động học biểu diễn đặc trưng từ dữ liệu thô. Trong bài toán phát hiện
+mã độc PE, học sâu có thể được áp dụng trên nhiều dạng dữ liệu khác
+nhau như byte sequence, opcode, hoặc các biểu diễn trung gian của file
+PE. Ưu điểm chính là khả năng phát hiện các mẫu phức tạp và mối quan
+hệ phi tuyến trong dữ liệu, đặc biệt hiệu quả khi đối mặt với các kỹ
+thuật làm rối và biến thể mã độc. Tuy nhiên, học sâu thường đòi hỏi
+lượng dữ liệu huấn luyện lớn, tài nguyên tính toán cao và thời gian
+huấn luyện dài hơn so với học máy truyền thống.
+
+\textbf{Nhận xét chung.}
+Mỗi hướng tiếp cận trong phát hiện mã độc bằng học máy đều có những
+ưu điểm và hạn chế riêng. Việc lựa chọn hướng tiếp cận phù hợp cần
+cân nhắc giữa độ chính xác, hiệu năng và khả năng triển khai trong
+thực tế. Trong đề tài này, hướng tiếp cận chính là học máy truyền
+thống kết hợp phân tích tĩnh, sử dụng mô hình LightGBM làm nền tảng.
+Trọng tâm thực nghiệm không nằm ở việc so sánh các loại mô hình, mà
+ở việc đánh giá hiệu quả của các tổ hợp đặc trưng khác nhau - cụ
+thể là đặc trưng EMBER2024 thuần túy, kết hợp với đặc trưng năng lực
+(capability) trích xuất bằng công cụ Capa ở dạng one-hot và dạng đã
+giảm chiều bằng TruncatedSVD - nhằm xác định tổ hợp đặc trưng tối
+ưu cho bài toán phát hiện mã độc PE.
+
+
+
+
+
+
+\subsection{Trích xuất đặc trưng từ file PE}
+
+Trong bài toán phát hiện mã độc dựa trên học máy, quá trình trích xuất
+đặc trưng đóng vai trò then chốt, quyết định trực tiếp đến hiệu quả
+của mô hình. Đối với các file thực thi định dạng PE, các đặc trưng có
+thể được trích xuất từ nhiều khía cạnh khác nhau, phản ánh cấu trúc,
+nội dung và một phần hành vi tiềm ẩn của chương trình. Phần này trình
+bày các nhóm đặc trưng chính được sử dụng trong đề tài, đặc biệt là
+trong các feature extractor (bộ trích xuất đặc trưng) nổi tiếng như EMBERv2 và EMBER2024
+\cite{ember2024benchmark}.
+
+\subsubsection{Đặc trưng tổng quát của file PE}
+
+Nhóm đặc trưng này phản ánh các thông tin tổng quát của file PE, bao
+gồm kích thước file, số lượng section, thời gian biên dịch (timestamp) và các cờ
+(flag) cấu hình trong header. Các đặc trưng này giúp mô hình học máy
+nắm bắt được những khác biệt cơ bản giữa file thực thi hợp lệ và mã
+độc, bởi mã độc thường có cấu trúc bất thường hoặc được tạo ra thông
+qua các công cụ tự động như packer, obfuscator, cryptor\dots
+
+\subsubsection{Đặc trưng cấu trúc PE và header}
+
+Các đặc trưng cấu trúc được trích xuất từ các thành phần quan trọng
+trong file PE như DOS header, PE header và optional header. Nhóm đặc
+trưng này bao gồm các trường thông tin phản ánh cách thức file được
+nạp và thực thi trên hệ điều hành Windows. Những sai lệch hoặc giá
+trị bất thường trong các trường header thường là dấu hiệu của mã độc
+hoặc các file đã bị chỉnh sửa.
+
+\subsubsection{Đặc trưng liên quan đến section}
+
+Mỗi file PE được chia thành nhiều section với các mục đích khác nhau.
+Các đặc trưng liên quan đến section bao gồm số lượng section, kích
+thước của từng section, quyền truy cập (read, write, execute) và phân
+bố entropy giữa các section. Đặc biệt, entropy cao ở một số section
+có thể là dấu hiệu của kỹ thuật đóng gói hoặc mã hóa, vốn thường
+được sử dụng trong mã độc để né tránh phân tích.
+
+Trong lý thuyết thông tin, entropy được sử dụng như một thước đo mức
+độ hỗn loạn và tính ngẫu nhiên của dữ liệu. Đối với các chương trình
+lành tính thông thường, dữ liệu trong các section của file thực thi
+thường có cấu trúc tương đối rõ ràng; khi tiến hành dịch ngược, có
+thể quan sát được luồng điều khiển và logic chương trình ở mức cơ bản.
+Ngược lại, nhiều loại mã độc sử dụng các kỹ thuật đóng gói hoặc mã
+hóa, làm cho nội dung các section trở nên khó phân tích và có mức
+entropy cao hơn so với các file thực thi thông thường.
+
+Tuy nhiên, cần lưu ý rằng entropy cao không phải là dấu hiệu đặc
+trưng tuyệt đối của mã độc. Một số phần mềm thương mại cũng áp dụng
+các kỹ thuật bảo vệ mã nguồn tương tự, dẫn đến mức entropy cao ở một
+số section. Do đó, việc đánh giá mã độc chỉ dựa trên entropy là không
+đủ và cần kết hợp với các nhóm đặc trưng khác để đưa ra quyết định
+phân loại chính xác hơn.
+
+\subsubsection{Đặc trưng về bảng import và export}
+
+Nhóm đặc trưng này tập trung vào các hàm và thư viện được file PE sử
+dụng. Việc phân tích các thư viện và hàm import cho phép suy đoán hành
+vi tiềm ẩn của chương trình, chẳng hạn như thao tác với hệ thống file,
+registry, mạng hoặc tiến trình. Các file mã độc thường sử dụng các hàm
+API đặc trưng phục vụ cho việc ẩn mình, duy trì tồn tại hoặc thu thập
+thông tin.
+
+\subsubsection{Đặc trưng thống kê từ nội dung nhị phân}
+
+Nhóm đặc trưng thống kê được trích xuất trực tiếp từ nội dung nhị phân
+của file, bao gồm phân bố byte, tần suất xuất hiện của các giá trị
+byte và các thống kê liên quan. Những đặc trưng này phản ánh cấu trúc
+tổng thể của file ở mức thấp và có khả năng phân biệt giữa file hợp
+lệ và mã độc ngay cả khi mã đã bị làm rối.
+
+\subsubsection{Đặc trưng trích xuất từ chuỗi văn bản}
+
+Trong file PE, nhiều chuỗi văn bản có thể được trích xuất, chẳng hạn
+như tên file, đường dẫn, URL, tên hàm hoặc thông báo lỗi. Việc phân
+tích các chuỗi này giúp phát hiện các dấu hiệu liên quan đến hoạt
+động độc hại, như kết nối mạng, tải thêm mã hoặc tương tác với hệ
+thống. Các chuỗi văn bản thường được mã độc sử dụng để phục vụ cho
+quá trình thực thi hoặc giao tiếp với máy chủ điều khiển.
+
+\subsubsection{Đặc trưng dạng biểu diễn rút gọn}
+
+Để phù hợp với các mô hình học máy truyền thống, nhiều đặc trưng có
+tính chất danh mục hoặc chuỗi được chuyển đổi sang dạng biểu diễn số
+thông qua các kỹ thuật rút gọn và mã hóa. Các kỹ thuật này giúp giảm
+chiều dữ liệu, đồng thời vẫn giữ lại các thông tin quan trọng phục vụ
+cho quá trình học của mô hình.
+
+\subsubsection{Đặc trưng dựa trên chữ ký số}
+
+Trong hệ điều hành Windows, các file thực thi PE có thể được ký số
+nhằm xác thực nguồn gốc và đảm bảo tính toàn vẹn của file. Các đặc
+trưng liên quan đến chữ ký số phản ánh trạng thái xác thực của file,
+chẳng hạn như việc file có được ký số hay không, chữ ký có hợp lệ hay
+không, cũng như một số thuộc tính cơ bản của chứng thư số đi kèm.
+
+Trong thực tế, phần lớn các phần mềm hợp lệ thường được ký số để tăng
+độ tin cậy, trong khi nhiều mẫu mã độc không được ký số hoặc sử dụng
+chữ ký không hợp lệ, tự ký hoặc đã bị chỉnh sửa. Tuy nhiên, sự tồn
+tại của chữ ký số hợp lệ không đảm bảo tuyệt đối file là an toàn,
+bởi mã độc vẫn có thể được phát tán thông qua các chứng thư bị lạm
+dụng hoặc bị đánh cắp. Vì vậy, nhóm đặc trưng này được sử dụng như
+một yếu tố bổ trợ, kết hợp với các nhóm đặc trưng khác trong quá
+trình phân loại.
+
+\subsubsection{Đặc trưng tổng hợp các lỗi đọc file PE}
+
+Quá trình phân tích tĩnh file PE đòi hỏi việc đọc và diễn giải chính
+xác cấu trúc nội bộ của file theo định dạng chuẩn. Trong thực tế,
+nhiều file mã độc được tạo ra với cấu trúc bất thường, bị làm hỏng có
+chủ đích hoặc cố tình vi phạm chuẩn định dạng nhằm gây khó khăn cho
+các công cụ phân tích. Do đó, các lỗi phát sinh khi đọc hoặc phân
+tích cấu trúc file PE - như header không hợp lệ, bảng section bị
+thiếu hoặc trùng lặp, offset không nhất quán, hoặc các trường dữ liệu
+chứa giá trị bất thường - có thể được ghi nhận và tổng hợp thành
+một nhóm đặc trưng riêng.
+
+Về mặt thống kê, một file thực thi phát sinh càng nhiều lỗi trong quá
+trình phân tích thì mức độ bất thường của file càng cao, thường phản
+ánh việc file đã bị chỉnh sửa, làm rối hoặc được tạo ra bởi các công
+cụ tự động - những đặc điểm phổ biến của mã độc. Tuy nhiên, tương
+tự như các nhóm đặc trưng khác, lỗi phân tích không thể được sử dụng
+độc lập để kết luận một file là mã độc, bởi một số file hợp lệ cũng
+có thể bị hỏng hoặc không tuân thủ hoàn toàn chuẩn định dạng. Vì vậy,
+nhóm đặc trưng này được kết hợp với các đặc trưng cấu trúc, thống kê
+và nội dung khác nhằm nâng cao độ chính xác của mô hình.
+
+Ngoài các nhóm đặc trưng nêu trên, một số hướng mở rộng có thể được
+xem xét trong các nghiên cứu tiếp theo, bao gồm đặc trưng dựa trên
+opcode hoặc lệnh máy (assembly), đặc trưng dựa trên đồ thị luồng điều
+khiển, và đặc trưng kết hợp giữa phân tích tĩnh và động. Tuy nhiên,
+trong phạm vi đề tài, các nhóm đặc trưng tĩnh từ file PE được lựa
+chọn nhằm đảm bảo tính an toàn, khả năng mở rộng và phù hợp với yêu
+cầu thực nghiệm.
+
+\subsection{Một số mô hình học máy tiêu biểu trong phát hiện mã độc PE}
+
+Trong những năm gần đây, nhiều mô hình học máy đã được nghiên cứu và
+áp dụng vào bài toán phát hiện mã độc, đặc biệt là đối với các file
+thực thi định dạng PE trên hệ điều hành Windows. Tùy thuộc vào đặc
+điểm dữ liệu, phương pháp trích xuất đặc trưng và yêu cầu triển khai,
+các mô hình học máy khác nhau thể hiện những ưu điểm và hạn chế riêng.
+
+\textbf{Hồi quy Logistic} là một trong những mô hình học máy đơn giản
+và phổ biến nhất cho bài toán phân loại nhị phân. Trong phát hiện mã
+độc, mô hình này được sử dụng để ước lượng xác suất một file thực thi
+là mã độc dựa trên các đặc trưng đầu vào. Ưu điểm của hồi quy
+Logistic là dễ cài đặt, tốc độ huấn luyện nhanh và khả năng diễn giải
+cao. Tuy nhiên, do giả định mối quan hệ tuyến tính giữa đặc trưng và
+nhãn, mô hình này thường gặp hạn chế khi xử lý dữ liệu phức tạp và
+có tính phi tuyến cao như trong các tập dữ liệu mã độc thực tế.
+
+\textbf{Support Vector Machine (SVM)} là mô hình học máy mạnh mẽ trong
+việc phân loại dữ liệu có số chiều lớn. SVM hoạt động bằng cách tìm
+siêu phẳng tối ưu nhằm phân tách các lớp dữ liệu với khoảng cách lớn
+nhất. Trong bài toán phát hiện mã độc, SVM cho kết quả tương đối tốt
+và tỏ ra vượt trội hơn hồi quy logistic khi sử dụng các kernel phi
+tuyến. Tuy nhiên, chi phí tính toán của SVM có thể tăng cao khi kích
+thước tập dữ liệu lớn, khiến việc triển khai trong môi trường thực tế
+gặp nhiều hạn chế.
+
+\textbf{Decision Tree và Random Forest.} Cây quyết định (Decision Tree)
+là mô hình học máy dựa trên cấu trúc cây, trong đó mỗi nút đại diện
+cho một điều kiện phân tách dữ liệu. Mô hình này có ưu điểm là trực
+quan, dễ hiểu và có khả năng xử lý dữ liệu phi tuyến. Rừng ngẫu nhiên
+(Random Forest) là mô hình mở rộng của cây quyết định, kết hợp nhiều
+cây độc lập để nâng cao độ chính xác và giảm hiện tượng quá khớp.
+Trong phát hiện mã độc, rừng ngẫu nhiên thường được sử dụng nhờ khả
+năng xử lý tốt dữ liệu nhiều chiều và tính ổn định cao.
+
+\textbf{Các mô hình tăng cường dựa trên cây} như Gradient Boosting,
+XGBoost và LightGBM đã cho thấy hiệu quả vượt trội trong nhiều bài
+toán phân loại, bao gồm phát hiện mã độc. Các mô hình này xây dựng
+tập hợp các cây yếu theo cách tuần tự, trong đó mỗi cây mới tập trung
+khắc phục các sai sót của các cây trước đó. Ưu điểm của nhóm mô hình
+này là khả năng học các mối quan hệ phi tuyến phức tạp, xử lý hiệu
+quả dữ liệu có số chiều lớn và khả năng kiểm soát hiện tượng quá khớp
+thông qua các tham số điều chỉnh. Trong đề tài này, LightGBM được lựa
+chọn để triển khai và đánh giá chi tiết hơn.
+
+Các mô hình học máy truyền thống, đặc biệt là các mô hình dựa trên
+cây và tăng cường, vẫn đóng vai trò quan trọng trong phát hiện mã độc
+nhờ sự cân bằng giữa độ chính xác, hiệu năng và khả năng triển khai.
+Việc lựa chọn mô hình phù hợp phụ thuộc vào đặc điểm tập dữ liệu,
+nhóm đặc trưng được sử dụng và yêu cầu cụ thể của bài toán.
+
+\subsection{Mô hình LightGBM}
+
+Light Gradient Boosting Machine (LightGBM) là một mô hình học máy
+thuộc nhóm các thuật toán tăng cường dựa trên cây quyết định, được
+thiết kế nhằm nâng cao hiệu quả huấn luyện và khả năng mở rộng đối
+với các tập dữ liệu có kích thước lớn và số lượng đặc trưng cao. Trong
+bối cảnh bài toán phát hiện mã độc PE, LightGBM cho thấy nhiều ưu
+điểm phù hợp với yêu cầu thực nghiệm và triển khai.
+
+LightGBM xây dựng mô hình bằng cách kết hợp nhiều cây quyết định yếu
+theo cơ chế học tăng cường, trong đó mỗi cây mới được huấn luyện nhằm
+giảm sai số còn tồn tại của các cây trước đó. Khác với các phương pháp
+tăng cường truyền thống, LightGBM áp dụng chiến lược tăng trưởng cây
+theo chiều sâu (leaf-wise), giúp mô hình hội tụ nhanh hơn và khai thác
+hiệu quả các mối quan hệ phi tuyến trong dữ liệu.
+
+Một ưu điểm quan trọng của LightGBM là khả năng xử lý hiệu quả dữ
+liệu có số chiều lớn, vốn là đặc trưng phổ biến trong bài toán phát
+hiện mã độc khi sử dụng nhiều nhóm đặc trưng trích xuất từ file PE.
+Bên cạnh đó, LightGBM hỗ trợ cơ chế rời rạc hóa đặc trưng và tối ưu
+bộ nhớ, giúp giảm chi phí tính toán trong quá trình huấn luyện và suy
+luận.
+
+Trong phạm vi đề tài, LightGBM được lựa chọn làm mô hình đại diện cho
+hướng tiếp cận học máy truyền thống nhờ các đặc điểm sau:
+
+\begin{itemize}
+    \item Khả năng đạt độ chính xác cao với dữ liệu đặc trưng tĩnh
+        từ file PE.
+    \item Thời gian huấn luyện và suy luận nhanh, phù hợp với kịch
+        bản xử lý số lượng lớn file.
+    \item Tính ổn định và khả năng kiểm soát hiện tượng quá khớp
+        thông qua các tham số điều chỉnh.
+\end{itemize}
+
+Ngoài ra, LightGBM cho phép đánh giá mức độ đóng góp của từng đặc
+trưng thông qua các chỉ số feature importance hoặc kỹ thuật xAI
+như SHAP, giúp hỗ trợ phân tích
+và giải thích kết quả thực nghiệm. Khả năng này đặc biệt hữu ích
+trong việc đánh giá vai trò của từng nhóm đặc trưng, cung cấp cơ sở
+lý giải cho kết quả thực nghiệm thu được.
+
+
+
+
+
+
+
+
+
+\section{Các công trình nghiên cứu liên quan}
+
+Phần này điểm qua các công trình nghiên cứu và tập dữ liệu tiêu biểu
+liên quan đến bốn khía cạnh chính của khóa luận: tập dữ liệu phục vụ
+huấn luyện mô hình, ứng dụng học máy trong phân tích tĩnh file PE,
+kỹ thuật trích xuất năng lực mã độc, và phương pháp lý giải quyết
+định của mô hình. Trên cơ sở đó, khóa luận xác định điểm kế thừa và
+đóng góp riêng so với các nghiên cứu hiện có.
+
+\subsection{Các tập dữ liệu file PE phục vụ huấn luyện mô hình học máy phát hiện mã độc}
+
+Chất lượng và quy mô tập dữ liệu có ảnh hưởng trực tiếp đến hiệu quả
+huấn luyện và khả năng tổng quát hóa của mô hình học máy trong bài
+toán phát hiện mã độc. Một số tập dữ liệu tiêu biểu đã được công bố
+và sử dụng rộng rãi trong cộng đồng nghiên cứu.
+
+\textbf{EMBER (Endgame Malware BEnchmark for Research).}
+EMBER \cite{ember2018} là một trong những tập dữ liệu benchmark được
+sử dụng phổ biến nhất cho bài toán phát hiện mã độc PE. Phiên bản đầu
+tiên được Anderson và Roth công bố năm 2018, bao gồm khoảng 1,1 triệu
+mẫu file PE (lành tính, mã độc và chưa gán nhãn), với các đặc trưng
+tĩnh được trích xuất sẵn theo định dạng vector có cấu trúc. Tập dữ
+liệu này cung cấp một pipeline trích xuất đặc trưng chuẩn hóa, bao
+gồm các nhóm đặc trưng từ PE header, section, import table, chuỗi văn
+bản và nội dung nhị phân, giúp tạo điều kiện thuận lợi cho việc so
+sánh các mô hình học máy trên cùng một nền tảng dữ liệu.
+
+Phiên bản EMBER2024 \cite{ember2024benchmark} là bản cập nhật mới nhất, được
+xây dựng nhằm phản ánh bối cảnh mã độc hiện đại hơn so với phiên bản
+2018. EMBER2024 bổ sung số lượng mẫu lớn hơn, cập nhật phân bố thời
+gian thu thập, và mở rộng pipeline trích xuất đặc trưng. Trong đề tài
+này, EMBER2024 được lựa chọn làm tập dữ liệu chính cho tất cả các
+thực nghiệm.
+
+\textbf{VirusShare và VirusTotal.}
+VirusShare \cite{virusshare} là một kho lưu trữ mẫu mã độc lớn được
+duy trì bởi cộng đồng nghiên cứu bảo mật, cung cấp hàng triệu mẫu
+file thực thi đã được xác nhận là mã độc. VirusTotal \cite{virustotal}
+là dịch vụ phân tích file trực tuyến tổng hợp kết quả từ hàng chục
+engine antivirus, thường được dùng để gán nhãn hoặc xác minh nhãn cho
+các mẫu trong quá trình xây dựng tập dữ liệu. Nhiều nghiên cứu sử
+dụng kết hợp hai nguồn này để thu thập mẫu mã độc đa dạng và đảm bảo
+độ tin cậy của nhãn phân loại.
+
+\textbf{Các tập dữ liệu khác.}
+Ngoài EMBER, một số tập dữ liệu khác cũng được sử dụng trong các
+nghiên cứu liên quan, chẳng hạn như SOREL-20M \cite{sorel20m} -
+tập dữ liệu quy mô lớn với 20 triệu mẫu PE do Sophos và ReversingLabs
+công bố - cũng như các tập dữ liệu tự thu thập từ honeypot hoặc các nguồn
+chia sẻ trong cộng đồng bảo mật. Tuy nhiên, EMBER vẫn là lựa chọn
+phổ biến nhất nhờ tính chuẩn hóa, khả năng tái lập và sự hỗ trợ,
+công nhận rộng rãi của cộng đồng nghiên cứu.
+
+\subsection{Các nghiên cứu về ứng dụng học máy trong phân tích tĩnh file thực thi nhị phân}
+
+Ứng dụng học máy trong phân tích tĩnh file PE là một hướng nghiên cứu
+được quan tâm rộng rãi, với nhiều công trình tiêu biểu đã đạt kết quả
+đáng chú ý.
+ 
+\textbf{Các mô hình học máy truyền thống trên đặc trưng tĩnh.}
+Anderson và Roth \cite{ember2018} đã đề xuất mô hình LightGBM huấn
+luyện trên tập đặc trưng EMBER, đạt tỷ lệ phát hiện mã độc cao với
+tốc độ suy luận phù hợp cho triển khai thực tế. Đây là một trong
+những baseline quan trọng nhất trong lĩnh vực, cho thấy các mô hình
+tăng cường dựa trên cây quyết định có thể đạt hiệu quả cạnh tranh
+với các phương pháp phức tạp hơn khi được kết hợp với bộ đặc trưng
+tĩnh chất lượng cao.
+
+\textbf{Kỹ thuật giảm chiều trong xử lý đặc trưng.}
+Khi tập đặc trưng có số chiều lớn - đặc biệt khi kết hợp nhiều
+nhóm đặc trưng khác nhau - các kỹ thuật giảm chiều như PCA
+(Principal Component Analysis) \cite{pca} và TruncatedSVD
+\cite{truncatedsvd} thường được áp dụng để giảm chi phí tính toán và
+hạn chế hiện tượng quá khớp. TruncatedSVD đặc biệt phù hợp với các
+ma trận đặc trưng thưa (sparse), vốn xuất hiện phổ biến khi mã hóa
+đặc trưng dạng one-hot hoặc bag-of-words từ dữ liệu mã độc.
+
+\textbf{Phương pháp Ensemble.}
+Các phương pháp kết hợp mô hình (ensemble) như voting, stacking và
+blending \cite{ensemble_survey} đã được áp dụng trong phát hiện mã
+độc nhằm kết hợp điểm mạnh của nhiều mô hình thành phần khác loại
+(heterogeneous ensemble), từ đó nâng cao độ chính xác và tính ổn định
+tổng thể. Tuy nhiên, cần phân biệt rõ hai cấp độ ensemble: ensemble
+giữa các mô hình khác loại (ví dụ kết hợp LightGBM với SVM hay mạng
+neuron) và ensemble nội tại bên trong một mô hình. LightGBM thuộc
+nhóm thứ hai - bản thân mô hình đã là một tổ hợp của hàng trăm cây
+quyết định được xây dựng tuần tự theo cơ chế gradient boosting, trong
+đó mỗi cây mới tập trung khắc phục sai số của các cây trước. Cơ chế
+này mang lại khả năng học các mối quan hệ phi tuyến phức tạp và tính
+ổn định cao, mà không cần thêm một lớp ensemble bên ngoài. Các nghiên
+cứu thực nghiệm \cite{ember2018, sorel20m} cho thấy LightGBM đơn lẻ
+đã đạt hiệu năng cạnh tranh với các heterogeneous ensemble phức tạp
+hơn trong bài toán phát hiện mã độc PE, trong khi vẫn duy trì ưu thế
+về tốc độ suy luận và khả năng triển khai thực tế - những yếu tố
+đặc biệt quan trọng khi triển khai mô hình ngay trong
+dịch vụ chạy trên máy endpoint trong khuôn khổ khóa luận.
+
+\subsection{Các nghiên cứu về trích xuất năng lực (capability extraction) của file thực thi nhị phân}
+
+Trích xuất năng lực (capability extraction) là kỹ thuật xác định các
+hành vi và khả năng tiềm ẩn của một file thực thi thông qua phân tích
+tĩnh, mà không cần thực thi file trong môi trường thật. Đây là hướng
+tiếp cận có tiềm năng cao trong việc bổ sung thông tin ngữ nghĩa hành
+vi vào quá trình phát hiện mã độc.
+
+\textbf{Công cụ Capa.}
+Capa \cite{capa} là công cụ mã nguồn mở do MANDIANT (trước đây là
+FireEye) phát triển, cho phép tự động nhận diện các năng lực của file
+thực thi nhị phân thông qua một tập quy tắc (rule) được xây dựng thủ
+công bởi các chuyên gia phân tích mã độc. Mỗi quy tắc trong Capa mô
+tả một năng lực cụ thể - chẳng hạn ``mã hóa dữ liệu bằng XOR'',
+``tạo tiến trình mới'', hay ``kết nối đến địa chỉ IP từ xa'' - và
+được ánh xạ sang các framework phân loại hành vi chuẩn như MITRE
+ATT\&CK \cite{attack} và MBC (Malware Behavior Catalog) \cite{mbc}.
+Capa hỗ trợ phân tích file PE thông qua kỹ thuật phân tích tĩnh 
+disassembly (dịch ngược hợp ngữ), sử dụng các backend như SMDA
+hoặc IDA Pro để dịch ngược và đối chiếu với tập quy tắc.
+ 
+Trong đề tài này, Capa được sử dụng để trích xuất vector đặc trưng
+năng lực từ các file PE trong tập EMBER2024, sau đó kết hợp với đặc
+trưng EMBER2024 gốc để huấn luyện mô hình học máy. Điểm khác biệt
+so với cách dùng Capa truyền thống (chủ yếu phục vụ phân tích thủ
+công) là đề tài tự động hóa quá trình này ở quy mô lớn và tích hợp
+kết quả vào pipeline học máy.
+
+Một số nghiên cứu đã khảo sát việc sử dụng thông tin về năng lực và
+hành vi của mã độc như một nguồn đặc trưng bổ sung cho mô hình học
+máy \cite{kim2022mapas,li2024malapi}. Các kết quả ban đầu cho thấy đặc trưng năng lực
+có tính phân biệt cao, đặc biệt trong việc phân loại họ mã độc và
+phát hiện các biến thể mới sử dụng kỹ thuật obfuscation. Tuy nhiên,
+việc tích hợp đặc trưng Capa vào pipeline học máy ở quy mô lớn vẫn
+còn ít được nghiên cứu một cách có hệ thống, đặc biệt khi kết hợp
+với các kỹ thuật giảm chiều như TruncatedSVD - đây là một trong
+những đóng góp chính của khóa luận.
+
+\subsection{Các nghiên cứu về lý giải quyết định của mô hình (Explainable AI - xAI)}
+
+Khi các mô hình học máy ngày càng được triển khai trong các hệ thống
+bảo mật thực tế, khả năng lý giải quyết định của mô hình (Explainable
+AI - xAI) trở thành yêu cầu quan trọng, giúp chuyên gia bảo mật
+hiểu được lý do một file bị phân loại là mã độc và đưa ra quyết định
+phản ứng phù hợp.
+ 
+\textbf{SHAP (SHapley Additive exPlanations).}
+SHAP \cite{shap} là một trong những phương pháp xAI phổ biến và có
+nền tảng lý thuyết vững chắc nhất hiện nay, dựa trên khái niệm Shapley
+value từ lý thuyết trò chơi hợp tác. SHAP tính toán mức độ đóng góp
+của từng đặc trưng vào kết quả dự đoán của mô hình cho từng mẫu cụ
+thể, cho phép giải thích quyết định ở cấp độ cục bộ (per-instance)
+lẫn toàn cục (global feature importance). Trong bài toán phát hiện mã
+độc, SHAP được sử dụng để xác định những đặc trưng nào - chẳng hạn
+một năng lực Capa cụ thể hay một trường PE header - đóng vai trò
+quyết định trong việc phân loại một file là mã độc.
+ 
+\textbf{LIME (Local Interpretable Model-agnostic Explanations).}
+LIME \cite{lime} là phương pháp xAI không phụ thuộc vào loại mô hình
+(model-agnostic), hoạt động bằng cách xây dựng một mô hình tuyến tính
+đơn giản xấp xỉ hành vi của mô hình phức tạp trong vùng lân cận của
+một điểm dữ liệu cụ thể. LIME phù hợp với các trường hợp cần giải
+thích nhanh và trực quan cho từng mẫu riêng lẻ, mặc dù độ ổn định
+của giải thích có thể thấp hơn so với SHAP trong một số trường hợp.
+ 
+\textbf{Ứng dụng xAI trong phát hiện mã độc.}
+Một số nghiên cứu đã kết hợp SHAP với các mô hình phát hiện mã độc
+dựa trên học máy \cite{shap_malware}, cho thấy xAI không chỉ hỗ trợ
+kiểm tra và gỡ lỗi mô hình mà còn cung cấp thông tin hữu ích cho quá
+trình điều tra và ứng phó sự cố. Trong đề tài này, SHAP được tích hợp
+vào server phân tích sâu (deep-analysis-server) nhằm cung cấp giải
+thích trực quan cho kết quả phân loại, giúp người dùng hiểu được
+những đặc trưng nào - bao gồm cả đặc trưng Capa - đã dẫn đến
+quyết định phân loại của mô hình.
+
+\textbf{Nhận xét chung.}
+So với các công trình liên quan, đề tài này có những điểm kế thừa và
+khác biệt như sau. Về kế thừa, đề tài sử dụng tập dữ liệu EMBER2024
+và mô hình LightGBM theo hướng đã được thiết lập tốt trong cộng đồng
+nghiên cứu, đồng thời áp dụng SHAP - một kỹ thuật xAI đã được kiểm
+chứng - để giải thích kết quả. Về đóng góp riêng, đề tài tập trung
+vào việc tích hợp có hệ thống đặc trưng năng lực từ Capa vào pipeline
+học máy ở quy mô lớn, đánh giá định lượng mức độ đóng góp của đặc
+trưng này so với baseline EMBER2024 thuần túy, và triển khai
+pipeline vào một dịch vụ bảo vệ endpoint thực tế trên Windows.
+ 
+
+
+
+
+
+
+
+
+
+\section{Công nghệ sử dụng}
+
+Đề tài kết hợp nhiều công nghệ và công cụ thuộc các lĩnh vực khác
+nhau, từ học máy và phân tích mã độc đến lập trình hệ thống Windows.
+Phần này trình bày tổng quan các công nghệ chính được sử dụng trong
+quá trình thực hiện.
+
+\subsection{Ngôn ngữ lập trình và công cụ xây dựng}
+
+\textbf{Python} là ngôn ngữ lập trình chính cho các thành phần liên
+quan đến học máy và phân tích dữ liệu. Python được lựa chọn nhờ hệ
+sinh thái thư viện phong phú, đặc biệt trong lĩnh vực khoa học dữ
+liệu và học máy, cùng với khả năng tích hợp nhanh chóng với các công
+cụ phân tích mã độc hiện có.
+
+\textbf{C++} được sử dụng cho module trích xuất đặc trưng EMBER2024
+chạy trực tiếp trên máy endpoint. Lựa chọn này xuất phát từ yêu cầu
+về hiệu năng - việc trích xuất đặc trưng cần được thực hiện nhanh
+chóng trên từng file PE trong thời gian thực - cũng như khả năng
+tích hợp tự nhiên với các API hệ thống Windows. Dự án C++ được quản
+lý bằng \textbf{CMake}, công cụ build đa nền tảng phổ biến, giúp đảm
+bảo tính nhất quán trong quá trình biên dịch và triển khai.
+
+\subsection{Lập trình hệ thống Windows}
+
+Các thành phần chạy trực tiếp trên máy endpoint được xây dựng dựa
+trên các công nghệ lập trình hệ thống của Windows.
+
+\textbf{Windows API} \cite{winapi} là tập hợp các hàm và giao diện
+lập trình do Microsoft cung cấp, cho phép ứng dụng tương tác trực
+tiếp với hệ điều hành Windows ở mức người dùng (user mode). Trong đề
+tài, Windows API được sử dụng để xây dựng dịch vụ nền (background
+service) và giao diện người dùng (UI) chạy trên endpoint, bao gồm
+các chức năng quản lý tiến trình, giao tiếp liên tiến trình (IPC),
+và tương tác với hệ thống file.
+
+\textbf{Kernel-Mode Driver Framework (KMDF)} \cite{kmdf} là framework
+do Microsoft cung cấp để phát triển driver chạy ở chế độ nhân
+(kernel mode) trên Windows. KMDF cung cấp một lớp trừu tượng trên
+WDM (Windows Driver Model), giúp đơn giản hóa việc lập trình driver
+và giảm thiểu rủi ro gây mất ổn định hệ thống. Trong đề tài, KMDF
+được sử dụng để xây dựng thành phần driver có khả năng theo dõi sự
+kiện thực thi file ở tầng nhân, phục vụ cho cơ chế phát hiện mã độc
+theo thời gian thực.
+
+\subsection{Phát triển dịch vụ phân tích}
+
+\textbf{FastAPI} \cite{fastapi} là framework Python hiện đại để xây
+dựng REST API, nổi bật với hiệu năng cao nhờ hỗ trợ bất đồng bộ
+(async) và khả năng tự động sinh tài liệu API. FastAPI được sử dụng
+làm nền tảng cho server phân tích sâu, tiếp nhận yêu cầu phân tích
+file từ các thành phần khác trong hệ thống và trả về kết quả phân
+loại cùng giải thích từ mô hình.
+
+Giao diện web của server phân tích được xây dựng bằng \textbf{HTML,
+CSS và JavaScript} thuần, không phụ thuộc vào framework frontend phức
+tạp, nhằm đảm bảo tính đơn giản và dễ triển khai.
+
+\textbf{Docker} \cite{docker} được sử dụng để đóng gói và triển khai
+server phân tích sâu dưới dạng container, đảm bảo tính nhất quán về
+môi trường thực thi và đơn giản hóa quá trình cài đặt trên các máy
+khác nhau.
+
+\subsection{Thư viện học máy và phân tích mã độc}
+
+\textbf{LightGBM} \cite{lgbm} là thư viện gradient boosting hiệu năng
+cao do Microsoft phát triển, được sử dụng làm mô hình phân loại chính
+trong đề tài. LightGBM hỗ trợ huấn luyện song song, tối ưu bộ nhớ
+và cung cấp API tích hợp tốt với hệ sinh thái Python. Ngoài ra, thư
+viện còn có phiên bản (binding) ngôn ngữ C++, hỗ trợ việc triển
+khai mô hình trực tiếp trên máy endpoint, đảm bảo hiệu năng mà
+không cần Python runtime.
+
+\textbf{scikit-learn} \cite{sklearn} là thư viện học máy nền tảng
+trong Python, được sử dụng cho các tác vụ tiền xử lý dữ liệu, giảm
+chiều đặc trưng (TruncatedSVD) và đánh giá mô hình.
+
+\textbf{SHAP} \cite{shap} là thư viện Python cung cấp các phương pháp
+giải thích mô hình học máy dựa trên Shapley value. SHAP được tích hợp
+vào server phân tích sâu để tạo ra các giải thích trực quan về lý do
+mô hình phân loại một file là mã độc.
+
+\textbf{Capa} \cite{capa} là công cụ mã nguồn mở do Mandiant phát
+triển, cho phép tự động nhận diện năng lực (capability) của file thực
+thi nhị phân thông qua phân tích tĩnh dựa trên tập quy tắc. Trong đề
+tài, Capa được tích hợp vào pipeline trích xuất đặc trưng để bổ sung
+thông tin ngữ nghĩa hành vi vào quá trình huấn luyện mô hình, cũng
+như được sử dụng trong dịch vụ phân tích chuyên sâu online
+(deep-analysis-server).
