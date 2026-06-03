@@ -141,7 +141,7 @@ deep-analysis-server & Python, FastAPI & Phân tích sâu với Capa +
 
 \section{Thiết kế hệ thống chi tiết}
 
-\subsection{Module trích xuất đặc trưng (ember2024-fe-cpp)}
+\subsection{Module trích xuất đặc trưng}
 \label{sec:fe_cpp}
 
 Module ember2024-fe-cpp cài đặt lại pipeline trích xuất đặc trưng
@@ -183,7 +183,7 @@ càng lớn. Điều này đặc biệt quan trọng với các file PE lớn - 
 phổ biến trong các bộ cài đặt phần mềm - nơi cài đặt Python mất
 gần 14 giây trong khi cài đặt C++ chỉ cần dưới 0.7 giây.
 
-\subsection{Module driver (pmd-driver)}
+\subsection{Module driver}
 
 pmd-driver được viết bằng C, dựa trên KMDF (Kernel-Mode Driver
 Framework). Driver sử dụng cơ chế \textbf{process creation callback}
@@ -224,7 +224,7 @@ nếu \texttt{FALSE}, driver lập tức dừng (terminate) tiến trình có
 \texttt{PID} tương ứng và lưu lại quyết định chặn dưới dạng struct
 \texttt{BLOCK\_OPERATION\_DTO} để pmd-ui có thể đọc lịch sử.
 
-\subsection{Module dịch vụ nền (pmd-service)}
+\subsection{Module dịch vụ nền}
 
 pmd-service là một Windows service viết bằng C++, đóng vai trò là
 bộ quét (scanner) trung tâm tại endpoint. Service cần được cài đặt
@@ -252,7 +252,7 @@ hiện các bước sau:
     \item Gửi \texttt{SCAN\_VERDICT\_DTO} phản hồi về driver qua IOCTL.
 \end{enumerate}
 
-\subsection{Module giao diện người dùng (pmd-ui)}
+\subsection{Module giao diện người dùng}
 
 pmd-ui là ứng dụng Windows với giao diện đồ họa (GUI) đơn giản, viết
 bằng C++ và chỉ sử dụng Windows API. Ứng dụng cần được chạy với
@@ -287,7 +287,7 @@ pmd-ui cung cấp các chức năng sau:
     \label{fig:pmd_ui_wanna_submit}
 \end{figure}
 
-\subsection{Module phân tích sâu (deep-analysis-server)}
+\subsection{Module phân tích sâu}
 
 deep-analysis-server là dịch vụ REST API viết bằng Python với
 framework FastAPI, được đóng gói bằng Docker. Dịch vụ này triển khai

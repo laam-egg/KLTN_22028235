@@ -83,6 +83,11 @@ Robert~J. Joyce, Gideon Miller, Phil Roth, Richard Zak, Elliott Zaresky-Williams
 \newblock {EMBER2024 - A Benchmark Dataset for Holistic Evaluation of Malware Classifier}.
 \newblock In {\em Proceedings of the 31st ACM SIGKDD Conference on Knowledge Discovery and Data Mining}, 2025.
 
+\bibitem{lgbm}
+Guolin Ke, Qi~Meng, Thomas Finley, Taifeng Wang, Wei Chen, Weidong Ma, Qiwei Ye, and Tie-Yan Liu.
+\newblock {LightGBM}: A highly efficient gradient boosting decision tree.
+\newblock In {\em Advances in Neural Information Processing Systems (NeurIPS)}, volume~30, 2017.
+
 \bibitem{virusshare}
 {VirusShare}.
 \newblock {VirusShare} - because sharing is caring.
@@ -172,11 +177,6 @@ Sebastián Ramírez.
 {Docker Inc.}
 \newblock Docker: Accelerated container application development.
 \newblock \url{https://www.docker.com}, 2024.
-
-\bibitem{lgbm}
-Guolin Ke, Qi~Meng, Thomas Finley, Taifeng Wang, Wei Chen, Weidong Ma, Qiwei Ye, and Tie-Yan Liu.
-\newblock {LightGBM}: A highly efficient gradient boosting decision tree.
-\newblock In {\em Advances in Neural Information Processing Systems (NeurIPS)}, volume~30, 2017.
 
 \bibitem{sklearn}
 Fabian Pedregosa, Gaël Varoquaux, Alexandre Gramfort, et~al.
